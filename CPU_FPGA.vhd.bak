@@ -1,0 +1,52 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity CPU_FPGA is
+    port (
+        clk      : in  std_logic;
+        rst      : in  std_logic;
+        pc_write : in  std_logic;
+        pc_src   : in  std_logic;
+        pc_out   : out std_logic_vector(31 downto 0)
+    );
+end entity CPU_FPGA;
+
+architecture Behavioral of CPU_FPGA is
+
+    -- Component declaration for your Program Counter
+    component Program_Counter is
+        generic (
+            DATA_WIDTH : integer := 32
+        );
+        port (
+            clk       : in  std_logic;
+            rst       : in  std_logic;
+            pc_write  : in  std_logic;
+            pc_src    : in  std_logic;
+            target_pc : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+            pc_out    : out std_logic_vector(DATA_WIDTH-1 downto 0);
+            pc_plus4  : out std_logic_vector(DATA_WIDTH-1 downto 0)
+        );
+    end component Program_Counter;
+
+    signal dummy_target  : std_logic_vector(31 downto 0) := (others => '0');
+    signal dummy_pc_plus4: std_logic_vector(31 downto 0);
+
+begin
+
+    -- Instantiate the Program Counter
+    U_PC : Program_Counter
+        generic map (
+            DATA_WIDTH => 32
+        )
+        port map (
+            clk       => clk,
+            rst       => rst,
+            pc_write  => pc_write,
+            pc_src    => pc_src,
+            target_pc => dummy_target,
+            pc_out    => pc_out,
+            pc_plus4  => dummy_pc_plus4
+        );
+
+end architecture Behavioral;
