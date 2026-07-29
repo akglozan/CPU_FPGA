@@ -1,0 +1,56 @@
+# ==============================================================================
+# Quartus II Synthesis & Implementation Artifacts
+# ==============================================================================
+# Quartus working directories
+db/
+incremental_db/
+hc_db/
+greybox_tmp/
+
+# Quartus compilation output files (programming & report files)
+*.rpt
+*.sof
+*.pof
+*.cdf
+*.summary
+*.smsg
+*.jdi
+*.pin
+*.done
+*.qws
+*.bak
+*.orig
+
+# Netlist / Timing analysis output files
+*.tms
+*.pin
+*.qsf.bak
+*.qpf.bak
+
+# ==============================================================================
+# ModelSim / QuestaSim Simulation Artifacts
+# ==============================================================================
+# Work library directory created by ModelSim
+work/
+mti_lib/
+
+# Simulation waveform database and transcript files
+transcript
+*.wlf
+*.vstf
+*.mpf
+
+# Compiler / Optimizer output logs
+*.log
+*.vcom.log
+*_vcom.log
+
+# ==============================================================================
+# System / OS / IDE Artifacts
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
