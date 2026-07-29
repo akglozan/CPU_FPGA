@@ -20,7 +20,10 @@ greybox_tmp/
 *.qws
 *.bak
 *.orig
+*.bak
 *.vhd.bak
+*.qws
+*.wlf
 
 # Netlist / Timing analysis output files
 *.tms
