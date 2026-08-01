@@ -24,7 +24,7 @@ architecture Structural of CPU_FPGA is
     -- Component Declarations
     -------------------------------------------------------------------
 
-    -- 1. Program Counter (Using YOUR exact entity port list)
+    -- 1. Program Counter
     component Program_Counter is
         generic (
             DATA_WIDTH : integer := 32
@@ -77,6 +77,85 @@ architecture Structural of CPU_FPGA is
         );
     end component;
 
+    -- 5. Control Unit
+    component Control_Unit is
+        port (
+            opcode    : in  std_logic_vector(6 downto 0);
+            funct3    : in  std_logic_vector(2 downto 0);
+            funct7    : in  std_logic_vector(6 downto 0);
+            imm_src   : out std_logic_vector(2 downto 0);
+            alu_src   : out std_logic;
+            reg_write : out std_logic;
+            mem_read  : out std_logic;
+            mem_write : out std_logic;
+            wb_sel    : out std_logic_vector(1 downto 0);
+            branch    : out std_logic;
+            jump      : out std_logic;
+            alu_ctrl  : out std_logic_vector(3 downto 0);
+            is_m_ext  : out std_logic
+        );
+    end component;
+
+    -- 6. Immediate Generator
+    component ImmGen is
+        port (
+            inst    : in  std_logic_vector(31 downto 0);
+            imm_src : in  std_logic_vector(2 downto 0);
+            imm_ext : out std_logic_vector(31 downto 0)
+        );
+    end component;
+
+    -- 7. ID/EX Pipeline Register
+    component ID_EX_Register is
+        port (
+            clk           : in  std_logic;
+            rst           : in  std_logic;
+            stall         : in  std_logic;
+            flush         : in  std_logic;
+            
+            pc_in         : in  std_logic_vector(31 downto 0);
+            pc_plus4_in   : in  std_logic_vector(31 downto 0);
+            imm_ext_in    : in  std_logic_vector(31 downto 0);
+            pc_out        : out std_logic_vector(31 downto 0);
+            pc_plus4_out  : out std_logic_vector(31 downto 0);
+            imm_ext_out   : out std_logic_vector(31 downto 0);
+            
+            reg_data1_in  : in  std_logic_vector(31 downto 0);
+            reg_data2_in  : in  std_logic_vector(31 downto 0);
+            rs1_addr_in   : in  std_logic_vector(4 downto 0);
+            rs2_addr_in   : in  std_logic_vector(4 downto 0);
+            rd_addr_in    : in  std_logic_vector(4 downto 0);
+            funct3_in     : in  std_logic_vector(2 downto 0);
+            
+            reg_data1_out : out std_logic_vector(31 downto 0);
+            reg_data2_out : out std_logic_vector(31 downto 0);
+            rs1_addr_out  : out std_logic_vector(4 downto 0);
+            rs2_addr_out  : out std_logic_vector(4 downto 0);
+            rd_addr_out   : out std_logic_vector(4 downto 0);
+            funct3_out    : out std_logic_vector(2 downto 0);
+            
+            alu_src_in    : in  std_logic;
+            alu_ctrl_in   : in  std_logic_vector(3 downto 0);
+            is_m_ext_in   : in  std_logic;
+            mem_read_in   : in  std_logic;
+            mem_write_in  : in  std_logic;
+            branch_in     : in  std_logic;
+            jump_in       : in  std_logic;
+            reg_write_in  : in  std_logic;
+            wb_sel_in     : in  std_logic_vector(1 downto 0);
+            
+            alu_src_out   : out std_logic;
+            alu_ctrl_out  : out std_logic_vector(3 downto 0);
+            is_m_ext_out  : out std_logic;
+            mem_read_out  : out std_logic;
+            mem_write_out : out std_logic;
+            branch_out    : out std_logic;
+            jump_out      : out std_logic;
+            reg_write_out : out std_logic;
+            wb_sel_out    : out std_logic_vector(1 downto 0)
+        );
+    end component;
+
     -------------------------------------------------------------------
     -- Internal Interconnect Signals
     -------------------------------------------------------------------
@@ -86,12 +165,12 @@ architecture Structural of CPU_FPGA is
     signal pc_plus4_wire   : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal if_instruction  : std_logic_vector(DATA_WIDTH-1 downto 0);
     
-    -- Default/Control placeholders for PC
+    -- Control placeholders for PC
     signal pc_write_enable : std_logic := '1';
     signal pc_src_select   : std_logic := '0';
     signal pc_target_addr  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
 
-    -- IF/ID Register Controls
+    -- IF/ID Pipeline Register Controls
     signal if_id_stall     : std_logic := '0';
     signal if_id_flush     : std_logic := '0';
 
@@ -100,8 +179,45 @@ architecture Structural of CPU_FPGA is
     signal id_instruction  : std_logic_vector(31 downto 0);
     signal id_rs1_data     : std_logic_vector(31 downto 0);
     signal id_rs2_data     : std_logic_vector(31 downto 0);
+    signal id_imm_ext      : std_logic_vector(31 downto 0);
 
-    -- Temporary Writeback signals (Will be driven by WB stage later)
+    -- Control Unit ID Stage Signals
+    signal id_imm_src      : std_logic_vector(2 downto 0);
+    signal id_alu_src      : std_logic;
+    signal id_reg_write    : std_logic;
+    signal id_mem_read     : std_logic;
+    signal id_mem_write    : std_logic;
+    signal id_wb_sel       : std_logic_vector(1 downto 0);
+    signal id_branch       : std_logic;
+    signal id_jump         : std_logic;
+    signal id_alu_ctrl     : std_logic_vector(3 downto 0);
+    signal id_is_m_ext     : std_logic;
+
+    -- ID/EX Pipeline Register Controls
+    signal id_ex_stall     : std_logic := '0';
+    signal id_ex_flush     : std_logic := '0';
+
+    -- EX Stage Interconnect Signals (Outputs of ID_EX_Register)
+    signal ex_pc           : std_logic_vector(31 downto 0);
+    signal ex_pc_plus4     : std_logic_vector(31 downto 0);
+    signal ex_imm_ext      : std_logic_vector(31 downto 0);
+    signal ex_reg_data1    : std_logic_vector(31 downto 0);
+    signal ex_reg_data2    : std_logic_vector(31 downto 0);
+    signal ex_rs1_addr     : std_logic_vector(4 downto 0);
+    signal ex_rs2_addr     : std_logic_vector(4 downto 0);
+    signal ex_rd_addr      : std_logic_vector(4 downto 0);
+    signal ex_funct3       : std_logic_vector(2 downto 0);
+    signal ex_alu_src      : std_logic;
+    signal ex_alu_ctrl     : std_logic_vector(3 downto 0);
+    signal ex_is_m_ext     : std_logic;
+    signal ex_mem_read     : std_logic;
+    signal ex_mem_write    : std_logic;
+    signal ex_branch       : std_logic;
+    signal ex_jump         : std_logic;
+    signal ex_reg_write    : std_logic;
+    signal ex_wb_sel       : std_logic_vector(1 downto 0);
+
+    -- Temporary Writeback signals (Driven by WB stage in later design steps)
     signal wb_reg_write    : std_logic := '0';
     signal wb_rd_addr      : std_logic_vector(4 downto 0) := (others => '0');
     signal wb_rd_data      : std_logic_vector(31 downto 0) := (others => '0');
@@ -166,6 +282,86 @@ begin
             rd_data   => wb_rd_data,
             rs1_data  => id_rs1_data,
             rs2_data  => id_rs2_data
+        );
+
+    -- Control Unit Instance
+    U_CONTROL : Control_Unit
+        port map (
+            opcode    => id_instruction(6 downto 0),
+            funct3    => id_instruction(14 downto 12),
+            funct7    => id_instruction(31 downto 25),
+            imm_src   => id_imm_src,
+            alu_src   => id_alu_src,
+            reg_write => id_reg_write,
+            mem_read  => id_mem_read,
+            mem_write => id_mem_write,
+            wb_sel    => id_wb_sel,
+            branch    => id_branch,
+            jump      => id_jump,
+            alu_ctrl  => id_alu_ctrl,
+            is_m_ext  => id_is_m_ext
+        );
+
+    -- Immediate Generator Instance
+    U_IMMGEN : ImmGen
+        port map (
+            inst    => id_instruction,
+            imm_src => id_imm_src,
+            imm_ext => id_imm_ext
+        );
+
+    -------------------------------------------------------------------
+    -- Pipeline Register: ID / EX
+    -------------------------------------------------------------------
+
+    U_ID_EX : ID_EX_Register
+        port map (
+            clk           => clk,
+            rst           => rst,
+            stall         => id_ex_stall,
+            flush         => id_ex_flush,
+            
+            -- Inputs from ID stage
+            pc_in         => id_pc,
+            pc_plus4_in   => pc_plus4_wire, -- Carried from IF stage
+            imm_ext_in    => id_imm_ext,
+            reg_data1_in  => id_rs1_data,
+            reg_data2_in  => id_rs2_data,
+            rs1_addr_in   => id_instruction(19 downto 15),
+            rs2_addr_in   => id_instruction(24 downto 20),
+            rd_addr_in    => id_instruction(11 downto 7),
+            funct3_in     => id_instruction(14 downto 12),
+            
+            alu_src_in    => id_alu_src,
+            alu_ctrl_in   => id_alu_ctrl,
+            is_m_ext_in   => id_is_m_ext,
+            mem_read_in   => id_mem_read,
+            mem_write_in  => id_mem_write,
+            branch_in     => id_branch,
+            jump_in       => id_jump,
+            reg_write_in  => id_reg_write,
+            wb_sel_in     => id_wb_sel,
+            
+            -- Outputs to EX stage
+            pc_out        => ex_pc,
+            pc_plus4_out  => ex_pc_plus4,
+            imm_ext_out   => ex_imm_ext,
+            reg_data1_out => ex_reg_data1,
+            reg_data2_out => ex_reg_data2,
+            rs1_addr_out  => ex_rs1_addr,
+            rs2_addr_out  => ex_rs2_addr,
+            rd_addr_out   => ex_rd_addr,
+            funct3_out    => ex_funct3,
+            
+            alu_src_out   => ex_alu_src,
+            alu_ctrl_out  => ex_alu_ctrl,
+            is_m_ext_out  => ex_is_m_ext,
+            mem_read_out  => ex_mem_read,
+            mem_write_out => ex_mem_write,
+            branch_out    => ex_branch,
+            jump_out      => ex_jump,
+            reg_write_out => ex_reg_write,
+            wb_sel_out    => ex_wb_sel
         );
 
     -------------------------------------------------------------------
