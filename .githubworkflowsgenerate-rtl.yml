@@ -31,7 +31,8 @@ jobs:
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
             # 1. Analyze all VHDL files in your repository
-            ghdl -a *.vhd
+            # Analyze all VHDL files in the repo (including subdirectories)
+            ghdl -a $(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \))
 
             # 2. Synthesize top module (Replace 'top_module' with your top-level entity name)
             yosys -p "ghdl CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
