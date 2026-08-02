@@ -10,7 +10,7 @@ entity ALU is
 		operand_a	:	in		std_logic_vector(31 downto 0);
 		operand_b	:	in		std_logic_vector(31 downto 0);
 		alu_result	:	out	std_logic_vector(31 downto 0);
-		zero_flag	:	out	std_logic;
+		zero_flag	:	out	std_logic
 
 	
 	);

@@ -8,71 +8,154 @@ z2
 !i10f 100
 cModel Technology
 Z0 dC:/Users/ozana/Desktop/CPU_FPGA
-Ecpu_fpga
-Z1 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
-Z2 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
-32
-Z3 !s110 1785095392
-!i10b 1
-Z4 w1785094475
+Ealu
+Z1 w1785675071
+Z2 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
+Z3 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z4 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
 R0
-Z5 8C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd
-Z6 FC:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd
+Z5 8ALU.vhd
+Z6 FALU.vhd
+l0
+L5
+VZW@8`WXf[H75LBUOLPdW>1
+!s100 g6h??c4nKf`CK`HhifZ^F0
+Z7 OV;C;10.5b;63
+33
+Z8 !s110 1785676930
+!i10b 1
+Z9 !s108 1785676930.000000
+Z10 !s90 -reportprogress|300|-2008|ALU.vhd|
+Z11 !s107 ALU.vhd|
+!i113 1
+Z12 o-2008
+Z13 tExplicit 1 CvgOpt 0
+Abehavioral
+R2
+R3
+R4
+Z14 DEx4 work 3 alu 0 22 ZW@8`WXf[H75LBUOLPdW>1
+l25
+L21
+Vg]<9T_nZaPjT>TG5A7<@h1
+!s100 XB49hkj405m`O4E@Q>WmN2
+R7
+33
+R8
+!i10b 1
+R9
+R10
+R11
+!i113 1
+R12
+R13
+Ealu_tb
+Z15 w1785676805
+R2
+R3
+R4
+R0
+Z16 8ALU_tb.vhd
+Z17 FALU_tb.vhd
+l0
+L5
+VVQcVn;X6>4H3BincjBO?:2
+!s100 h27RS_[I2<GP5fE^2UzSl0
+R7
+33
+R8
+!i10b 1
+R9
+Z18 !s90 -reportprogress|300|-2008|ALU_tb.vhd|
+Z19 !s107 ALU_tb.vhd|
+!i113 1
+R12
+R13
+Abehavior
+R14
+R2
+R3
+R4
+DEx4 work 6 alu_tb 0 22 VQcVn;X6>4H3BincjBO?:2
+l26
+L8
+VPLGV:Ge5USLL1<g:`RG0F0
+!s100 1Ri3Xim:J;?NEmo:gUmRO3
+R7
+33
+R8
+!i10b 1
+R9
+R18
+R19
+!i113 1
+R12
+R13
+Ecpu_fpga
+R3
+R4
+32
+Z20 !s110 1785095392
+!i10b 1
+Z21 w1785094475
+R0
+Z22 8C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd
+Z23 FC:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd
 l0
 L4
 V:OBFchaXnLc@E=b>Yg7e01
 !s100 TMoE?@5i70fa]:NVBn^093
-Z7 OV;C;10.5b;63
-Z8 !s108 1785095392.000000
-Z9 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd|
-Z10 !s107 C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd|
+R7
+Z24 !s108 1785095392.000000
+Z25 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd|
+Z26 !s107 C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd|
 !i113 1
-Z11 o-work work
-Z12 tExplicit 1 CvgOpt 0
+Z27 o-work work
+R13
 Abehavioral
-R1
-R2
+R3
+R4
 DEx4 work 8 cpu_fpga 0 22 :OBFchaXnLc@E=b>Yg7e01
 32
-R3
+R20
 !i10b 1
 l47
 L15
 VE?7`VZ:zi1@L_W=S>nL]E0
 !s100 7TfBFfM<j8oP<EKh9Z@9I1
 R7
-R8
-R9
-R10
+R24
+R25
+R26
 !i113 1
-R11
-R12
+R27
+R13
 Eif_id_register
-Z13 w1785099363
-Z14 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
-R1
+Z28 w1785099363
 R2
+R3
+R4
 R0
-Z15 8C:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd
-Z16 FC:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd
+Z29 8C:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd
+Z30 FC:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd
 l0
 L5
 V5S`;Cz04;nRSOA<0YgA^M3
 !s100 9I@1_Tme`V;N=40FS^jng0
 R7
 33
-Z17 !s110 1785099925
+Z31 !s110 1785099925
 !i10b 1
-Z18 !s108 1785099925.000000
-Z19 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd|
-Z20 !s107 C:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd|
+Z32 !s108 1785099925.000000
+Z33 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd|
+Z34 !s107 C:/Users/ozana/Desktop/CPU_FPGA/IF_ID_Register.vhd|
 !i113 1
-R11
-R12
+R27
+R13
 Abehavioral
-R14
-R1
 R2
+R3
+R4
 DEx4 work 14 if_id_register 0 22 5S`;Cz04;nRSOA<0YgA^M3
 l44
 L42
@@ -80,200 +163,200 @@ V;Bfo8G;X_9UQD0OKM0Be33
 !s100 BC0UFJ4?nSFC>XoVITEME2
 R7
 33
-R17
+R31
 !i10b 1
-R18
-R19
-R20
+R32
+R33
+R34
 !i113 1
-R11
-R12
+R27
+R13
 Eimmgen
-Z21 w1785275542
-R14
-R1
+Z35 w1785275542
 R2
+R3
+R4
 R0
-Z22 8ImmGen.vhd
-Z23 FImmGen.vhd
+Z36 8ImmGen.vhd
+Z37 FImmGen.vhd
 l0
 L5
 Vg]4101n;>VHgHkEaiB10B0
 !s100 O`MP11bhn7GzBFMFL3Tli3
 R7
 33
-Z24 !s110 1785277573
+Z38 !s110 1785277573
 !i10b 1
-Z25 !s108 1785277573.000000
-Z26 !s90 -reportprogress|300|ImmGen.vhd|
-Z27 !s107 ImmGen.vhd|
+Z39 !s108 1785277573.000000
+Z40 !s90 -reportprogress|300|ImmGen.vhd|
+Z41 !s107 ImmGen.vhd|
 !i113 1
-R12
+R13
 Abehavioral
-R14
-R1
 R2
-Z28 DEx4 work 6 immgen 0 22 g]4101n;>VHgHkEaiB10B0
+R3
+R4
+Z42 DEx4 work 6 immgen 0 22 g]4101n;>VHgHkEaiB10B0
 l20
 L18
 VnP]KbM7P5T[`72C[z:G;01
 !s100 G64G]lQ8iJc0`E@8Z7eH]2
 R7
 33
-R24
+R38
 !i10b 1
-R25
-R26
-R27
+R39
+R40
+R41
 !i113 1
-R12
+R13
 Eimmgen_tb
-Z29 w1785277540
-R14
-R1
+Z43 w1785277540
 R2
+R3
+R4
 R0
-Z30 8ImmGen_tb.vhd
-Z31 FImmGen_tb.vhd
+Z44 8ImmGen_tb.vhd
+Z45 FImmGen_tb.vhd
 l0
 L6
 V7OZ`3LGflT6CaK87?VIO00
 !s100 93mSFdJL^667D>cAG3c5_2
 R7
 33
-Z32 !s110 1785277580
+Z46 !s110 1785277580
 !i10b 1
-Z33 !s108 1785277580.000000
-Z34 !s90 -reportprogress|300|ImmGen_tb.vhd|
-Z35 !s107 ImmGen_tb.vhd|
+Z47 !s108 1785277580.000000
+Z48 !s90 -reportprogress|300|ImmGen_tb.vhd|
+Z49 !s107 ImmGen_tb.vhd|
 !i113 1
-R12
+R13
 Abehavior
-R28
-R14
-R1
+R42
 R2
+R3
+R4
 DEx4 work 9 immgen_tb 0 22 7OZ`3LGflT6CaK87?VIO00
 l28
 L11
 V>6R5NK<J:^48K[?UNfQ5V2
-Z36 !s100 So9`=B5_MM?ELJAJJ:XU^0
+!s100 So9`=B5_MM?ELJAJJ:XU^0
 R7
 33
-R32
+R46
 !i10b 1
-R33
-R34
-R35
+R47
+R48
+R49
 !i113 1
-R12
+R13
 Einstruction_memory
-Z37 DPx4 ieee 16 std_logic_textio 0 22 V5TSK`;aJKC<l]CEg1>mz1
-R14
-R1
+Z50 DPx4 ieee 16 std_logic_textio 0 22 V5TSK`;aJKC<l]CEg1>mz1
 R2
-32
 R3
+R4
+32
+R20
 !i10b 1
-Z38 w1785094370
+Z51 w1785094370
 R0
-Z39 8C:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd
-Z40 FC:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd
+Z52 8C:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd
+Z53 FC:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd
 l0
 L7
 VTR>_8[4e?f<]c7[coaJ1K1
 !s100 O9OUk[BAEI6UeR:1VR64B3
 R7
-R8
-Z41 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd|
-Z42 !s107 C:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd|
+R24
+Z54 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd|
+Z55 !s107 C:/Users/ozana/Desktop/CPU_FPGA/Instruction_Memory.vhd|
 !i113 1
-R11
-R12
+R27
+R13
 Abehavioral
-R37
-R14
-R1
+R50
 R2
+R3
+R4
 DEx4 work 18 instruction_memory 0 22 TR>_8[4e?f<]c7[coaJ1K1
 32
-R3
+R20
 !i10b 1
 l45
 L21
 V<EY>?bojfzY4HZhlh_N>^3
 !s100 49BMaNb@Hz^SJkNh4F_m_1
 R7
-R8
-R41
-R42
+R24
+R54
+R55
 !i113 1
-R11
-R12
+R27
+R13
 Eprogram_counter
-R14
-R1
 R2
+R3
+R4
 32
-Z43 !s110 1785095453
+Z56 !s110 1785095453
 !i10b 1
-Z44 w1785094291
+Z57 w1785094291
 R0
-Z45 8Program_Counter.vhd
-Z46 FProgram_Counter.vhd
+Z58 8Program_Counter.vhd
+Z59 FProgram_Counter.vhd
 l0
 L5
 VG:7oAaiZKGVEIUd`B1D3C0
 !s100 eJ73H;PQ`A:KEb7dSg<^i0
 R7
-Z47 !s108 1785095453.000000
-Z48 !s90 -reportprogress|300|Program_Counter.vhd|
-Z49 !s107 Program_Counter.vhd|
+Z60 !s108 1785095453.000000
+Z61 !s90 -reportprogress|300|Program_Counter.vhd|
+Z62 !s107 Program_Counter.vhd|
 !i113 1
-R12
+R13
 Abehavioral
-R14
-R1
 R2
+R3
+R4
 DEx4 work 15 program_counter 0 22 G:7oAaiZKGVEIUd`B1D3C0
 32
-R43
+R56
 !i10b 1
 l35
 L32
 VKK:lo1PhN2FLfA_9_77V31
 !s100 P`i]mWTSa?2JN7fT:<=3b3
 R7
-R47
-R48
-R49
+R60
+R61
+R62
 !i113 1
-R12
+R13
 Eregfile
-Z50 w1785102237
-R14
-R1
+Z63 w1785102237
 R2
+R3
+R4
 R0
-Z51 8RegFile.vhd
-Z52 FRegFile.vhd
+Z64 8RegFile.vhd
+Z65 FRegFile.vhd
 l0
 L5
 VTAOY<khYBoQCWfXS@;Ll53
 !s100 c8^>`M[SS6T^mQ4`ce];l1
 R7
 33
-Z53 !s110 1785102269
+Z66 !s110 1785102269
 !i10b 1
-Z54 !s108 1785102269.000000
-Z55 !s90 -reportprogress|300|RegFile.vhd|
-Z56 !s107 RegFile.vhd|
+Z67 !s108 1785102269.000000
+Z68 !s90 -reportprogress|300|RegFile.vhd|
+Z69 !s107 RegFile.vhd|
 !i113 1
-R12
+R13
 Abehavioral
-R14
-R1
 R2
+R3
+R4
 DEx4 work 7 regfile 0 22 TAOY<khYBoQCWfXS@;Ll53
 l38
 L29
@@ -281,51 +364,51 @@ Vj@X34HS9@k]m>[3;VJ^hD1
 !s100 2eFkYaXSm0TdLh@CH7QF41
 R7
 33
-R53
+R66
 !i10b 1
-R54
-R55
-R56
+R67
+R68
+R69
 !i113 1
-R12
+R13
 Etb_cpu_fpga
-R14
-R1
 R2
-32
 R3
+R4
+32
+R20
 !i10b 1
-Z57 w1785095166
+Z70 w1785095166
 R0
-Z58 8C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd
-Z59 FC:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd
+Z71 8C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd
+Z72 FC:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd
 l0
 L5
 VWRA[_^PoD;KeTC_EF19SX3
 !s100 BPaKk76Z7glmY9MlM25B^3
 R7
-R8
-Z60 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd|
-Z61 !s107 C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd|
+R24
+Z73 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd|
+Z74 !s107 C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd|
 !i113 1
-R11
-R12
+R27
+R13
 Abehavior
-R14
-R1
 R2
+R3
+R4
 DEx4 work 11 tb_cpu_fpga 0 22 WRA[_^PoD;KeTC_EF19SX3
 32
-R3
+R20
 !i10b 1
 l35
 L9
 VbQOoN0H_jVGL:HEf<hlX^2
 !s100 cI>I[<^S8oHefL@FUXj^91
 R7
-R8
-R60
-R61
+R24
+R73
+R74
 !i113 1
-R11
-R12
+R27
+R13
