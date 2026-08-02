@@ -90,4 +90,6 @@
 
 ## Hardware Schematic
 
-![RTL Schematic](./rtl_schematic.svg)
+<div align="center" style="background-color: white; padding: 15px; border-radius: 8px;">
+  <img src="./rtl_schematic.svg" alt="RTL Schematic">
+</div>
