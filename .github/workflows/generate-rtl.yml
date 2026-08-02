@@ -19,7 +19,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install netlistsvg
         run: npm install -g netlistsvg
@@ -30,10 +30,10 @@ jobs:
           image: hdlc/ghdl:yosys
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
-            # Analyze all VHDL files recursively
-            ghdl -a $(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \))
+            # 1. Analyze all VHDL files (ignoring order issues by scanning iteratively)
+            ghdl -a --workdir=. $(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \))
 
-            # Synthesize top module
+            # 2. Synthesize top module (Ensure CPU_FPGA matches your exact top entity name)
             yosys -p "ghdl CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
 
       - name: Convert JSON to SVG Schematic
