@@ -1,0 +1,48 @@
+name: Generate RTL Schematic
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-rtl-schematic:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install netlistsvg
+        run: npm install -g netlistsvg
+
+      - name: Generate RTL Schematic using Yosys & GHDL Container
+        uses: addnab/docker-run-action@v3
+        with:
+          image: hdlc/ghdl:yosys
+          options: -v ${{ github.workspace }}:/work -w /work
+          run: |
+            # Analyze all VHDL files recursively
+            ghdl -a $(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \))
+
+            # Synthesize top module
+            yosys -p "ghdl CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
+
+      - name: Convert JSON to SVG Schematic
+        run: |
+          netlistsvg rtl.json -o rtl_schematic.svg
+
+      - name: Commit and Push Schematic
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add rtl_schematic.svg
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update RTL schematic" && git push)
