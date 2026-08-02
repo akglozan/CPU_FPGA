@@ -33,8 +33,8 @@ jobs:
             # Gather design VHDL files into a space-delimited string (excluding testbenches)
             FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | paste -sd " " -)
 
-            # Synthesize top entity with VHDL-2008 & relaxed binding flags
-            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed $FILES -e CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
+            # Synthesize top entity with VHDL-2008, relaxed rules, and latch support
+            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed --latches $FILES -e CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
 
       - name: Convert JSON to SVG Schematic
         run: |
