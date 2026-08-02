@@ -34,7 +34,7 @@ jobs:
             ghdl -a *.vhd
 
             # 2. Synthesize top module (Replace 'top_module' with your top-level entity name)
-            yosys -p "ghdl CPU_FPGA; prep -top top_module; write_json -compat-int rtl.json"
+            yosys -p "ghdl CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
 
       - name: Convert JSON to SVG Schematic
         run: |
