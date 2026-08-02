@@ -30,11 +30,11 @@ jobs:
           image: hdlc/ghdl:yosys
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
-            # Gather files into a single space-separated line
+            # Gather design VHDL files into a space-delimited string (excluding testbenches)
             FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | paste -sd " " -)
 
-            # Synthesize & elaborate top entity directly
-            yosys -m ghdl -p "ghdl --ieee=synopsys $FILES -e CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
+            # Synthesize top entity with VHDL-2008 support
+            yosys -m ghdl -p "ghdl -vhdl2008 --ieee=synopsys $FILES -e CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
 
       - name: Convert JSON to SVG Schematic
         run: |
