@@ -24,17 +24,18 @@ jobs:
       - name: Install netlistsvg
         run: npm install -g netlistsvg
 
-      - name: Generate RTL Schematic using Yosys & GHDL Container
+     - name: Generate RTL Schematic using Yosys & GHDL Container
         uses: addnab/docker-run-action@v3
         with:
           image: hdlc/ghdl:yosys
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
-            # 1. Analyze design VHDL files only (excluding testbenches)
-            ghdl -a --ieee=synopsys $(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*")
+            # 1. Gather design files (excluding testbenches)
+            FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*")
 
-            # 2. Synthesize top module (loading the GHDL plugin with -m ghdl)
-            yosys -m ghdl -p "ghdl CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
+            # 2. Pass source files directly into Yosys GHDL elaboration (-e CPU_FPGA)
+            yosys -m ghdl -p "ghdl --ieee=synopsys $FILES -e CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
+
       - name: Convert JSON to SVG Schematic
         run: |
           netlistsvg rtl.json -o rtl_schematic.svg
