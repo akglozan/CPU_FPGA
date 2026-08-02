@@ -84,3 +84,10 @@
 - [ ] **6.2 System Optimization & Closure**
   - [ ] Run Quartus II TimeQuest Timing Analyzer to fix setup/hold violations.
   - [ ] Optimize VHDL code to keep total logic usage strictly under ~5,000 LEs.
+
+
+
+
+## Hardware Schematic
+
+![RTL Schematic](./rtl_schematic.svg)
