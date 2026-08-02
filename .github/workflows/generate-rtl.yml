@@ -30,15 +30,18 @@ jobs:
           image: hdlc/ghdl:yosys
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
-            # Gather design VHDL files into a space-delimited string (excluding testbenches)
+            # 1. Gather design VHDL files into a space-delimited string (excluding testbenches)
             FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | paste -sd " " -)
 
-            # Synthesize top entity with VHDL-2008, relaxed rules, and latch support
-            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed --latches $FILES -e CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
+            # 2. Elaborate hierarchy without aggressive optimization/pruning of unused submodules
+            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed --latches $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; write_json -compat-int rtl.json"
 
-      - name: Convert JSON to SVG Schematic
+      - name: Convert JSON to SVG Schematic & Adapt for Dark Mode
         run: |
           netlistsvg rtl.json -o rtl_schematic.svg
+          # Invert stroke and text fills to light gray (#e6edf3) so elements are visible on dark backgrounds
+          sed -i 's/stroke="black"/stroke="#e6edf3"/g' rtl_schematic.svg
+          sed -i 's/fill="black"/fill="#e6edf3"/g' rtl_schematic.svg
 
       - name: Commit and Push Schematic
         run: |
