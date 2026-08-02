@@ -30,8 +30,11 @@ jobs:
           image: hdlc/ghdl:yosys
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
-            # Find VHDL files and pass them directly to Yosys/GHDL using xargs
-            find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | xargs yosys -m ghdl -p "ghdl --ieee=synopsys -e CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
+            # Analyze all non-testbench VHDL files
+            find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | xargs ghdl -a --ieee=synopsys
+
+            # Synthesize & elaborate CPU_FPGA
+            yosys -m ghdl -p "ghdl CPU_FPGA; prep -top CPU_FPGA; write_json -compat-int rtl.json"
 
       - name: Convert JSON to SVG Schematic
         run: |
