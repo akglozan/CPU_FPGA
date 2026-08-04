@@ -43,6 +43,7 @@ architecture Structural of CPU_FPGA is
     -- 2. Instruction Memory
     component Instruction_Memory is
         port (
+            clk         : in  std_logic;
             addr        : in  std_logic_vector(31 downto 0);
             instruction : out std_logic_vector(31 downto 0)
         );
@@ -112,28 +113,24 @@ architecture Structural of CPU_FPGA is
             rst           : in  std_logic;
             stall         : in  std_logic;
             flush         : in  std_logic;
-            
             pc_in         : in  std_logic_vector(31 downto 0);
             pc_plus4_in   : in  std_logic_vector(31 downto 0);
             imm_ext_in    : in  std_logic_vector(31 downto 0);
             pc_out        : out std_logic_vector(31 downto 0);
             pc_plus4_out  : out std_logic_vector(31 downto 0);
             imm_ext_out   : out std_logic_vector(31 downto 0);
-            
             reg_data1_in  : in  std_logic_vector(31 downto 0);
             reg_data2_in  : in  std_logic_vector(31 downto 0);
             rs1_addr_in   : in  std_logic_vector(4 downto 0);
             rs2_addr_in   : in  std_logic_vector(4 downto 0);
             rd_addr_in    : in  std_logic_vector(4 downto 0);
             funct3_in     : in  std_logic_vector(2 downto 0);
-            
             reg_data1_out : out std_logic_vector(31 downto 0);
             reg_data2_out : out std_logic_vector(31 downto 0);
             rs1_addr_out  : out std_logic_vector(4 downto 0);
             rs2_addr_out  : out std_logic_vector(4 downto 0);
             rd_addr_out   : out std_logic_vector(4 downto 0);
             funct3_out    : out std_logic_vector(2 downto 0);
-            
             alu_src_in    : in  std_logic;
             alu_ctrl_in   : in  std_logic_vector(3 downto 0);
             is_m_ext_in   : in  std_logic;
@@ -143,7 +140,6 @@ architecture Structural of CPU_FPGA is
             jump_in       : in  std_logic;
             reg_write_in  : in  std_logic;
             wb_sel_in     : in  std_logic_vector(1 downto 0);
-            
             alu_src_out   : out std_logic;
             alu_ctrl_out  : out std_logic_vector(3 downto 0);
             is_m_ext_out  : out std_logic;
@@ -153,6 +149,31 @@ architecture Structural of CPU_FPGA is
             jump_out      : out std_logic;
             reg_write_out : out std_logic;
             wb_sel_out    : out std_logic_vector(1 downto 0)
+        );
+    end component;
+
+    -- 8. Base Integer ALU
+    component ALU is
+        port (
+            alu_ctrl   : in  std_logic_vector(3 downto 0);
+            operand_a  : in  std_logic_vector(31 downto 0);
+            operand_b  : in  std_logic_vector(31 downto 0);
+            alu_result : out std_logic_vector(31 downto 0);
+            zero_flag  : out std_logic
+        );
+    end component;
+
+    -- 9. RV32M Extension Unit
+    component M_Extension_Unit is
+        port (
+            clk       : in  std_logic;
+            reset     : in  std_logic;
+            is_m_ext  : in  std_logic;
+            funct3    : in  std_logic_vector(2 downto 0);
+            operand_a : in  std_logic_vector(31 downto 0);
+            operand_b : in  std_logic_vector(31 downto 0);
+            m_result  : out std_logic_vector(31 downto 0);
+            stall_m   : out std_logic
         );
     end component;
 
@@ -217,7 +238,15 @@ architecture Structural of CPU_FPGA is
     signal ex_reg_write    : std_logic;
     signal ex_wb_sel       : std_logic_vector(1 downto 0);
 
-    -- Temporary Writeback signals (Driven by WB stage in later design steps)
+    -- EX Stage Datapath & Execution Results
+    signal ex_alu_operand_b: std_logic_vector(31 downto 0);
+    signal ex_base_alu_res : std_logic_vector(31 downto 0);
+    signal ex_zero_flag    : std_logic;
+    signal ex_m_ext_res    : std_logic_vector(31 downto 0);
+    signal ex_final_result : std_logic_vector(31 downto 0);
+    signal stall_m_wire    : std_logic;
+
+    -- Temporary Writeback signals (Driven by WB stage in later steps)
     signal wb_reg_write    : std_logic := '0';
     signal wb_rd_addr      : std_logic_vector(4 downto 0) := (others => '0');
     signal wb_rd_data      : std_logic_vector(31 downto 0) := (others => '0');
@@ -246,6 +275,7 @@ begin
     -- Instruction Memory Instance
     U_IMEM : Instruction_Memory
         port map (
+            clk         => clk,
             addr        => pc_current,
             instruction => if_instruction
         );
@@ -321,9 +351,8 @@ begin
             stall         => id_ex_stall,
             flush         => id_ex_flush,
             
-            -- Inputs from ID stage
             pc_in         => id_pc,
-            pc_plus4_in   => pc_plus4_wire, -- Carried from IF stage
+            pc_plus4_in   => pc_plus4_wire,
             imm_ext_in    => id_imm_ext,
             reg_data1_in  => id_rs1_data,
             reg_data2_in  => id_rs2_data,
@@ -342,7 +371,6 @@ begin
             reg_write_in  => id_reg_write,
             wb_sel_in     => id_wb_sel,
             
-            -- Outputs to EX stage
             pc_out        => ex_pc,
             pc_plus4_out  => ex_pc_plus4,
             imm_ext_out   => ex_imm_ext,
@@ -363,6 +391,39 @@ begin
             reg_write_out => ex_reg_write,
             wb_sel_out    => ex_wb_sel
         );
+
+    -------------------------------------------------------------------
+    -- EX Stage Datapath & Hardware Units
+    -------------------------------------------------------------------
+
+    -- ALU Operand B MUX (Register Data vs Extended Immediate)
+    ex_alu_operand_b <= ex_imm_ext when ex_alu_src = '1' else ex_reg_data2;
+
+    -- Base Integer ALU Instance
+    U_ALU : ALU
+        port map (
+            alu_ctrl   => ex_alu_ctrl,
+            operand_a  => ex_reg_data1,
+            operand_b  => ex_alu_operand_b,
+            alu_result => ex_base_alu_res,
+            zero_flag  => ex_zero_flag
+        );
+
+    -- M-Extension Hardware Unit Instance
+    U_M_EXT : M_Extension_Unit
+        port map (
+            clk       => clk,
+            reset     => rst,
+            is_m_ext  => ex_is_m_ext,
+            funct3    => ex_funct3,
+            operand_a => ex_reg_data1,
+            operand_b => ex_reg_data2,
+            m_result  => ex_m_ext_res,
+            stall_m   => stall_m_wire
+        );
+
+    -- Execution Stage Result Multiplexer (ALU vs M-Extension)
+    ex_final_result <= ex_m_ext_res when ex_is_m_ext = '1' else ex_base_alu_res;
 
     -------------------------------------------------------------------
     -- Output Debug Assignments
