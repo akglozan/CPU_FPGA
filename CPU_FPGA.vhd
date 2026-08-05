@@ -176,6 +176,24 @@ architecture Structural of CPU_FPGA is
             stall_m   : out std_logic
         );
     end component;
+	 
+	 -- 10. Forwarding Unit
+	 component Forwarding_Unit is
+		port(
+	
+				ex_rs1_addr		: in std_logic_vector(4 downto 0);
+				ex_rs2_addr		: in std_logic_vector(4 downto 0);
+				mem_rd_addr		: in std_logic_vector(4 downto 0);
+				mem_reg_write	: in std_logic;
+				wb_rd_addr		: in std_logic_vector(4 downto 0);
+				wb_reg_write	: in std_logic;
+				
+				forward_a		: out std_logic_vector(1 downto 0);
+				forward_b		: out std_logic_vector(1 downto 0)
+				);
+		 
+	 
+	 end component;
 
     -------------------------------------------------------------------
     -- Internal Interconnect Signals
@@ -251,6 +269,20 @@ architecture Structural of CPU_FPGA is
     signal wb_rd_addr      : std_logic_vector(4 downto 0) := (others => '0');
     signal wb_rd_data      : std_logic_vector(31 downto 0) := (others => '0');
 
+	 --Forwarding Unit Interconnect signals
+	 signal forward_a			: std_logic_vector(1 downto 0) := (others => '0');
+	 signal forward_b			: std_logic_vector(1 downto 0) := (others => '0');
+	
+	 --Forwarding Unit Operand signals
+	 signal ex_operand_a_forwarded : std_logic_vector(31 downto 0);
+	 signal ex_operand_b_forwarded : std_logic_vector(31 downto 0);
+	 
+	 --
+	 signal mem_rd_addr		:	std_logic_vector(4 downto 0);
+	 signal mem_reg_write	:	std_logic;
+	 signal mem_result		:	std_logic_vector(31 downto 0);
+	 
+	 
 begin
 
     -------------------------------------------------------------------
@@ -397,13 +429,13 @@ begin
     -------------------------------------------------------------------
 
     -- ALU Operand B MUX (Register Data vs Extended Immediate)
-    ex_alu_operand_b <= ex_imm_ext when ex_alu_src = '1' else ex_reg_data2;
+    ex_alu_operand_b <= ex_imm_ext when ex_alu_src = '1' else ex_operand_b_forwarded;
 
     -- Base Integer ALU Instance
     U_ALU : ALU
         port map (
             alu_ctrl   => ex_alu_ctrl,
-            operand_a  => ex_reg_data1,
+            operand_a  => ex_operand_a_forwarded,
             operand_b  => ex_alu_operand_b,
             alu_result => ex_base_alu_res,
             zero_flag  => ex_zero_flag
@@ -416,11 +448,38 @@ begin
             reset     => rst,
             is_m_ext  => ex_is_m_ext,
             funct3    => ex_funct3,
-            operand_a => ex_reg_data1,
-            operand_b => ex_reg_data2,
+            operand_a => ex_operand_a_forwarded,
+            operand_b => ex_operand_b_forwarded,
             m_result  => ex_m_ext_res,
             stall_m   => stall_m_wire
         );
+	 -- Forwarding Unit Instance
+	U_FWD : Forwarding_Unit
+		  port map (
+				ex_rs1_addr => ex_rs1_addr,
+				ex_rs2_addr => ex_rs2_addr,
+				mem_rd_addr => mem_rd_addr,
+				mem_reg_write => mem_reg_write,
+				wb_rd_addr => wb_rd_addr,
+				wb_reg_write => wb_reg_write,
+				forward_a => forward_a,
+				forward_b => forward_b
+				
+			
+		  );
+		  
+	with forward_a select
+		ex_operand_a_forwarded <= ex_reg_data1 when "00",
+										  mem_result when "10",
+										  wb_rd_data when "01",
+										  (others => '0') when others;
+	
+	with forward_b select
+		ex_operand_b_forwarded <= ex_reg_data2 when "00",
+										  mem_result when "10",
+										  wb_rd_data when "01",
+										  (others => '0') when others;
+
 
     -- Execution Stage Result Multiplexer (ALU vs M-Extension)
     ex_final_result <= ex_m_ext_res when ex_is_m_ext = '1' else ex_base_alu_res;
