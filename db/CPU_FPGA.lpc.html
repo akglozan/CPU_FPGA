@@ -16,15 +16,31 @@
 <TH>Output only Bidir</TH>
 </TR>
 <TR >
-<TD >U_CPU|U_MEM_WB</TD>
+<TD >U_CPU|U_HAZARD</TD>
+<TD >18</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >5</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+</TR>
+<TR >
+<TD >U_CPU|U_STAGE_MEM|U_MEM_WB</TD>
 <TD >76</TD>
-<TD >3</TD>
+<TD >2</TD>
 <TD >0</TD>
-<TD >3</TD>
+<TD >2</TD>
 <TD >72</TD>
-<TD >3</TD>
-<TD >3</TD>
-<TD >3</TD>
+<TD >2</TD>
+<TD >2</TD>
+<TD >2</TD>
 <TD >0</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -32,7 +48,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_DMEM|ram[0][7]__4|auto_generated</TD>
+<TD >U_CPU|U_STAGE_MEM|U_DMEM|ram[0][7]__4|auto_generated</TD>
 <TD >20</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -48,7 +64,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_DMEM|ram[0][15]__3|auto_generated</TD>
+<TD >U_CPU|U_STAGE_MEM|U_DMEM|ram[0][15]__3|auto_generated</TD>
 <TD >20</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -64,7 +80,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_DMEM|ram[0][23]__2|auto_generated</TD>
+<TD >U_CPU|U_STAGE_MEM|U_DMEM|ram[0][23]__2|auto_generated</TD>
 <TD >20</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -80,7 +96,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_DMEM|ram[0][31]__1|auto_generated</TD>
+<TD >U_CPU|U_STAGE_MEM|U_DMEM|ram[0][31]__1|auto_generated</TD>
 <TD >20</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -96,7 +112,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_DMEM</TD>
+<TD >U_CPU|U_STAGE_MEM|U_DMEM</TD>
 <TD >70</TD>
 <TD >0</TD>
 <TD >21</TD>
@@ -112,15 +128,15 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_HAZARD</TD>
-<TD >18</TD>
-<TD >1</TD>
+<TD >U_CPU|U_STAGE_MEM</TD>
+<TD >79</TD>
 <TD >0</TD>
-<TD >1</TD>
-<TD >5</TD>
-<TD >1</TD>
-<TD >1</TD>
-<TD >1</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >104</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
 <TD >0</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -128,7 +144,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_EX_MEM</TD>
+<TD >U_CPU|U_STAGE_EX|U_EX_MEM</TD>
 <TD >80</TD>
 <TD >1</TD>
 <TD >0</TD>
@@ -144,23 +160,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_FWD</TD>
-<TD >22</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >4</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >0</TD>
-<TD >0</TD>
-</TR>
-<TR >
-<TD >U_CPU|U_M_EXT</TD>
+<TD >U_CPU|U_STAGE_EX|U_M_EXT</TD>
 <TD >70</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -176,12 +176,44 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_ALU</TD>
+<TD >U_CPU|U_STAGE_EX|U_ALU</TD>
 <TD >68</TD>
-<TD >1</TD>
 <TD >0</TD>
-<TD >1</TD>
+<TD >0</TD>
+<TD >0</TD>
 <TD >33</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+</TR>
+<TR >
+<TD >U_CPU|U_STAGE_EX|U_FWD</TD>
+<TD >22</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >4</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+</TR>
+<TR >
+<TD >U_CPU|U_STAGE_EX</TD>
+<TD >237</TD>
+<TD >1</TD>
+<TD >1</TD>
+<TD >1</TD>
+<TD >111</TD>
 <TD >1</TD>
 <TD >1</TD>
 <TD >1</TD>
@@ -192,15 +224,15 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_ID_EX</TD>
+<TD >U_CPU|U_STAGE_ID|U_ID_EX</TD>
 <TD >195</TD>
-<TD >35</TD>
 <TD >0</TD>
-<TD >35</TD>
+<TD >0</TD>
+<TD >0</TD>
 <TD >191</TD>
-<TD >35</TD>
-<TD >35</TD>
-<TD >35</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
 <TD >0</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -208,7 +240,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_IMMGEN</TD>
+<TD >U_CPU|U_STAGE_ID|U_IMMGEN</TD>
 <TD >35</TD>
 <TD >0</TD>
 <TD >7</TD>
@@ -224,7 +256,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_CONTROL</TD>
+<TD >U_CPU|U_STAGE_ID|U_CONTROL</TD>
 <TD >17</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -240,7 +272,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_REGFILE</TD>
+<TD >U_CPU|U_STAGE_ID|U_REGFILE</TD>
 <TD >50</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -256,7 +288,23 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_IF_ID</TD>
+<TD >U_CPU|U_STAGE_ID</TD>
+<TD >138</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >265</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+</TR>
+<TR >
+<TD >U_CPU|U_STAGE_IF|U_IF_ID</TD>
 <TD >68</TD>
 <TD >0</TD>
 <TD >0</TD>
@@ -272,7 +320,7 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_IMEM</TD>
+<TD >U_CPU|U_STAGE_IF|U_IMEM</TD>
 <TD >33</TD>
 <TD >0</TD>
 <TD >22</TD>
@@ -288,15 +336,31 @@
 <TD >0</TD>
 </TR>
 <TR >
-<TD >U_CPU|U_PC</TD>
+<TD >U_CPU|U_STAGE_IF|U_PC</TD>
 <TD >36</TD>
-<TD >33</TD>
+<TD >32</TD>
 <TD >0</TD>
-<TD >33</TD>
+<TD >32</TD>
 <TD >64</TD>
-<TD >33</TD>
-<TD >33</TD>
-<TD >33</TD>
+<TD >32</TD>
+<TD >32</TD>
+<TD >32</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+</TR>
+<TR >
+<TD >U_CPU|U_STAGE_IF</TD>
+<TD >38</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >96</TD>
+<TD >0</TD>
+<TD >0</TD>
+<TD >0</TD>
 <TD >0</TD>
 <TD >0</TD>
 <TD >0</TD>

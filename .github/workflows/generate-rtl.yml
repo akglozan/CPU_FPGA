@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - Factorizing_stages
 
 permissions:
   contents: write
@@ -30,12 +31,10 @@ jobs:
           image: hdlc/ghdl:yosys
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
-            # 1. Gather VHDL design files into a single space-separated string
             FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | paste -sd " " -)
 
-            # 2. Synthesize complete module hierarchy without aggressive cell pruning
-            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed --latches $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; write_json -compat-int rtl.json"
-
+            # Added 'setundef -zero' to sanitize undefined/high-Z bit enum values for netlistsvg
+            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed --latches $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; setundef -zero; write_json -compat-int rtl.json"
       - name: Convert JSON to SVG Schematic & Bake Light Background
         run: |
           netlistsvg rtl.json -o rtl_schematic.svg
