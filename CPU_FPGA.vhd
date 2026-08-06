@@ -177,61 +177,71 @@ architecture Structural of CPU_FPGA is
         );
     end component;
 	 
-	 -- 10. Forwarding Unit
-	 component Forwarding_Unit is
-		port(
-	
-				ex_rs1_addr		: in std_logic_vector(4 downto 0);
-				ex_rs2_addr		: in std_logic_vector(4 downto 0);
-				mem_rd_addr		: in std_logic_vector(4 downto 0);
-				mem_reg_write	: in std_logic;
-				wb_rd_addr		: in std_logic_vector(4 downto 0);
-				wb_reg_write	: in std_logic;
-				
-				forward_a		: out std_logic_vector(1 downto 0);
-				forward_b		: out std_logic_vector(1 downto 0)
-				);
-		 
+    -- 10. Forwarding Unit
+    component Forwarding_Unit is
+        port (
+            ex_rs1_addr   : in std_logic_vector(4 downto 0);
+            ex_rs2_addr   : in std_logic_vector(4 downto 0);
+            mem_rd_addr   : in std_logic_vector(4 downto 0);
+            mem_reg_write : in std_logic;
+            wb_rd_addr    : in std_logic_vector(4 downto 0);
+            wb_reg_write  : in std_logic;
+            forward_a     : out std_logic_vector(1 downto 0);
+            forward_b     : out std_logic_vector(1 downto 0)
+        );
+    end component;
 	 
-	 end component;
-	 
-	 -- 11. EX/MEM Register
-	 component EX_MEM_Register is
+    -- 11. EX/MEM Register
+    component EX_MEM_Register is
+        port (
+            -- System & Pipeline Controls
+            clk                     : in std_logic;
+            reset                   : in std_logic;
+            flush                   : in std_logic;
+            stall                   : in std_logic;
+            
+            -- Data Inputs (from EX Stage)
+            ex_final_result         : in std_logic_vector(31 downto 0);
+            ex_operand_b_forwarded : in std_logic_vector(31 downto 0);
+            ex_rd_addr              : in std_logic_vector(4 downto 0);
+            
+            -- Control Inputs (from EX Stage)
+            ex_reg_write            : in std_logic;
+            ex_mem_read             : in std_logic;
+            ex_mem_write            : in std_logic;
+            ex_wb_sel               : in std_logic;
+            ex_funct3               : in std_logic_vector(2 downto 0);
+            
+            -- Data Outputs (to MEM Stage & Forwarding Unit)
+            mem_result              : out std_logic_vector(31 downto 0);
+            mem_write_data          : out std_logic_vector(31 downto 0);
+            mem_rd_addr             : out std_logic_vector(4 downto 0);
+            
+            -- Control Outputs (to MEM Stage & Forwarding Unit)
+            mem_reg_write           : out std_logic;
+            mem_mem_read            : out std_logic;
+            mem_mem_write           : out std_logic;
+            mem_wb_sel              : out std_logic;
+            mem_funct3              : out std_logic_vector(2 downto 0)
+        );
+    end component;
 
-		port (
-	
-				-- System & Pipeline Controls
-				clk		:	in	std_logic;
-				reset		:	in std_logic;
-				flush		:	in std_logic;
-				stall		:	in std_logic;
-				
-				-- Data Inputs (from EX Stage)
-				ex_final_result			:	in std_logic_vector(31 downto 0);
-				ex_operand_b_forwarded	:	in std_logic_vector(31 downto 0);
-				ex_rd_addr					:  in std_logic_vector(4 downto 0);
-				
-				-- Control Inputs (from EX Stage)
-				ex_reg_write	:	in std_logic;
-				ex_mem_read		:	in	std_logic;
-				ex_mem_write	:	in std_logic;
-				ex_wb_sel		:  in std_logic; --Can be designed to be 2 bit if it causes future problems
-				ex_funct3		:	in std_logic_vector(2 downto 0);
-				
-				-- Data Outputs (to MEM Stage & Forwarding Unit)
-				mem_result		:	out std_logic_vector(31 downto 0);
-				mem_write_data	:	out std_logic_vector(31 downto 0);
-				mem_rd_addr		:  out std_logic_vector(4 downto 0);
-				
-				-- Control Outputs (to MEM Stage & Forwarding Unit)
-				mem_reg_write	:	out std_logic;
-				mem_mem_read	:	out std_logic;
-				mem_mem_write	:	out std_logic;
-				mem_wb_sel		:	out std_logic;
-				mem_funct3		:  out std_logic_vector(2 downto 0)
-				);
-
-		end component;
+    -- 12. Hazard Unit
+    component Hazard_Unit is
+        port (
+            stall_m     : in std_logic;
+            id_rs1_addr : in std_logic_vector(4 downto 0);
+            id_rs2_addr : in std_logic_vector(4 downto 0);
+            ex_rd_addr  : in std_logic_vector(4 downto 0);
+            ex_mem_read : in std_logic;
+            take_branch : in std_logic;
+            pc_write    : out std_logic;
+            if_id_stall : out std_logic;
+            if_id_flush : out std_logic;
+            id_ex_stall : out std_logic;
+            id_ex_flush : out std_logic
+        );
+    end component;
 
     -------------------------------------------------------------------
     -- Internal Interconnect Signals
@@ -242,14 +252,14 @@ architecture Structural of CPU_FPGA is
     signal pc_plus4_wire   : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal if_instruction  : std_logic_vector(DATA_WIDTH-1 downto 0);
     
-    -- Control placeholders for PC
-    signal pc_write_enable : std_logic := '1';
+    -- Hazard Controlled PC Signals
+    signal pc_write_enable : std_logic;
     signal pc_src_select   : std_logic := '0';
     signal pc_target_addr  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
 
     -- IF/ID Pipeline Register Controls
-    signal if_id_stall     : std_logic := '0';
-    signal if_id_flush     : std_logic := '0';
+    signal if_id_stall     : std_logic;
+    signal if_id_flush     : std_logic;
 
     -- ID Stage Signals
     signal id_pc           : std_logic_vector(31 downto 0);
@@ -271,8 +281,8 @@ architecture Structural of CPU_FPGA is
     signal id_is_m_ext     : std_logic;
 
     -- ID/EX Pipeline Register Controls
-    signal id_ex_stall     : std_logic := '0';
-    signal id_ex_flush     : std_logic := '0';
+    signal id_ex_stall     : std_logic;
+    signal id_ex_flush     : std_logic;
 
     -- EX Stage Interconnect Signals (Outputs of ID_EX_Register)
     signal ex_pc           : std_logic_vector(31 downto 0);
@@ -302,32 +312,34 @@ architecture Structural of CPU_FPGA is
     signal ex_final_result : std_logic_vector(31 downto 0);
     signal stall_m_wire    : std_logic;
 
+    -- Branch Control Placeholder
+    signal take_branch_wire: std_logic := '0';
+
     -- Temporary Writeback signals (Driven by WB stage in later steps)
     signal wb_reg_write    : std_logic := '0';
     signal wb_rd_addr      : std_logic_vector(4 downto 0) := (others => '0');
     signal wb_rd_data      : std_logic_vector(31 downto 0) := (others => '0');
 
-	 --Forwarding Unit Interconnect signals
-	 signal forward_a			: std_logic_vector(1 downto 0) := (others => '0');
-	 signal forward_b			: std_logic_vector(1 downto 0) := (others => '0');
-	
-	 --Forwarding Unit Operand signals
-	 signal ex_operand_a_forwarded : std_logic_vector(31 downto 0);
-	 signal ex_operand_b_forwarded : std_logic_vector(31 downto 0);
-	 
-	 -- EX/MEM Register Data Signals
-	 signal mem_rd_addr		:	std_logic_vector(4 downto 0);
-	 signal mem_result		:	std_logic_vector(31 downto 0);
-	 signal mem_write_data	:	std_logic_vector(31 downto 0);
-	 
-	 -- EX/MEM Register Control Signals
-	 signal mem_reg_write	:	std_logic;
-	 signal mem_mem_read		:	std_logic;
-	 signal mem_mem_write	:	std_logic;
-	 signal mem_wb_sel		:	std_logic;
-	 signal mem_funct3		:	std_logic_vector(2 downto 0);
-	 
-	 
+    -- Forwarding Unit Interconnect signals
+    signal forward_a              : std_logic_vector(1 downto 0) := (others => '0');
+    signal forward_b              : std_logic_vector(1 downto 0) := (others => '0');
+    
+    -- Forwarding Unit Operand signals
+    signal ex_operand_a_forwarded : std_logic_vector(31 downto 0);
+    signal ex_operand_b_forwarded : std_logic_vector(31 downto 0);
+    
+    -- EX/MEM Register Data Signals
+    signal mem_rd_addr            : std_logic_vector(4 downto 0);
+    signal mem_result             : std_logic_vector(31 downto 0);
+    signal mem_write_data         : std_logic_vector(31 downto 0);
+    
+    -- EX/MEM Register Control Signals
+    signal mem_reg_write          : std_logic;
+    signal mem_mem_read           : std_logic;
+    signal mem_mem_write          : std_logic;
+    signal mem_wb_sel             : std_logic;
+    signal mem_funct3             : std_logic_vector(2 downto 0);
+
 begin
 
     -------------------------------------------------------------------
@@ -498,73 +510,90 @@ begin
             m_result  => ex_m_ext_res,
             stall_m   => stall_m_wire
         );
-	 -- Forwarding Unit Instance
-	U_FWD : Forwarding_Unit
-		  port map (
-				ex_rs1_addr => ex_rs1_addr,
-				ex_rs2_addr => ex_rs2_addr,
-				mem_rd_addr => mem_rd_addr,
-				mem_reg_write => mem_reg_write,
-				wb_rd_addr => wb_rd_addr,
-				wb_reg_write => wb_reg_write,
-				forward_a => forward_a,
-				forward_b => forward_b
-				
-			
-		  );
-		  
-	with forward_a select
-		ex_operand_a_forwarded <= ex_reg_data1 when "00",
-										  mem_result when "10",
-										  wb_rd_data when "01",
-										  (others => '0') when others;
-	
-	with forward_b select
-		ex_operand_b_forwarded <= ex_reg_data2 when "00",
-										  mem_result when "10",
-										  wb_rd_data when "01",
-										  (others => '0') when others;
 
+    -- Forwarding Unit Instance
+    U_FWD : Forwarding_Unit
+        port map (
+            ex_rs1_addr   => ex_rs1_addr,
+            ex_rs2_addr   => ex_rs2_addr,
+            mem_rd_addr   => mem_rd_addr,
+            mem_reg_write => mem_reg_write,
+            wb_rd_addr    => wb_rd_addr,
+            wb_reg_write  => wb_reg_write,
+            forward_a     => forward_a,
+            forward_b     => forward_b
+        );
+          
+    with forward_a select
+        ex_operand_a_forwarded <= ex_reg_data1 when "00",
+                                  mem_result when "10",
+                                  wb_rd_data when "01",
+                                  (others => '0') when others;
+    
+    with forward_b select
+        ex_operand_b_forwarded <= ex_reg_data2 when "00",
+                                  mem_result when "10",
+                                  wb_rd_data when "01",
+                                  (others => '0') when others;
 
     -- Execution Stage Result Multiplexer (ALU vs M-Extension)
     ex_final_result <= ex_m_ext_res when ex_is_m_ext = '1' else ex_base_alu_res;
 
-	 
-	 -- EX/MEM Register Unit Instance
-	 U_EX_MEM	: Ex_MEM_Register
-			port map (
-				--System Inputs
-				clk       => clk,
-				reset     => rst,
-				
-				--Pipeline Controls
-				stall		=> stall_m_wire,
-				flush 	=> '0',
-				
-				--EX Data Inputs
-				ex_final_result	=> ex_final_result,
-				ex_operand_b_forwarded => ex_operand_b_forwarded,
-				ex_rd_addr => ex_rd_addr,
-				
-				--EX Control Inputs
-				ex_reg_write => ex_reg_write,
-				ex_mem_read => ex_mem_read,
-				ex_mem_write => ex_mem_write,
-				ex_wb_sel => ex_wb_sel(0),
-				ex_funct3 => ex_funct3,
-				
-				--MEM Outputs
-				mem_reg_write	=>	mem_reg_write,
-				mem_mem_read	=>	mem_mem_read,
-				mem_mem_write	=> mem_mem_write,
-				mem_wb_sel		=>	mem_wb_sel,
-				mem_funct3		=>	mem_funct3
-			
-			
-			);
-			
-	 
-	 
+    -- EX/MEM Register Unit Instance
+    U_EX_MEM : EX_MEM_Register
+        port map (
+            -- System Inputs
+            clk                    => clk,
+            reset                  => rst,
+            
+            -- Pipeline Controls
+            stall                  => stall_m_wire,
+            flush                  => '0',
+            
+            -- EX Data Inputs
+            ex_final_result        => ex_final_result,
+            ex_operand_b_forwarded => ex_operand_b_forwarded,
+            ex_rd_addr             => ex_rd_addr,
+            
+            -- EX Control Inputs
+            ex_reg_write           => ex_reg_write,
+            ex_mem_read            => ex_mem_read,
+            ex_mem_write           => ex_mem_write,
+            ex_wb_sel              => ex_wb_sel(0),
+            ex_funct3              => ex_funct3,
+            
+            -- MEM Data Outputs
+            mem_result             => mem_result,
+            mem_write_data         => mem_write_data,
+            mem_rd_addr            => mem_rd_addr,
+            
+            -- MEM Control Outputs
+            mem_reg_write          => mem_reg_write,
+            mem_mem_read           => mem_mem_read,
+            mem_mem_write          => mem_mem_write,
+            mem_wb_sel             => mem_wb_sel,
+            mem_funct3             => mem_funct3
+        );
+
+    -------------------------------------------------------------------
+    -- Pipeline Hazard Unit Integration
+    -------------------------------------------------------------------
+
+    U_HAZARD : Hazard_Unit
+        port map (
+            stall_m     => stall_m_wire,
+            id_rs1_addr => id_instruction(19 downto 15),
+            id_rs2_addr => id_instruction(24 downto 20),
+            ex_rd_addr  => ex_rd_addr,
+            ex_mem_read => ex_mem_read,
+            take_branch => take_branch_wire,
+            pc_write    => pc_write_enable,
+            if_id_stall => if_id_stall,
+            if_id_flush => if_id_flush,
+            id_ex_stall => id_ex_stall,
+            id_ex_flush => id_ex_flush
+        );
+
     -------------------------------------------------------------------
     -- Output Debug Assignments
     -------------------------------------------------------------------

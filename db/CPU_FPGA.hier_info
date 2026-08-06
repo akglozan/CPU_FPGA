@@ -8130,3 +8130,44 @@ mem_funct3[1] <= mem_funct3[1]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 mem_funct3[2] <= mem_funct3[2]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 
+|CPU_FPGA|Hazard_Unit:U_HAZARD
+stall_m => pc_write.OUTPUTSELECT
+stall_m => if_id_stall.OUTPUTSELECT
+stall_m => if_id_flush.OUTPUTSELECT
+stall_m => id_ex_flush.OUTPUTSELECT
+stall_m => id_ex_stall.DATAIN
+id_rs1_addr[0] => Equal0.IN4
+id_rs1_addr[1] => Equal0.IN3
+id_rs1_addr[2] => Equal0.IN2
+id_rs1_addr[3] => Equal0.IN1
+id_rs1_addr[4] => Equal0.IN0
+id_rs2_addr[0] => Equal1.IN4
+id_rs2_addr[1] => Equal1.IN3
+id_rs2_addr[2] => Equal1.IN2
+id_rs2_addr[3] => Equal1.IN1
+id_rs2_addr[4] => Equal1.IN0
+ex_rd_addr[0] => Equal0.IN9
+ex_rd_addr[0] => Equal1.IN9
+ex_rd_addr[0] => Equal2.IN4
+ex_rd_addr[1] => Equal0.IN8
+ex_rd_addr[1] => Equal1.IN8
+ex_rd_addr[1] => Equal2.IN3
+ex_rd_addr[2] => Equal0.IN7
+ex_rd_addr[2] => Equal1.IN7
+ex_rd_addr[2] => Equal2.IN2
+ex_rd_addr[3] => Equal0.IN6
+ex_rd_addr[3] => Equal1.IN6
+ex_rd_addr[3] => Equal2.IN1
+ex_rd_addr[4] => Equal0.IN5
+ex_rd_addr[4] => Equal1.IN5
+ex_rd_addr[4] => Equal2.IN0
+ex_mem_read => process_0.IN1
+take_branch => if_id_flush.DATAA
+take_branch => id_ex_flush.DATAA
+pc_write <= pc_write.DB_MAX_OUTPUT_PORT_TYPE
+if_id_stall <= if_id_stall.DB_MAX_OUTPUT_PORT_TYPE
+if_id_flush <= if_id_flush.DB_MAX_OUTPUT_PORT_TYPE
+id_ex_stall <= stall_m.DB_MAX_OUTPUT_PORT_TYPE
+id_ex_flush <= id_ex_flush.DB_MAX_OUTPUT_PORT_TYPE
+
+
