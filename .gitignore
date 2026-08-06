@@ -58,3 +58,10 @@ Thumbs.db
 .idea/
 *.swp
 *~
+
+# ModelSim / QuestaSim artifacts
+work/
+*.wlf
+*.qdb
+transcript
+vsim.wlf
