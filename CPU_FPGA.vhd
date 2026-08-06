@@ -132,7 +132,8 @@ architecture Structural of CPU_FPGA is
             wb_read_data_out    : out std_logic_vector(31 downto 0);
             wb_rd_addr_out      : out std_logic_vector(4 downto 0);
             wb_reg_write_out    : out std_logic;
-            wb_sel_out          : out std_logic_vector(1 downto 0)
+            wb_sel_out          : out std_logic_vector(1 downto 0);
+				wb_pc_plus4_out     : out std_logic_vector(31 downto 0)
         );
     end component;
 
@@ -205,6 +206,7 @@ architecture Structural of CPU_FPGA is
     signal wb_reg_write      : std_logic;
     signal wb_sel            : std_logic_vector(1 downto 0);
     signal wb_rd_data        : std_logic_vector(31 downto 0);
+	 signal wb_pc_plus4 : std_logic_vector(31 downto 0);
 
 begin
 
@@ -319,7 +321,8 @@ begin
             wb_read_data_out    => wb_read_data,
             wb_rd_addr_out      => wb_rd_addr,
             wb_reg_write_out    => wb_reg_write,
-            wb_sel_out          => wb_sel
+            wb_sel_out          => wb_sel,
+				wb_pc_plus4_out 	  => wb_pc_plus4
         );
 
     -- 5. Hazard Unit
@@ -342,7 +345,7 @@ begin
     with wb_sel select
         wb_rd_data <= wb_result       when "00",
                       wb_read_data    when "01",
-                      ex_pc_plus4     when "10",
+                      wb_pc_plus4     when "10",
                       (others => '0') when others;
 
     -- Debug Signals

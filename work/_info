@@ -172,7 +172,7 @@ R29
 R12
 R13
 Ecpu_fpga
-Z30 w1786027545
+Z30 w1786057858
 R2
 R3
 R4
@@ -185,11 +185,11 @@ V7ZH6S<Q1FHkl2KOb<HT9l2
 !s100 O2^];G?SYaQK3SR9j9[EV1
 R7
 33
-R8
+Z33 !s110 1786057925
 !i10b 1
-R9
-Z33 !s90 -reportprogress|300|-2008|CPU_FPGA.vhd|
-Z34 !s107 CPU_FPGA.vhd|
+Z34 !s108 1786057925.000000
+Z35 !s90 -reportprogress|300|-2008|CPU_FPGA.vhd|
+Z36 !s107 CPU_FPGA.vhd|
 !i113 1
 R12
 R13
@@ -198,17 +198,17 @@ R2
 R3
 R4
 DEx4 work 8 cpu_fpga 0 22 7ZH6S<Q1FHkl2KOb<HT9l2
-l209
+l211
 L21
-V91b9BGEb@Vh:[HgZ1C[YV1
-!s100 AG>g=2_29Zb2ENR5RO6co1
+VY>S<IXJWNl[zDGB3dA0jg3
+!s100 [f6fYi7@>3<Z5R3X`k?UB2
 R7
 33
-R8
-!i10b 1
-R9
 R33
+!i10b 1
 R34
+R35
+R36
 !i113 1
 R12
 R13
@@ -217,41 +217,41 @@ R3
 R4
 DEx4 work 8 cpu_fpga 0 22 :OBFchaXnLc@E=b>Yg7e01
 32
-Z35 !s110 1785095392
+Z37 !s110 1785095392
 !i10b 1
 l47
 L15
 VE?7`VZ:zi1@L_W=S>nL]E0
 !s100 7TfBFfM<j8oP<EKh9Z@9I1
 R7
-Z36 !s108 1785095392.000000
+Z38 !s108 1785095392.000000
 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd|
 !s107 C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd|
 !i113 1
-Z37 o-work work
+Z39 o-work work
 R13
 FC:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd
 w1785094475
 8C:/Users/ozana/Desktop/CPU_FPGA/CPU_FPGA.vhd
 Edata_memory
-Z38 w1786023494
+Z40 w1786057118
 R2
 R3
 R4
 R0
-Z39 8Data_Memory.vhd
-Z40 FData_Memory.vhd
+Z41 8Data_Memory.vhd
+Z42 FData_Memory.vhd
 l0
 L6
 VMHO;Sn0K1jWAS@nbiUOCk1
 !s100 50;7BSWb1LoSJiFzPT_NO1
 R7
 33
-R18
+R33
 !i10b 1
-R19
-R20
-R21
+R34
+Z43 !s90 -reportprogress|300|-2008|Data_Memory.vhd|
+Z44 !s107 Data_Memory.vhd|
 !i113 1
 R12
 R13
@@ -260,28 +260,28 @@ R2
 R3
 R4
 DEx4 work 11 data_memory 0 22 MHO;Sn0K1jWAS@nbiUOCk1
-l35
+l36
 L23
-VzjfJ;_:lU7Noo;ch?3X1d2
-!s100 IP?fZ@=V]lE3NkN2BB>;X3
+VD2il76XiH^R>hTE5nMnGd3
+!s100 JH4:H;>4>Zb1UkO5_<4M42
 R7
 33
-R18
+R33
 !i10b 1
-R19
-R20
-R21
+R34
+R43
+R44
 !i113 1
 R12
 R13
 Eex_mem_register
-Z41 w1785973846
+Z45 w1785973846
 R2
 R3
 R4
 R0
-Z42 8EX_MEM_Register.vhd
-Z43 FEX_MEM_Register.vhd
+Z46 8EX_MEM_Register.vhd
+Z47 FEX_MEM_Register.vhd
 l0
 L5
 VVOgDbJfCaWYP<do@BRKH;0
@@ -291,8 +291,8 @@ R7
 R8
 !i10b 1
 R9
-Z44 !s90 -reportprogress|300|-2008|EX_MEM_Register.vhd|
-Z45 !s107 EX_MEM_Register.vhd|
+Z48 !s90 -reportprogress|300|-2008|EX_MEM_Register.vhd|
+Z49 !s107 EX_MEM_Register.vhd|
 !i113 1
 R12
 R13
@@ -310,19 +310,19 @@ R7
 R8
 !i10b 1
 R9
-R44
-R45
+R48
+R49
 !i113 1
 R12
 R13
 Eex_stage
-Z46 w1786025395
+Z50 w1786025395
 R2
 R3
 R4
 R0
-Z47 8EX_Stage.vhd
-Z48 FEX_Stage.vhd
+Z51 8EX_Stage.vhd
+Z52 FEX_Stage.vhd
 l0
 L5
 VYAjoDKgR<Z5oJ_dVI2ZJz3
@@ -357,13 +357,13 @@ R21
 R12
 R13
 Eforwarding_unit
-Z49 w1785930939
+Z53 w1785930939
 R2
 R3
 R4
 R0
-Z50 8Forwarding_Unit.vhd
-Z51 FForwarding_Unit.vhd
+Z54 8Forwarding_Unit.vhd
+Z55 FForwarding_Unit.vhd
 l0
 L5
 V;JkCJBWJ_lZ=@]>kRDJWB0
@@ -373,8 +373,8 @@ R7
 R8
 !i10b 1
 R9
-Z52 !s90 -reportprogress|300|-2008|Forwarding_Unit.vhd|
-Z53 !s107 Forwarding_Unit.vhd|
+Z56 !s90 -reportprogress|300|-2008|Forwarding_Unit.vhd|
+Z57 !s107 Forwarding_Unit.vhd|
 !i113 1
 R12
 R13
@@ -392,19 +392,19 @@ R7
 R8
 !i10b 1
 R9
-R52
-R53
+R56
+R57
 !i113 1
 R12
 R13
 Ehazard_unit
-Z54 w1785925151
+Z58 w1785925151
 R2
 R3
 R4
 R0
-Z55 8Hazard_Unit.vhd
-Z56 FHazard_Unit.vhd
+Z59 8Hazard_Unit.vhd
+Z60 FHazard_Unit.vhd
 l0
 L6
 V<:_2=m`<oe<R4KND318lB0
@@ -414,8 +414,8 @@ R7
 R8
 !i10b 1
 R9
-Z57 !s90 -reportprogress|300|-2008|Hazard_Unit.vhd|
-Z58 !s107 Hazard_Unit.vhd|
+Z61 !s90 -reportprogress|300|-2008|Hazard_Unit.vhd|
+Z62 !s107 Hazard_Unit.vhd|
 !i113 1
 R12
 R13
@@ -433,19 +433,19 @@ R7
 R8
 !i10b 1
 R9
-R57
-R58
+R61
+R62
 !i113 1
 R12
 R13
 Eid_ex_register
-Z59 w1785586572
+Z63 w1785586572
 R2
 R3
 R4
 R0
-Z60 8ID_EX_Register.vhd
-Z61 FID_EX_Register.vhd
+Z64 8ID_EX_Register.vhd
+Z65 FID_EX_Register.vhd
 l0
 L6
 VX@5^cD3OVDB@KiXW`A]@T2
@@ -455,8 +455,8 @@ R7
 R8
 !i10b 1
 R9
-Z62 !s90 -reportprogress|300|-2008|ID_EX_Register.vhd|
-Z63 !s107 ID_EX_Register.vhd|
+Z66 !s90 -reportprogress|300|-2008|ID_EX_Register.vhd|
+Z67 !s107 ID_EX_Register.vhd|
 !i113 1
 R12
 R13
@@ -474,19 +474,19 @@ R7
 R8
 !i10b 1
 R9
-R62
-R63
+R66
+R67
 !i113 1
 R12
 R13
 Eid_stage
-Z64 w1786026781
+Z68 w1786026781
 R2
 R3
 R4
 R0
-Z65 8ID_Stage.vhd
-Z66 FID_Stage.vhd
+Z69 8ID_Stage.vhd
+Z70 FID_Stage.vhd
 l0
 L5
 V8:VJjk7Az7`BjbMGg=X9:0
@@ -521,24 +521,24 @@ R21
 R12
 R13
 Eif_id_register
-Z67 w1785099363
+Z71 w1785099363
 R2
 R3
 R4
 R0
-Z68 8IF_ID_Register.vhd
-Z69 FIF_ID_Register.vhd
+Z72 8IF_ID_Register.vhd
+Z73 FIF_ID_Register.vhd
 l0
 L5
 VPlA>9<_^ID>=Hlb3eG9NI3
 !s100 9I@1_Tme`V;N=40FS^jng0
 R7
 33
-Z70 !s110 1786054811
+Z74 !s110 1786054811
 !i10b 1
-Z71 !s108 1786054811.000000
-Z72 !s90 -reportprogress|300|-2008|IF_ID_Register.vhd|
-Z73 !s107 IF_ID_Register.vhd|
+Z75 !s108 1786054811.000000
+Z76 !s90 -reportprogress|300|-2008|IF_ID_Register.vhd|
+Z77 !s107 IF_ID_Register.vhd|
 !i113 1
 R12
 R13
@@ -553,23 +553,23 @@ VZI0ZT84lUXijBiNLDNWEa1
 !s100 BC0UFJ4?nSFC>XoVITEME2
 R7
 33
-R70
+R74
 !i10b 1
-R71
-R72
-R73
+R75
+R76
+R77
 !i113 1
 R12
 R13
 Eif_stage
-R46
-Z74 DPx4 ieee 16 std_logic_textio 0 22 V5TSK`;aJKC<l]CEg1>mz1
+R50
+Z78 DPx4 ieee 16 std_logic_textio 0 22 V5TSK`;aJKC<l]CEg1>mz1
 R2
 R3
 R4
 R0
-Z75 8IF_Stage.vhd
-Z76 FIF_Stage.vhd
+Z79 8IF_Stage.vhd
+Z80 FIF_Stage.vhd
 l0
 L7
 V:H>]Bo[TC_SZao59H5;cV3
@@ -585,7 +585,7 @@ R21
 R12
 R13
 Astructural
-R74
+R78
 R2
 R3
 R4
@@ -605,13 +605,13 @@ R21
 R12
 R13
 Eimmgen
-Z77 w1785275542
+Z81 w1785275542
 R2
 R3
 R4
 R0
-Z78 8ImmGen.vhd
-Z79 FImmGen.vhd
+Z82 8ImmGen.vhd
+Z83 FImmGen.vhd
 l0
 L5
 V7_nX=cz^UFJ;A>hRn6OgT1
@@ -621,8 +621,8 @@ R7
 R8
 !i10b 1
 R9
-Z80 !s90 -reportprogress|300|-2008|ImmGen.vhd|
-Z81 !s107 ImmGen.vhd|
+Z84 !s90 -reportprogress|300|-2008|ImmGen.vhd|
+Z85 !s107 ImmGen.vhd|
 !i113 1
 R12
 R13
@@ -630,7 +630,7 @@ Abehavioral
 R2
 R3
 R4
-Z82 DEx4 work 6 immgen 0 22 7_nX=cz^UFJ;A>hRn6OgT1
+Z86 DEx4 work 6 immgen 0 22 7_nX=cz^UFJ;A>hRn6OgT1
 l20
 L18
 V43e3LhgEIllG86P7EXld[2
@@ -640,19 +640,19 @@ R7
 R8
 !i10b 1
 R9
-R80
-R81
+R84
+R85
 !i113 1
 R12
 R13
 Eimmgen_tb
-Z83 w1785277540
+Z87 w1785277540
 R2
 R3
 R4
 R0
-Z84 8ImmGen_tb.vhd
-Z85 FImmGen_tb.vhd
+Z88 8ImmGen_tb.vhd
+Z89 FImmGen_tb.vhd
 l0
 L6
 VQUkU5KEfCe8^0X<dc`73T2
@@ -668,7 +668,7 @@ R21
 R12
 R13
 Abehavior
-R82
+R86
 R2
 R3
 R4
@@ -688,30 +688,30 @@ R21
 R12
 R13
 Einstruction_memory
-Z86 w1785094370
-R74
+Z90 w1785094370
+R78
 R2
 R3
 R4
 R0
-Z87 8Instruction_Memory.vhd
-Z88 FInstruction_Memory.vhd
+Z91 8Instruction_Memory.vhd
+Z92 FInstruction_Memory.vhd
 l0
 L7
 VZ4E2]UI4P2E;z6OD?GY;Q3
 !s100 O9OUk[BAEI6UeR:1VR64B3
 R7
 33
-R70
+R74
 !i10b 1
-R71
-Z89 !s90 -reportprogress|300|-2008|Instruction_Memory.vhd|
-Z90 !s107 Instruction_Memory.vhd|
+R75
+Z93 !s90 -reportprogress|300|-2008|Instruction_Memory.vhd|
+Z94 !s107 Instruction_Memory.vhd|
 !i113 1
 R12
 R13
 Abehavioral
-R74
+R78
 R2
 R3
 R4
@@ -722,22 +722,22 @@ VoDi:ChdSc3a35H2NVf7WE0
 !s100 49BMaNb@Hz^SJkNh4F_m_1
 R7
 33
-R70
+R74
 !i10b 1
-R71
-R89
-R90
+R75
+R93
+R94
 !i113 1
 R12
 R13
 Em_extension_unit
-Z91 w1785887062
+Z95 w1785887062
 R2
 R3
 R4
 R0
-Z92 8M_Extension_Unit.vhd
-Z93 FM_Extension_Unit.vhd
+Z96 8M_Extension_Unit.vhd
+Z97 FM_Extension_Unit.vhd
 l0
 L5
 VUA^`c[PFTmh0oNPNmY6^^2
@@ -747,8 +747,8 @@ R7
 R8
 !i10b 1
 R9
-Z94 !s90 -reportprogress|300|-2008|M_Extension_Unit.vhd|
-Z95 !s107 M_Extension_Unit.vhd|
+Z98 !s90 -reportprogress|300|-2008|M_Extension_Unit.vhd|
+Z99 !s107 M_Extension_Unit.vhd|
 !i113 1
 R12
 R13
@@ -766,19 +766,19 @@ R7
 R8
 !i10b 1
 R9
-R94
-R95
+R98
+R99
 !i113 1
 R12
 R13
 Em_extension_unit_tb
-Z96 w1785887109
+Z100 w1785887109
 R2
 R3
 R4
 R0
-Z97 8M_Extension_Unit_tb.vhd
-Z98 FM_Extension_Unit_tb.vhd
+Z101 8M_Extension_Unit_tb.vhd
+Z102 FM_Extension_Unit_tb.vhd
 l0
 L5
 V2T7jPHzjNf=>98QPDV:UE2
@@ -813,24 +813,24 @@ R21
 R12
 R13
 Emem_stage
-R46
+Z103 w1786057779
 R2
 R3
 R4
 R0
-Z99 8MEM_Stage.vhd
-Z100 FMEM_Stage.vhd
+Z104 8MEM_Stage.vhd
+Z105 FMEM_Stage.vhd
 l0
 L5
-Vl65R0OfcAeEDICShWB;jX2
-!s100 PJ?VQOMVN;nheMl>8LTdf0
+ViF=G:4W[fn^KR2UIVQaX93
+!s100 R7GQQ5j?6<2QXBTV]mXl00
 R7
 33
-R18
+R33
 !i10b 1
-R19
-R20
-R21
+R34
+Z106 !s90 -reportprogress|300|-2008|MEM_Stage.vhd|
+Z107 !s107 MEM_Stage.vhd|
 !i113 1
 R12
 R13
@@ -838,40 +838,40 @@ Astructural
 R2
 R3
 R4
-DEx4 work 9 mem_stage 0 22 l65R0OfcAeEDICShWB;jX2
-l69
-L32
-Vom>[a?z1zIQhV>2<gE:kE0
-!s100 _?k[2Pe[6kIdG`T3lZe=a3
+DEx4 work 9 mem_stage 0 22 iF=G:4W[fn^KR2UIVQaX93
+l70
+L33
+VWCLz^JC4894e[RFKVFV<;3
+!s100 5]U?@`J<`2F[4hf7PI`jX0
 R7
 33
-R18
+R33
 !i10b 1
-R19
-R20
-R21
+R34
+R106
+R107
 !i113 1
 R12
 R13
 Emem_wb_register
-R46
+Z108 w1786056246
 R2
 R3
 R4
 R0
-Z101 8MEM_WB_Register.vhd
-Z102 FMEM_WB_Register.vhd
+Z109 8MEM_WB_Register.vhd
+Z110 FMEM_WB_Register.vhd
 l0
 L6
 V<l^djlenlKPgaB]^Y@2D=2
 !s100 Cg51<k0^UGRQbXkB1U?Xo0
 R7
 33
-R18
+R33
 !i10b 1
-R19
-R20
-R21
+R34
+Z111 !s90 -reportprogress|300|-2008|MEM_WB_Register.vhd|
+Z112 !s107 MEM_WB_Register.vhd|
 !i113 1
 R12
 R13
@@ -886,33 +886,33 @@ V8F]Q^C1RkIB8kY]QLn3Wj0
 !s100 :[8fJfdQ174RKE7FJc[h]0
 R7
 33
-R18
+R33
 !i10b 1
-R19
-R20
-R21
+R34
+R111
+R112
 !i113 1
 R12
 R13
 Eprogram_counter
-Z103 w1785094291
+Z113 w1785094291
 R2
 R3
 R4
 R0
-Z104 8Program_Counter.vhd
-Z105 FProgram_Counter.vhd
+Z114 8Program_Counter.vhd
+Z115 FProgram_Counter.vhd
 l0
 L5
 VXa?To:UXEV16hl1^hbeg>1
 !s100 eJ73H;PQ`A:KEb7dSg<^i0
 R7
 33
-R70
+R74
 !i10b 1
-R71
-Z106 !s90 -reportprogress|300|-2008|Program_Counter.vhd|
-Z107 !s107 Program_Counter.vhd|
+R75
+Z116 !s90 -reportprogress|300|-2008|Program_Counter.vhd|
+Z117 !s107 Program_Counter.vhd|
 !i113 1
 R12
 R13
@@ -927,33 +927,33 @@ V[In83odRUDm<;h[I_g^mR0
 !s100 P`i]mWTSa?2JN7fT:<=3b3
 R7
 33
-R70
+R74
 !i10b 1
-R71
-R106
-R107
+R75
+R116
+R117
 !i113 1
 R12
 R13
 Eregfile
-Z108 w1785102237
+Z118 w1785102237
 R2
 R3
 R4
 R0
-Z109 8RegFile.vhd
-Z110 FRegFile.vhd
+Z119 8RegFile.vhd
+Z120 FRegFile.vhd
 l0
 L5
 V^AC[ZD`m7DKE9f9Cd4jc70
 !s100 c8^>`M[SS6T^mQ4`ce];l1
 R7
 33
-R70
+R74
 !i10b 1
-R71
-Z111 !s90 -reportprogress|300|-2008|RegFile.vhd|
-Z112 !s107 RegFile.vhd|
+R75
+Z121 !s90 -reportprogress|300|-2008|RegFile.vhd|
+Z122 !s107 RegFile.vhd|
 !i113 1
 R12
 R13
@@ -968,33 +968,33 @@ V<B@CYSFZamF4a?DKAg]cU0
 !s100 2eFkYaXSm0TdLh@CH7QF41
 R7
 33
-R70
+R74
 !i10b 1
-R71
-R111
-R112
+R75
+R121
+R122
 !i113 1
 R12
 R13
 Etb_cpu_fpga
-R30
+R108
 R2
 R3
 R4
 R0
-Z113 8tb_CPU_FPGA.vhd
-Z114 Ftb_CPU_FPGA.vhd
+Z123 8tb_CPU_FPGA.vhd
+Z124 Ftb_CPU_FPGA.vhd
 l0
 L5
 VWKnanNgiQa_<YFK2jiJ<b2
 !s100 Ig0:3j8U;b8hENgDj3lnm2
 R7
 33
-R8
+R33
 !i10b 1
-R9
-Z115 !s90 -reportprogress|300|-2008|tb_CPU_FPGA.vhd|
-Z116 !s107 tb_CPU_FPGA.vhd|
+R34
+Z125 !s90 -reportprogress|300|-2008|tb_CPU_FPGA.vhd|
+Z126 !s107 tb_CPU_FPGA.vhd|
 !i113 1
 R12
 R13
@@ -1002,18 +1002,18 @@ Abehavioral
 R2
 R3
 R4
-Z117 DEx4 work 11 tb_cpu_fpga 0 22 WKnanNgiQa_<YFK2jiJ<b2
+Z127 DEx4 work 11 tb_cpu_fpga 0 22 WKnanNgiQa_<YFK2jiJ<b2
 l45
 L8
-Z118 V@P4=BLjn[NdGVWlK=hoo<3
-Z119 !s100 7efW2BHL=AYXGH:7LEHU?1
+Z128 V@P4=BLjn[NdGVWlK=hoo<3
+Z129 !s100 7efW2BHL=AYXGH:7LEHU?1
 R7
 33
-R8
+R33
 !i10b 1
-R9
-R115
-R116
+R34
+R125
+R126
 !i113 1
 R12
 R13
@@ -1023,18 +1023,18 @@ R3
 R4
 DEx4 work 11 tb_cpu_fpga 0 22 WRA[_^PoD;KeTC_EF19SX3
 32
-R35
+R37
 !i10b 1
 l35
 L9
 VbQOoN0H_jVGL:HEf<hlX^2
 !s100 cI>I[<^S8oHefL@FUXj^91
 R7
-R36
+R38
 !s90 -reportprogress|300|-work|work|C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd|
 !s107 C:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd|
 !i113 1
-R37
+R39
 R13
 FC:/Users/ozana/Desktop/CPU_FPGA/tb_CPU_FPGA.vhd
 w1785095166

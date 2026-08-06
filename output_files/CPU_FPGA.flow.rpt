@@ -1,5 +1,5 @@
 Flow report for CPU_FPGA
-Fri Aug 07 00:59:03 2026
+Fri Aug 07 01:21:23 2026
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -40,21 +40,21 @@ applicable agreement for further details.
 +--------------------------------------------------------------------------------------+
 ; Flow Summary                                                                         ;
 +------------------------------------+-------------------------------------------------+
-; Flow Status                        ; Successful - Fri Aug 07 00:59:00 2026           ;
+; Flow Status                        ; Successful - Fri Aug 07 01:21:19 2026           ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition ;
 ; Revision Name                      ; CPU_FPGA                                        ;
-; Top-level Entity Name              ; Board_Top                                       ;
+; Top-level Entity Name              ; CPU_Top_Wrapper                                 ;
 ; Family                             ; Cyclone IV E                                    ;
 ; Device                             ; EP4CE6E22C8                                     ;
 ; Timing Models                      ; Final                                           ;
-; Total logic elements               ; 0 / 6,272 ( 0 % )                               ;
-;     Total combinational functions  ; 0 / 6,272 ( 0 % )                               ;
-;     Dedicated logic registers      ; 0 / 6,272 ( 0 % )                               ;
-; Total registers                    ; 0                                               ;
-; Total pins                         ; 2 / 92 ( 2 % )                                  ;
+; Total logic elements               ; 4,154 / 6,272 ( 66 % )                          ;
+;     Total combinational functions  ; 3,423 / 6,272 ( 55 % )                          ;
+;     Dedicated logic registers      ; 1,443 / 6,272 ( 23 % )                          ;
+; Total registers                    ; 1443                                            ;
+; Total pins                         ; 12 / 92 ( 13 % )                                ;
 ; Total virtual pins                 ; 0                                               ;
-; Total memory bits                  ; 0 / 276,480 ( 0 % )                             ;
-; Embedded Multiplier 9-bit elements ; 0 / 30 ( 0 % )                                  ;
+; Total memory bits                  ; 65,536 / 276,480 ( 24 % )                       ;
+; Embedded Multiplier 9-bit elements ; 8 / 30 ( 27 % )                                 ;
 ; Total PLLs                         ; 0 / 2 ( 0 % )                                   ;
 +------------------------------------+-------------------------------------------------+
 
@@ -64,28 +64,28 @@ applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 08/07/2026 00:58:44 ;
+; Start date & time ; 08/07/2026 01:20:41 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; CPU_FPGA            ;
 +-------------------+---------------------+
 
 
-+------------------------------------------------------------------------------------------------------------------+
-; Flow Non-Default Global Settings                                                                                 ;
-+-------------------------------------+---------------------------------+---------------+-------------+------------+
-; Assignment Name                     ; Value                           ; Default Value ; Entity Name ; Section Id ;
-+-------------------------------------+---------------------------------+---------------+-------------+------------+
-; COMPILER_SIGNATURE_ID               ; 242035505737454.178605712449428 ; --            ; --          ; --         ;
-; MAX_CORE_JUNCTION_TEMP              ; 85                              ; --            ; --          ; --         ;
-; MIN_CORE_JUNCTION_TEMP              ; 0                               ; --            ; --          ; --         ;
-; PARTITION_COLOR                     ; 16764057                        ; --            ; Board_Top   ; Top        ;
-; PARTITION_FITTER_PRESERVATION_LEVEL ; PLACEMENT_AND_ROUTING           ; --            ; Board_Top   ; Top        ;
-; PARTITION_NETLIST_TYPE              ; SOURCE                          ; --            ; Board_Top   ; Top        ;
-; PROJECT_OUTPUT_DIRECTORY            ; output_files                    ; --            ; --          ; --         ;
-; TOP_LEVEL_ENTITY                    ; Board_Top                       ; CPU_FPGA      ; --          ; --         ;
-; VHDL_INPUT_VERSION                  ; VHDL_2008                       ; VHDL_1993     ; --          ; --         ;
-; VHDL_SHOW_LMF_MAPPING_MESSAGES      ; Off                             ; --            ; --          ; --         ;
-+-------------------------------------+---------------------------------+---------------+-------------+------------+
++----------------------------------------------------------------------------------------------------------------------+
+; Flow Non-Default Global Settings                                                                                     ;
++-------------------------------------+---------------------------------+---------------+-----------------+------------+
+; Assignment Name                     ; Value                           ; Default Value ; Entity Name     ; Section Id ;
++-------------------------------------+---------------------------------+---------------+-----------------+------------+
+; COMPILER_SIGNATURE_ID               ; 242035505737454.178605844143832 ; --            ; --              ; --         ;
+; MAX_CORE_JUNCTION_TEMP              ; 85                              ; --            ; --              ; --         ;
+; MIN_CORE_JUNCTION_TEMP              ; 0                               ; --            ; --              ; --         ;
+; PARTITION_COLOR                     ; 16764057                        ; --            ; CPU_Top_Wrapper ; Top        ;
+; PARTITION_FITTER_PRESERVATION_LEVEL ; PLACEMENT_AND_ROUTING           ; --            ; CPU_Top_Wrapper ; Top        ;
+; PARTITION_NETLIST_TYPE              ; SOURCE                          ; --            ; CPU_Top_Wrapper ; Top        ;
+; PROJECT_OUTPUT_DIRECTORY            ; output_files                    ; --            ; --              ; --         ;
+; TOP_LEVEL_ENTITY                    ; CPU_Top_Wrapper                 ; CPU_FPGA      ; --              ; --         ;
+; VHDL_INPUT_VERSION                  ; VHDL_2008                       ; VHDL_1993     ; --              ; --         ;
+; VHDL_SHOW_LMF_MAPPING_MESSAGES      ; Off                             ; --            ; --              ; --         ;
++-------------------------------------+---------------------------------+---------------+-----------------+------------+
 
 
 +-------------------------------------------------------------------------------------------------------------------------------+
@@ -93,11 +93,11 @@ applicable agreement for further details.
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis      ; 00:00:10     ; 1.0                     ; 4849 MB             ; 00:00:10                           ;
-; Fitter                    ; 00:00:03     ; 1.0                     ; 4852 MB             ; 00:00:03                           ;
-; Assembler                 ; 00:00:01     ; 1.0                     ; 4548 MB             ; 00:00:01                           ;
-; TimeQuest Timing Analyzer ; 00:00:02     ; 1.0                     ; 4602 MB             ; 00:00:01                           ;
-; Total                     ; 00:00:16     ; --                      ; --                  ; 00:00:15                           ;
+; Analysis & Synthesis      ; 00:00:10     ; 1.0                     ; 4737 MB             ; 00:00:10                           ;
+; Fitter                    ; 00:00:23     ; 1.0                     ; 4956 MB             ; 00:00:23                           ;
+; Assembler                 ; 00:00:01     ; 1.0                     ; 4569 MB             ; 00:00:01                           ;
+; TimeQuest Timing Analyzer ; 00:00:04     ; 1.0                     ; 4666 MB             ; 00:00:04                           ;
+; Total                     ; 00:00:38     ; --                      ; --                  ; 00:00:38                           ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 

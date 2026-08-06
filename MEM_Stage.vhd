@@ -25,7 +25,8 @@ entity MEM_Stage is
         wb_read_data_out    : out std_logic_vector(31 downto 0);
         wb_rd_addr_out      : out std_logic_vector(4 downto 0);
         wb_reg_write_out    : out std_logic;
-        wb_sel_out          : out std_logic_vector(1 downto 0)
+        wb_sel_out          : out std_logic_vector(1 downto 0);
+		  wb_pc_plus4_out     : out std_logic_vector(31 downto 0)
     );
 end entity MEM_Stage;
 
