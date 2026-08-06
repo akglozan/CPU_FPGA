@@ -176,7 +176,7 @@ architecture Structural of CPU_FPGA is
             stall_m   : out std_logic
         );
     end component;
-	 
+
     -- 10. Forwarding Unit
     component Forwarding_Unit is
         port (
@@ -190,34 +190,25 @@ architecture Structural of CPU_FPGA is
             forward_b     : out std_logic_vector(1 downto 0)
         );
     end component;
-	 
+
     -- 11. EX/MEM Register
     component EX_MEM_Register is
         port (
-            -- System & Pipeline Controls
             clk                     : in std_logic;
             reset                   : in std_logic;
             flush                   : in std_logic;
             stall                   : in std_logic;
-            
-            -- Data Inputs (from EX Stage)
             ex_final_result         : in std_logic_vector(31 downto 0);
             ex_operand_b_forwarded : in std_logic_vector(31 downto 0);
             ex_rd_addr              : in std_logic_vector(4 downto 0);
-            
-            -- Control Inputs (from EX Stage)
             ex_reg_write            : in std_logic;
             ex_mem_read             : in std_logic;
             ex_mem_write            : in std_logic;
             ex_wb_sel               : in std_logic;
             ex_funct3               : in std_logic_vector(2 downto 0);
-            
-            -- Data Outputs (to MEM Stage & Forwarding Unit)
             mem_result              : out std_logic_vector(31 downto 0);
             mem_write_data          : out std_logic_vector(31 downto 0);
             mem_rd_addr             : out std_logic_vector(4 downto 0);
-            
-            -- Control Outputs (to MEM Stage & Forwarding Unit)
             mem_reg_write           : out std_logic;
             mem_mem_read            : out std_logic;
             mem_mem_write           : out std_logic;
@@ -240,6 +231,39 @@ architecture Structural of CPU_FPGA is
             if_id_flush : out std_logic;
             id_ex_stall : out std_logic;
             id_ex_flush : out std_logic
+        );
+    end component;
+
+    -- 13. Data Memory Unit
+    component Data_Memory is
+        port(
+            clk        : in  std_logic;
+            mem_write  : in  std_logic;
+            mem_read   : in  std_logic;
+            funct3     : in  std_logic_vector(2 downto 0);
+            addr       : in  std_logic_vector(31 downto 0);
+            write_data : in  std_logic_vector(31 downto 0);
+            read_data  : out std_logic_vector(31 downto 0)
+        );
+    end component;
+
+    -- 14. MEM/WB Register Unit
+    component MEM_WB_Register is
+        port(
+            clk              : in  std_logic;
+            reset            : in  std_logic;
+            stall            : in  std_logic;
+            flush            : in  std_logic;
+            mem_result_in    : in  std_logic_vector(31 downto 0);
+            mem_read_data_in : in  std_logic_vector(31 downto 0);
+            rd_addr_in       : in  std_logic_vector(4 downto 0);
+            reg_write_in     : in  std_logic;
+            wb_sel_in        : in  std_logic_vector(1 downto 0);
+            wb_result_out    : out std_logic_vector(31 downto 0);
+            wb_read_data_out : out std_logic_vector(31 downto 0);
+            wb_rd_addr_out   : out std_logic_vector(4 downto 0);
+            wb_reg_write_out : out std_logic;
+            wb_sel_out       : out std_logic_vector(1 downto 0)
         );
     end component;
 
@@ -315,30 +339,33 @@ architecture Structural of CPU_FPGA is
     -- Branch Control Placeholder
     signal take_branch_wire: std_logic := '0';
 
-    -- Temporary Writeback signals (Driven by WB stage in later steps)
-    signal wb_reg_write    : std_logic := '0';
-    signal wb_rd_addr      : std_logic_vector(4 downto 0) := (others => '0');
-    signal wb_rd_data      : std_logic_vector(31 downto 0) := (others => '0');
-
     -- Forwarding Unit Interconnect signals
     signal forward_a              : std_logic_vector(1 downto 0) := (others => '0');
     signal forward_b              : std_logic_vector(1 downto 0) := (others => '0');
-    
-    -- Forwarding Unit Operand signals
     signal ex_operand_a_forwarded : std_logic_vector(31 downto 0);
     signal ex_operand_b_forwarded : std_logic_vector(31 downto 0);
     
-    -- EX/MEM Register Data Signals
+    -- EX/MEM Register Signals
     signal mem_rd_addr            : std_logic_vector(4 downto 0);
     signal mem_result             : std_logic_vector(31 downto 0);
     signal mem_write_data         : std_logic_vector(31 downto 0);
-    
-    -- EX/MEM Register Control Signals
     signal mem_reg_write          : std_logic;
     signal mem_mem_read           : std_logic;
     signal mem_mem_write          : std_logic;
     signal mem_wb_sel             : std_logic;
     signal mem_funct3             : std_logic_vector(2 downto 0);
+    signal mem_wb_sel_vector      : std_logic_vector(1 downto 0);
+	 
+    -- Data_Memory Outputs
+    signal mem_read_data          : std_logic_vector(31 downto 0);
+
+    -- MEM/WB Register Outputs & Writeback Stage Signals
+    signal wb_result              : std_logic_vector(31 downto 0);
+    signal wb_read_data           : std_logic_vector(31 downto 0);
+    signal wb_rd_addr             : std_logic_vector(4 downto 0);
+    signal wb_reg_write           : std_logic;
+    signal wb_sel                 : std_logic_vector(1 downto 0);
+    signal wb_rd_data             : std_logic_vector(31 downto 0);
 
 begin
 
@@ -526,14 +553,14 @@ begin
           
     with forward_a select
         ex_operand_a_forwarded <= ex_reg_data1 when "00",
-                                  mem_result when "10",
-                                  wb_rd_data when "01",
+                                  mem_result   when "10",
+                                  wb_rd_data   when "01",
                                   (others => '0') when others;
     
     with forward_b select
         ex_operand_b_forwarded <= ex_reg_data2 when "00",
-                                  mem_result when "10",
-                                  wb_rd_data when "01",
+                                  mem_result   when "10",
+                                  wb_rd_data   when "01",
                                   (others => '0') when others;
 
     -- Execution Stage Result Multiplexer (ALU vs M-Extension)
@@ -542,32 +569,21 @@ begin
     -- EX/MEM Register Unit Instance
     U_EX_MEM : EX_MEM_Register
         port map (
-            -- System Inputs
             clk                    => clk,
             reset                  => rst,
-            
-            -- Pipeline Controls
             stall                  => stall_m_wire,
             flush                  => '0',
-            
-            -- EX Data Inputs
             ex_final_result        => ex_final_result,
             ex_operand_b_forwarded => ex_operand_b_forwarded,
             ex_rd_addr             => ex_rd_addr,
-            
-            -- EX Control Inputs
             ex_reg_write           => ex_reg_write,
             ex_mem_read            => ex_mem_read,
             ex_mem_write           => ex_mem_write,
             ex_wb_sel              => ex_wb_sel(0),
             ex_funct3              => ex_funct3,
-            
-            -- MEM Data Outputs
             mem_result             => mem_result,
             mem_write_data         => mem_write_data,
             mem_rd_addr            => mem_rd_addr,
-            
-            -- MEM Control Outputs
             mem_reg_write          => mem_reg_write,
             mem_mem_read           => mem_mem_read,
             mem_mem_write          => mem_mem_write,
@@ -593,6 +609,56 @@ begin
             id_ex_stall => id_ex_stall,
             id_ex_flush => id_ex_flush
         );
+
+    -------------------------------------------------------------------
+    -- MEM Stage Hardware: Data Memory
+    -------------------------------------------------------------------
+
+    U_DMEM : Data_Memory
+        port map (
+            clk        => clk,
+            mem_write  => mem_mem_write,
+            mem_read   => mem_mem_read,
+            funct3     => mem_funct3,
+            addr       => mem_result,
+            write_data => mem_write_data,
+            read_data  => mem_read_data
+        );
+
+    -------------------------------------------------------------------
+    -- Pipeline Register: MEM / WB
+    -------------------------------------------------------------------
+
+    -- Expand 1-bit mem_wb_sel into 2-bit vector for WB MUX
+    mem_wb_sel_vector <= "0" & mem_wb_sel;
+
+    U_MEM_WB : MEM_WB_Register
+        port map (
+            clk              => clk,
+            reset            => rst,
+            stall            => '0',
+            flush            => '0',
+            mem_result_in    => mem_result,
+            mem_read_data_in => mem_read_data,
+            rd_addr_in       => mem_rd_addr,
+            reg_write_in     => mem_reg_write,
+            wb_sel_in        => mem_wb_sel_vector,
+            wb_result_out    => wb_result,
+            wb_read_data_out => wb_read_data,
+            wb_rd_addr_out   => wb_rd_addr,
+            wb_reg_write_out => wb_reg_write,
+            wb_sel_out       => wb_sel
+        );
+
+    -------------------------------------------------------------------
+    -- WB Stage Multiplexer & Closed Data Loop
+    -------------------------------------------------------------------
+
+    with wb_sel select
+        wb_rd_data <= wb_result       when "00", -- ALU / M-Extension Result
+                      wb_read_data    when "01", -- Memory Read Data
+                      ex_pc_plus4     when "10", -- PC + 4 (JAL / JALR)
+                      (others => '0') when others;
 
     -------------------------------------------------------------------
     -- Output Debug Assignments

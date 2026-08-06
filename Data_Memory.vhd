@@ -10,7 +10,7 @@ entity Data_Memory is
 		clk			:	in std_logic;
 		mem_write	:	in std_logic;
 		mem_read		:	in std_logic;
-		funct3			:	in std_logic_vector(2 downto 0);
+		funct3		:	in std_logic_vector(2 downto 0);
 		addr			:	in	std_logic_vector(31 downto 0);
 		write_data	:	in	std_logic_vector(31 downto 0);
 		read_data	:	out	std_logic_vector(31 downto 0)
