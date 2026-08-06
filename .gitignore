@@ -1,67 +1,99 @@
 # ==============================================================================
-# Quartus II Synthesis & Implementation Artifacts
+# Quartus II / Prime Synthesis & Implementation Artifacts
 # ==============================================================================
-# Quartus working directories
-db/
-incremental_db/
-hc_db/
-greybox_tmp/
+# Database and intermediate working directories
+/db/
+/incremental_db/
+/hc_db/
+/greybox_tmp/
+/output_files/
+/simulation/
+/hps_isw_handoff/
+/.qsys_edit/
 
-# Quartus compilation output files (programming & report files)
-*.rpt
+# Programming, netlist, and compiled hardware binary files
 *.sof
 *.pof
 *.cdf
+*.jam
+*.jbc
+*.ekp
+*.rbf
+*.hex
+*.ttf
+
+# Reports, summaries, and tool messages
+*.rpt
 *.summary
 *.smsg
 *.jdi
 *.pin
 *.done
+*.sld
+*.qdf
+
+# Tool state, workspace, and legacy backup files
 *.qws
+*.qws.bak
 *.bak
 *.orig
-*.bak
 *.vhd.bak
-*.qws
-*.wlf
-
-# Netlist / Timing analysis output files
-*.tms
-*.pin
+*.vhdl.bak
 *.qsf.bak
 *.qpf.bak
+*.tms
+
+# Smart compile, IP generation, and Qsys/Platform Designer logs
+*.qip.bak
+*.sip.bak
+*.bsf
+*.spd
+*.sopc_builder/
+dna_info.xml
 
 # ==============================================================================
 # ModelSim / QuestaSim Simulation Artifacts
 # ==============================================================================
-# Work library directory created by ModelSim
+# Work library directories
 work/
 mti_lib/
+msim/
 
-# Simulation waveform database and transcript files
+# Simulation databases, waveform files, and execution state
 transcript
 *.wlf
 *.vstf
 *.mpf
+*.qdb
+vsim.wlf
+vsim_stacktrace.pts
 
-# Compiler / Optimizer output logs
+# Compiler / Optimizer output logs & DLLs
 *.log
 *.vcom.log
 *_vcom.log
+*.vlog.log
+*_vlog.log
+*.sl
+*.dll
 
 # ==============================================================================
 # System / OS / IDE Artifacts
 # ==============================================================================
+# Operating system metadata
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# IDE, Editor, and Language Server directories
 .vscode/
 .idea/
 *.swp
+*.swo
 *~
-
-# ModelSim / QuestaSim artifacts
-work/
-*.wlf
-*.qdb
-transcript
-vsim.wlf
+*.bak

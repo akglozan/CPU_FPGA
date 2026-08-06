@@ -31,6 +31,7 @@ architecture Behavioral of Data_Memory is
     signal aligned_write_data : std_logic_vector(31 downto 0);
     signal raw_read_data      : std_logic_vector(31 downto 0);
     signal addr_latched       : std_logic_vector(1 downto 0);
+	 signal mem_read_latched 	: std_logic;
 
 begin
 
@@ -98,6 +99,7 @@ begin
             
             -- Latch address offset for read alignment on following cycle
             addr_latched <= addr(1 downto 0);
+				mem_read_latched <= mem_read;
         end if;
     end process;
 
@@ -125,25 +127,29 @@ begin
         end if;
 
         -- Apply Sign / Zero Extension based on funct3
-        case funct3 is
-            when "000" => -- LB (Load Byte, Sign-Extended)
-                read_data <= std_logic_vector(resize(signed(selected_byte), 32));
-                
-            when "100" => -- LBU (Load Byte Unsigned, Zero-Extended)
-                read_data <= std_logic_vector(resize(unsigned(selected_byte), 32));
-                
-            when "001" => -- LH (Load Halfword, Sign-Extended)
-                read_data <= std_logic_vector(resize(signed(selected_halfword), 32));
-                
-            when "101" => -- LHU (Load Halfword Unsigned, Zero-Extended)
-                read_data <= std_logic_vector(resize(unsigned(selected_halfword), 32));
-                
-            when "010" => -- LW (Load Word)
-                read_data <= raw_read_data;
-                
-            when others =>
-                read_data <= (others => '0');
-        end case;
+		  if mem_read_latched = '1' then
+			  case funct3 is
+					when "000" => -- LB (Load Byte, Sign-Extended)
+						 read_data <= std_logic_vector(resize(signed(selected_byte), 32));
+						 
+					when "100" => -- LBU (Load Byte Unsigned, Zero-Extended)
+						 read_data <= std_logic_vector(resize(unsigned(selected_byte), 32));
+						 
+					when "001" => -- LH (Load Halfword, Sign-Extended)
+						 read_data <= std_logic_vector(resize(signed(selected_halfword), 32));
+						 
+					when "101" => -- LHU (Load Halfword Unsigned, Zero-Extended)
+						 read_data <= std_logic_vector(resize(unsigned(selected_halfword), 32));
+						 
+					when "010" => -- LW (Load Word)
+						 read_data <= raw_read_data;
+						 
+					when others =>
+						 read_data <= (others => '0');
+			  end case;
+			  else
+            read_data <= (others => '0'); -- Forced low during Non-LOAD operations or pipeline bubbles
+			end if;
     end process;
 
 end architecture Behavioral;
