@@ -1,10 +1,11 @@
 <?xml version="1.0" ?>
 <LOG_ROOT>
 	<PROJECT NAME="CPU_FPGA">
-		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
-		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
-		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
-		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
-		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0" CBX_FILE_NAME="altsyncram_9b81.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0" CBX_FILE_NAME="mult_86t.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0" CBX_FILE_NAME="altsyncram_9b81.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|Board_Top|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4" CBX_FILE_NAME="altsyncram_1f81.tdf"/>
 	</PROJECT>
 </LOG_ROOT>

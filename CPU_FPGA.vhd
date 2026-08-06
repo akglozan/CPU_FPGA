@@ -10,7 +10,7 @@ entity CPU_FPGA is
         clk         : in  std_logic;
         rst         : in  std_logic;
         
-        -- External debug outputs for simulation/RTL Viewer
+        -- External debug outputs
         pc_debug    : out std_logic_vector(DATA_WIDTH-1 downto 0);
         instr_debug : out std_logic_vector(DATA_WIDTH-1 downto 0);
         rs1_debug   : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -20,204 +20,120 @@ end entity CPU_FPGA;
 
 architecture Structural of CPU_FPGA is
 
-    -------------------------------------------------------------------
-    -- Component Declarations
-    -------------------------------------------------------------------
-
-    -- 1. Program Counter
-    component Program_Counter is
-        generic (
-            DATA_WIDTH : integer := 32
-        );
-        port (
-            clk       : in  std_logic;
-            rst       : in  std_logic;
-            pc_write  : in  std_logic;
-            pc_src    : in  std_logic;
-            target_pc : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-            pc_out    : out std_logic_vector(DATA_WIDTH-1 downto 0);
-            pc_plus4  : out std_logic_vector(DATA_WIDTH-1 downto 0)
-        );
-    end component;
-
-    -- 2. Instruction Memory
-    component Instruction_Memory is
-        port (
-            clk         : in  std_logic;
-            addr        : in  std_logic_vector(31 downto 0);
-            instruction : out std_logic_vector(31 downto 0)
-        );
-    end component;
-
-    -- 3. IF/ID Pipeline Register
-    component IF_ID_Register is
+    -- Stage Components
+    component IF_Stage is
+        generic ( DATA_WIDTH : integer := 32 );
         port (
             clk             : in  std_logic;
             rst             : in  std_logic;
-            stall           : in  std_logic;
-            flush           : in  std_logic;
-            pc_in           : in  std_logic_vector(31 downto 0);
-            instruction_in  : in  std_logic_vector(31 downto 0);
-            pc_out          : out std_logic_vector(31 downto 0);
-            instruction_out : out std_logic_vector(31 downto 0)
+            pc_write        : in  std_logic;
+            if_id_stall     : in  std_logic;
+            if_id_flush     : in  std_logic;
+            pc_src          : in  std_logic;
+            target_pc       : in  std_logic_vector(31 downto 0);
+            pc_current_out  : out std_logic_vector(31 downto 0);
+            id_pc_out       : out std_logic_vector(31 downto 0);
+            id_instr_out    : out std_logic_vector(31 downto 0)
         );
     end component;
 
-    -- 4. Register File
-    component RegFile is
+    component ID_Stage is
         port (
-            clk       : in  std_logic;
-            rst       : in  std_logic;
-            reg_write : in  std_logic;
-            rd_addr   : in  std_logic_vector(4 downto 0);
-            rs1_addr  : in  std_logic_vector(4 downto 0);
-            rs2_addr  : in  std_logic_vector(4 downto 0);
-            rd_data   : in  std_logic_vector(31 downto 0);
-            rs1_data  : out std_logic_vector(31 downto 0);
-            rs2_data  : out std_logic_vector(31 downto 0)
+            clk             : in  std_logic;
+            rst             : in  std_logic;
+            id_ex_stall     : in  std_logic;
+            id_ex_flush     : in  std_logic;
+            id_pc_in        : in  std_logic_vector(31 downto 0);
+            id_pc_plus4_in  : in  std_logic_vector(31 downto 0);
+            id_instr_in     : in  std_logic_vector(31 downto 0);
+            wb_reg_write    : in  std_logic;
+            wb_rd_addr      : in  std_logic_vector(4 downto 0);
+            wb_rd_data      : in  std_logic_vector(31 downto 0);
+            id_rs1_addr_out : out std_logic_vector(4 downto 0);
+            id_rs2_addr_out : out std_logic_vector(4 downto 0);
+            ex_pc_out       : out std_logic_vector(31 downto 0);
+            ex_pc_plus4_out : out std_logic_vector(31 downto 0);
+            ex_imm_ext_out  : out std_logic_vector(31 downto 0);
+            ex_reg_data1_out: out std_logic_vector(31 downto 0);
+            ex_reg_data2_out: out std_logic_vector(31 downto 0);
+            ex_rs1_addr_out : out std_logic_vector(4 downto 0);
+            ex_rs2_addr_out : out std_logic_vector(4 downto 0);
+            ex_rd_addr_out  : out std_logic_vector(4 downto 0);
+            ex_funct3_out   : out std_logic_vector(2 downto 0);
+            ex_alu_src_out  : out std_logic;
+            ex_alu_ctrl_out : out std_logic_vector(3 downto 0);
+            ex_is_m_ext_out : out std_logic;
+            ex_mem_read_out : out std_logic;
+            ex_mem_write_out: out std_logic;
+            ex_branch_out   : out std_logic;
+            ex_jump_out     : out std_logic;
+            ex_reg_write_out: out std_logic;
+            ex_wb_sel_out   : out std_logic_vector(1 downto 0)
         );
     end component;
 
-    -- 5. Control Unit
-    component Control_Unit is
+    component EX_Stage is
         port (
-            opcode    : in  std_logic_vector(6 downto 0);
-            funct3    : in  std_logic_vector(2 downto 0);
-            funct7    : in  std_logic_vector(6 downto 0);
-            imm_src   : out std_logic_vector(2 downto 0);
-            alu_src   : out std_logic;
-            reg_write : out std_logic;
-            mem_read  : out std_logic;
-            mem_write : out std_logic;
-            wb_sel    : out std_logic_vector(1 downto 0);
-            branch    : out std_logic;
-            jump      : out std_logic;
-            alu_ctrl  : out std_logic_vector(3 downto 0);
-            is_m_ext  : out std_logic
+            clk                     : in  std_logic;
+            rst                     : in  std_logic;
+            ex_pc_in                : in  std_logic_vector(31 downto 0);
+            ex_imm_ext_in           : in  std_logic_vector(31 downto 0);
+            ex_reg_data1_in         : in  std_logic_vector(31 downto 0);
+            ex_reg_data2_in         : in  std_logic_vector(31 downto 0);
+            ex_rs1_addr_in          : in  std_logic_vector(4 downto 0);
+            ex_rs2_addr_in          : in  std_logic_vector(4 downto 0);
+            ex_rd_addr_in           : in  std_logic_vector(4 downto 0);
+            ex_funct3_in            : in  std_logic_vector(2 downto 0);
+            ex_alu_src_in           : in  std_logic;
+            ex_alu_ctrl_in          : in  std_logic_vector(3 downto 0);
+            ex_is_m_ext_in          : in  std_logic;
+            ex_mem_read_in          : in  std_logic;
+            ex_mem_write_in         : in  std_logic;
+            ex_branch_in            : in  std_logic;
+            ex_jump_in              : in  std_logic;
+            ex_reg_write_in         : in  std_logic;
+            ex_wb_sel_in            : in  std_logic_vector(1 downto 0);
+            mem_rd_addr_in          : in  std_logic_vector(4 downto 0);
+            mem_reg_write_in        : in  std_logic;
+            mem_result_in           : in  std_logic_vector(31 downto 0);
+            wb_rd_addr_in           : in  std_logic_vector(4 downto 0);
+            wb_reg_write_in         : in  std_logic;
+            wb_rd_data_in           : in  std_logic_vector(31 downto 0);
+            take_branch_out         : out std_logic;
+            target_pc_out           : out std_logic_vector(31 downto 0);
+            stall_m_out             : out std_logic;
+            mem_result_out          : out std_logic_vector(31 downto 0);
+            mem_write_data_out      : out std_logic_vector(31 downto 0);
+            mem_rd_addr_out         : out std_logic_vector(4 downto 0);
+            mem_reg_write_out       : out std_logic;
+            mem_mem_read_out        : out std_logic;
+            mem_mem_write_out       : out std_logic;
+            mem_wb_sel_out          : out std_logic_vector(1 downto 0);
+            mem_funct3_out          : out std_logic_vector(2 downto 0)
         );
     end component;
 
-    -- 6. Immediate Generator
-    component ImmGen is
+    component MEM_Stage is
         port (
-            inst    : in  std_logic_vector(31 downto 0);
-            imm_src : in  std_logic_vector(2 downto 0);
-            imm_ext : out std_logic_vector(31 downto 0)
+            clk                 : in  std_logic;
+            rst                 : in  std_logic;
+            mem_result_in       : in  std_logic_vector(31 downto 0);
+            mem_write_data_in   : in  std_logic_vector(31 downto 0);
+            mem_rd_addr_in      : in  std_logic_vector(4 downto 0);
+            mem_reg_write_in    : in  std_logic;
+            mem_mem_read_in     : in  std_logic;
+            mem_mem_write_in    : in  std_logic;
+            mem_wb_sel_in       : in  std_logic_vector(1 downto 0);
+            mem_funct3_in       : in  std_logic_vector(2 downto 0);
+            mem_result_fwd_out  : out std_logic_vector(31 downto 0);
+            wb_result_out       : out std_logic_vector(31 downto 0);
+            wb_read_data_out    : out std_logic_vector(31 downto 0);
+            wb_rd_addr_out      : out std_logic_vector(4 downto 0);
+            wb_reg_write_out    : out std_logic;
+            wb_sel_out          : out std_logic_vector(1 downto 0)
         );
     end component;
 
-    -- 7. ID/EX Pipeline Register
-    component ID_EX_Register is
-        port (
-            clk           : in  std_logic;
-            rst           : in  std_logic;
-            stall         : in  std_logic;
-            flush         : in  std_logic;
-            pc_in         : in  std_logic_vector(31 downto 0);
-            pc_plus4_in   : in  std_logic_vector(31 downto 0);
-            imm_ext_in    : in  std_logic_vector(31 downto 0);
-            pc_out        : out std_logic_vector(31 downto 0);
-            pc_plus4_out  : out std_logic_vector(31 downto 0);
-            imm_ext_out   : out std_logic_vector(31 downto 0);
-            reg_data1_in  : in  std_logic_vector(31 downto 0);
-            reg_data2_in  : in  std_logic_vector(31 downto 0);
-            rs1_addr_in   : in  std_logic_vector(4 downto 0);
-            rs2_addr_in   : in  std_logic_vector(4 downto 0);
-            rd_addr_in    : in  std_logic_vector(4 downto 0);
-            funct3_in     : in  std_logic_vector(2 downto 0);
-            reg_data1_out : out std_logic_vector(31 downto 0);
-            reg_data2_out : out std_logic_vector(31 downto 0);
-            rs1_addr_out  : out std_logic_vector(4 downto 0);
-            rs2_addr_out  : out std_logic_vector(4 downto 0);
-            rd_addr_out   : out std_logic_vector(4 downto 0);
-            funct3_out    : out std_logic_vector(2 downto 0);
-            alu_src_in    : in  std_logic;
-            alu_ctrl_in   : in  std_logic_vector(3 downto 0);
-            is_m_ext_in   : in  std_logic;
-            mem_read_in   : in  std_logic;
-            mem_write_in  : in  std_logic;
-            branch_in     : in  std_logic;
-            jump_in       : in  std_logic;
-            reg_write_in  : in  std_logic;
-            wb_sel_in     : in  std_logic_vector(1 downto 0);
-            alu_src_out   : out std_logic;
-            alu_ctrl_out  : out std_logic_vector(3 downto 0);
-            is_m_ext_out  : out std_logic;
-            mem_read_out  : out std_logic;
-            mem_write_out : out std_logic;
-            branch_out    : out std_logic;
-            jump_out      : out std_logic;
-            reg_write_out : out std_logic;
-            wb_sel_out    : out std_logic_vector(1 downto 0)
-        );
-    end component;
-
-    -- 8. Base Integer ALU
-    component ALU is
-        port (
-            alu_ctrl   : in  std_logic_vector(3 downto 0);
-            operand_a  : in  std_logic_vector(31 downto 0);
-            operand_b  : in  std_logic_vector(31 downto 0);
-            alu_result : out std_logic_vector(31 downto 0);
-            zero_flag  : out std_logic
-        );
-    end component;
-
-    -- 9. RV32M Extension Unit
-    component M_Extension_Unit is
-        port (
-            clk       : in  std_logic;
-            reset     : in  std_logic;
-            is_m_ext  : in  std_logic;
-            funct3    : in  std_logic_vector(2 downto 0);
-            operand_a : in  std_logic_vector(31 downto 0);
-            operand_b : in  std_logic_vector(31 downto 0);
-            m_result  : out std_logic_vector(31 downto 0);
-            stall_m   : out std_logic
-        );
-    end component;
-
-    -- 10. Forwarding Unit
-    component Forwarding_Unit is
-        port (
-            ex_rs1_addr   : in std_logic_vector(4 downto 0);
-            ex_rs2_addr   : in std_logic_vector(4 downto 0);
-            mem_rd_addr   : in std_logic_vector(4 downto 0);
-            mem_reg_write : in std_logic;
-            wb_rd_addr    : in std_logic_vector(4 downto 0);
-            wb_reg_write  : in std_logic;
-            forward_a     : out std_logic_vector(1 downto 0);
-            forward_b     : out std_logic_vector(1 downto 0)
-        );
-    end component;
-
-    -- 11. EX/MEM Register
-    component EX_MEM_Register is
-        port (
-            clk                     : in std_logic;
-            reset                   : in std_logic;
-            flush                   : in std_logic;
-            stall                   : in std_logic;
-            ex_final_result         : in std_logic_vector(31 downto 0);
-            ex_operand_b_forwarded : in std_logic_vector(31 downto 0);
-            ex_rd_addr              : in std_logic_vector(4 downto 0);
-            ex_reg_write            : in std_logic;
-            ex_mem_read             : in std_logic;
-            ex_mem_write            : in std_logic;
-            ex_wb_sel               : in std_logic;
-            ex_funct3               : in std_logic_vector(2 downto 0);
-            mem_result              : out std_logic_vector(31 downto 0);
-            mem_write_data          : out std_logic_vector(31 downto 0);
-            mem_rd_addr             : out std_logic_vector(4 downto 0);
-            mem_reg_write           : out std_logic;
-            mem_mem_read            : out std_logic;
-            mem_mem_write           : out std_logic;
-            mem_wb_sel              : out std_logic;
-            mem_funct3              : out std_logic_vector(2 downto 0)
-        );
-    end component;
-
-    -- 12. Hazard Unit
     component Hazard_Unit is
         port (
             stall_m     : in std_logic;
@@ -234,438 +150,197 @@ architecture Structural of CPU_FPGA is
         );
     end component;
 
-    -- 13. Data Memory Unit
-    component Data_Memory is
-        port(
-            clk        : in  std_logic;
-            mem_write  : in  std_logic;
-            mem_read   : in  std_logic;
-            funct3     : in  std_logic_vector(2 downto 0);
-            addr       : in  std_logic_vector(31 downto 0);
-            write_data : in  std_logic_vector(31 downto 0);
-            read_data  : out std_logic_vector(31 downto 0)
-        );
-    end component;
+    -- Interconnect Signals
+    signal pc_write_wire     : std_logic;
+    signal if_id_stall_wire  : std_logic;
+    signal if_id_flush_wire  : std_logic;
+    signal id_ex_stall_wire  : std_logic;
+    signal id_ex_flush_wire  : std_logic;
+    signal take_branch_wire  : std_logic;
+    signal target_pc_wire    : std_logic_vector(31 downto 0);
+    signal stall_m_wire      : std_logic;
 
-    -- 14. MEM/WB Register Unit
-    component MEM_WB_Register is
-        port(
-            clk              : in  std_logic;
-            reset            : in  std_logic;
-            stall            : in  std_logic;
-            flush            : in  std_logic;
-            mem_result_in    : in  std_logic_vector(31 downto 0);
-            mem_read_data_in : in  std_logic_vector(31 downto 0);
-            rd_addr_in       : in  std_logic_vector(4 downto 0);
-            reg_write_in     : in  std_logic;
-            wb_sel_in        : in  std_logic_vector(1 downto 0);
-            wb_result_out    : out std_logic_vector(31 downto 0);
-            wb_read_data_out : out std_logic_vector(31 downto 0);
-            wb_rd_addr_out   : out std_logic_vector(4 downto 0);
-            wb_reg_write_out : out std_logic;
-            wb_sel_out       : out std_logic_vector(1 downto 0)
-        );
-    end component;
+    signal pc_current        : std_logic_vector(31 downto 0);
+    signal id_pc             : std_logic_vector(31 downto 0);
+    signal id_instr          : std_logic_vector(31 downto 0);
+    signal id_rs1_addr       : std_logic_vector(4 downto 0);
+    signal id_rs2_addr       : std_logic_vector(4 downto 0);
 
-    -------------------------------------------------------------------
-    -- Internal Interconnect Signals
-    -------------------------------------------------------------------
-    
-    -- IF Stage Signals
-    signal pc_current      : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal pc_plus4_wire   : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal if_instruction  : std_logic_vector(DATA_WIDTH-1 downto 0);
-    
-    -- Hazard Controlled PC Signals
-    signal pc_write_enable : std_logic;
-    signal pc_src_select   : std_logic := '0';
-    signal pc_target_addr  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+    signal ex_pc             : std_logic_vector(31 downto 0);
+    signal ex_pc_plus4       : std_logic_vector(31 downto 0);
+    signal ex_imm_ext        : std_logic_vector(31 downto 0);
+    signal ex_reg_data1      : std_logic_vector(31 downto 0);
+    signal ex_reg_data2      : std_logic_vector(31 downto 0);
+    signal ex_rs1_addr       : std_logic_vector(4 downto 0);
+    signal ex_rs2_addr       : std_logic_vector(4 downto 0);
+    signal ex_rd_addr        : std_logic_vector(4 downto 0);
+    signal ex_funct3         : std_logic_vector(2 downto 0);
+    signal ex_alu_src        : std_logic;
+    signal ex_alu_ctrl       : std_logic_vector(3 downto 0);
+    signal ex_is_m_ext       : std_logic;
+    signal ex_mem_read       : std_logic;
+    signal ex_mem_write      : std_logic;
+    signal ex_branch         : std_logic;
+    signal ex_jump           : std_logic;
+    signal ex_reg_write      : std_logic;
+    signal ex_wb_sel         : std_logic_vector(1 downto 0);
 
-    -- IF/ID Pipeline Register Controls
-    signal if_id_stall     : std_logic;
-    signal if_id_flush     : std_logic;
+    signal mem_result        : std_logic_vector(31 downto 0);
+    signal mem_write_data    : std_logic_vector(31 downto 0);
+    signal mem_rd_addr       : std_logic_vector(4 downto 0);
+    signal mem_reg_write     : std_logic;
+    signal mem_mem_read      : std_logic;
+    signal mem_mem_write     : std_logic;
+    signal mem_wb_sel        : std_logic_vector(1 downto 0);
+    signal mem_funct3        : std_logic_vector(2 downto 0);
+    signal mem_result_fwd    : std_logic_vector(31 downto 0);
 
-    -- ID Stage Signals
-    signal id_pc           : std_logic_vector(31 downto 0);
-    signal id_instruction  : std_logic_vector(31 downto 0);
-    signal id_rs1_data     : std_logic_vector(31 downto 0);
-    signal id_rs2_data     : std_logic_vector(31 downto 0);
-    signal id_imm_ext      : std_logic_vector(31 downto 0);
-
-    -- Control Unit ID Stage Signals
-    signal id_imm_src      : std_logic_vector(2 downto 0);
-    signal id_alu_src      : std_logic;
-    signal id_reg_write    : std_logic;
-    signal id_mem_read     : std_logic;
-    signal id_mem_write    : std_logic;
-    signal id_wb_sel       : std_logic_vector(1 downto 0);
-    signal id_branch       : std_logic;
-    signal id_jump         : std_logic;
-    signal id_alu_ctrl     : std_logic_vector(3 downto 0);
-    signal id_is_m_ext     : std_logic;
-
-    -- ID/EX Pipeline Register Controls
-    signal id_ex_stall     : std_logic;
-    signal id_ex_flush     : std_logic;
-
-    -- EX Stage Interconnect Signals (Outputs of ID_EX_Register)
-    signal ex_pc           : std_logic_vector(31 downto 0);
-    signal ex_pc_plus4     : std_logic_vector(31 downto 0);
-    signal ex_imm_ext      : std_logic_vector(31 downto 0);
-    signal ex_reg_data1    : std_logic_vector(31 downto 0);
-    signal ex_reg_data2    : std_logic_vector(31 downto 0);
-    signal ex_rs1_addr     : std_logic_vector(4 downto 0);
-    signal ex_rs2_addr     : std_logic_vector(4 downto 0);
-    signal ex_rd_addr      : std_logic_vector(4 downto 0);
-    signal ex_funct3       : std_logic_vector(2 downto 0);
-    signal ex_alu_src      : std_logic;
-    signal ex_alu_ctrl     : std_logic_vector(3 downto 0);
-    signal ex_is_m_ext     : std_logic;
-    signal ex_mem_read     : std_logic;
-    signal ex_mem_write    : std_logic;
-    signal ex_branch       : std_logic;
-    signal ex_jump         : std_logic;
-    signal ex_reg_write    : std_logic;
-    signal ex_wb_sel       : std_logic_vector(1 downto 0);
-
-    -- EX Stage Datapath & Execution Results
-    signal ex_alu_operand_b: std_logic_vector(31 downto 0);
-    signal ex_base_alu_res : std_logic_vector(31 downto 0);
-    signal ex_zero_flag    : std_logic;
-    signal ex_m_ext_res    : std_logic_vector(31 downto 0);
-    signal ex_final_result : std_logic_vector(31 downto 0);
-    signal stall_m_wire    : std_logic;
-
-    -- Branch Control Placeholder
-    signal take_branch_wire: std_logic := '0';
-
-    -- Forwarding Unit Interconnect signals
-    signal forward_a              : std_logic_vector(1 downto 0) := (others => '0');
-    signal forward_b              : std_logic_vector(1 downto 0) := (others => '0');
-    signal ex_operand_a_forwarded : std_logic_vector(31 downto 0);
-    signal ex_operand_b_forwarded : std_logic_vector(31 downto 0);
-    
-    -- EX/MEM Register Signals
-    signal mem_rd_addr            : std_logic_vector(4 downto 0);
-    signal mem_result             : std_logic_vector(31 downto 0);
-    signal mem_write_data         : std_logic_vector(31 downto 0);
-    signal mem_reg_write          : std_logic;
-    signal mem_mem_read           : std_logic;
-    signal mem_mem_write          : std_logic;
-    signal mem_wb_sel             : std_logic;
-    signal mem_funct3             : std_logic_vector(2 downto 0);
-    signal mem_wb_sel_vector      : std_logic_vector(1 downto 0);
-	 
-    -- Data_Memory Outputs
-    signal mem_read_data          : std_logic_vector(31 downto 0);
-
-    -- MEM/WB Register Outputs & Writeback Stage Signals
-    signal wb_result              : std_logic_vector(31 downto 0);
-    signal wb_read_data           : std_logic_vector(31 downto 0);
-    signal wb_rd_addr             : std_logic_vector(4 downto 0);
-    signal wb_reg_write           : std_logic;
-    signal wb_sel                 : std_logic_vector(1 downto 0);
-    signal wb_rd_data             : std_logic_vector(31 downto 0);
+    signal wb_result         : std_logic_vector(31 downto 0);
+    signal wb_read_data      : std_logic_vector(31 downto 0);
+    signal wb_rd_addr        : std_logic_vector(4 downto 0);
+    signal wb_reg_write      : std_logic;
+    signal wb_sel            : std_logic_vector(1 downto 0);
+    signal wb_rd_data        : std_logic_vector(31 downto 0);
 
 begin
 
-    -------------------------------------------------------------------
-    -- IF Stage Logic & Port Maps
-    -------------------------------------------------------------------
-
-    -- Program Counter Instance
-    U_PC : Program_Counter
-        generic map (
-            DATA_WIDTH => DATA_WIDTH
-        )
-        port map (
-            clk       => clk,
-            rst       => rst,
-            pc_write  => pc_write_enable,
-            pc_src    => pc_src_select,
-            target_pc => pc_target_addr,
-            pc_out    => pc_current,
-            pc_plus4  => pc_plus4_wire
-        );
-
-    -- Instruction Memory Instance
-    U_IMEM : Instruction_Memory
-        port map (
-            clk         => clk,
-            addr        => pc_current,
-            instruction => if_instruction
-        );
-
-    -------------------------------------------------------------------
-    -- Pipeline Register: IF / ID
-    -------------------------------------------------------------------
-
-    U_IF_ID : IF_ID_Register
+    -- 1. IF Stage
+    U_STAGE_IF : IF_Stage
         port map (
             clk             => clk,
             rst             => rst,
-            stall           => if_id_stall,
-            flush           => if_id_flush,
-            pc_in           => pc_current,
-            instruction_in  => if_instruction,
-            pc_out          => id_pc,
-            instruction_out => id_instruction
+            pc_write        => pc_write_wire,
+            if_id_stall     => if_id_stall_wire,
+            if_id_flush     => if_id_flush_wire,
+            pc_src          => take_branch_wire,
+            target_pc       => target_pc_wire,
+            pc_current_out  => pc_current,
+            id_pc_out       => id_pc,
+            id_instr_out    => id_instr
         );
 
-    -------------------------------------------------------------------
-    -- ID Stage Logic & Port Maps
-    -------------------------------------------------------------------
-
-    -- Register File Instance
-    U_REGFILE : RegFile
+    -- 2. ID Stage
+    U_STAGE_ID : ID_Stage
         port map (
-            clk       => clk,
-            rst       => rst,
-            reg_write => wb_reg_write,
-            rd_addr   => wb_rd_addr,
-            rs1_addr  => id_instruction(19 downto 15),
-            rs2_addr  => id_instruction(24 downto 20),
-            rd_data   => wb_rd_data,
-            rs1_data  => id_rs1_data,
-            rs2_data  => id_rs2_data
+            clk             => clk,
+            rst             => rst,
+            id_ex_stall     => id_ex_stall_wire,
+            id_ex_flush     => id_ex_flush_wire,
+            id_pc_in        => id_pc,
+            id_pc_plus4_in  => std_logic_vector(unsigned(id_pc) + 4),
+            id_instr_in     => id_instr,
+            wb_reg_write    => wb_reg_write,
+            wb_rd_addr      => wb_rd_addr,
+            wb_rd_data      => wb_rd_data,
+            id_rs1_addr_out => id_rs1_addr,
+            id_rs2_addr_out => id_rs2_addr,
+            ex_pc_out       => ex_pc,
+            ex_pc_plus4_out => ex_pc_plus4,
+            ex_imm_ext_out  => ex_imm_ext,
+            ex_reg_data1_out=> ex_reg_data1,
+            ex_reg_data2_out=> ex_reg_data2,
+            ex_rs1_addr_out => ex_rs1_addr,
+            ex_rs2_addr_out => ex_rs2_addr,
+            ex_rd_addr_out  => ex_rd_addr,
+            ex_funct3_out   => ex_funct3,
+            ex_alu_src_out  => ex_alu_src,
+            ex_alu_ctrl_out => ex_alu_ctrl,
+            ex_is_m_ext_out => ex_is_m_ext,
+            ex_mem_read_out => ex_mem_read,
+            ex_mem_write_out=> ex_mem_write,
+            ex_branch_out   => ex_branch,
+            ex_jump_out     => ex_jump,
+            ex_reg_write_out=> ex_reg_write,
+            ex_wb_sel_out   => ex_wb_sel
         );
 
-    -- Control Unit Instance
-    U_CONTROL : Control_Unit
+    -- 3. EX Stage
+    U_STAGE_EX : EX_Stage
         port map (
-            opcode    => id_instruction(6 downto 0),
-            funct3    => id_instruction(14 downto 12),
-            funct7    => id_instruction(31 downto 25),
-            imm_src   => id_imm_src,
-            alu_src   => id_alu_src,
-            reg_write => id_reg_write,
-            mem_read  => id_mem_read,
-            mem_write => id_mem_write,
-            wb_sel    => id_wb_sel,
-            branch    => id_branch,
-            jump      => id_jump,
-            alu_ctrl  => id_alu_ctrl,
-            is_m_ext  => id_is_m_ext
+            clk                     => clk,
+            rst                     => rst,
+            ex_pc_in                => ex_pc,
+            ex_imm_ext_in           => ex_imm_ext,
+            ex_reg_data1_in         => ex_reg_data1,
+            ex_reg_data2_in         => ex_reg_data2,
+            ex_rs1_addr_in          => ex_rs1_addr,
+            ex_rs2_addr_in          => ex_rs2_addr,
+            ex_rd_addr_in           => ex_rd_addr,
+            ex_funct3_in            => ex_funct3,
+            ex_alu_src_in           => ex_alu_src,
+            ex_alu_ctrl_in          => ex_alu_ctrl,
+            ex_is_m_ext_in          => ex_is_m_ext,
+            ex_mem_read_in          => ex_mem_read,
+            ex_mem_write_in         => ex_mem_write,
+            ex_branch_in            => ex_branch,
+            ex_jump_in              => ex_jump,
+            ex_reg_write_in         => ex_reg_write,
+            ex_wb_sel_in            => ex_wb_sel,
+            mem_rd_addr_in          => mem_rd_addr,
+            mem_reg_write_in        => mem_reg_write,
+            mem_result_in           => mem_result_fwd,
+            wb_rd_addr_in           => wb_rd_addr,
+            wb_reg_write_in         => wb_reg_write,
+            wb_rd_data_in           => wb_rd_data,
+            take_branch_out         => take_branch_wire,
+            target_pc_out           => target_pc_wire,
+            stall_m_out             => stall_m_wire,
+            mem_result_out          => mem_result,
+            mem_write_data_out      => mem_write_data,
+            mem_rd_addr_out         => mem_rd_addr,
+            mem_reg_write_out       => mem_reg_write,
+            mem_mem_read_out        => mem_mem_read,
+            mem_mem_write_out       => mem_mem_write,
+            mem_wb_sel_out          => mem_wb_sel,
+            mem_funct3_out          => mem_funct3
         );
 
-    -- Immediate Generator Instance
-    U_IMMGEN : ImmGen
+    -- 4. MEM Stage
+    U_STAGE_MEM : MEM_Stage
         port map (
-            inst    => id_instruction,
-            imm_src => id_imm_src,
-            imm_ext => id_imm_ext
+            clk                 => clk,
+            rst                 => rst,
+            mem_result_in       => mem_result,
+            mem_write_data_in   => mem_write_data,
+            mem_rd_addr_in      => mem_rd_addr,
+            mem_reg_write_in    => mem_reg_write,
+            mem_mem_read_in     => mem_mem_read,
+            mem_mem_write_in    => mem_mem_write,
+            mem_wb_sel_in       => mem_wb_sel,
+            mem_funct3_in       => mem_funct3,
+            mem_result_fwd_out  => mem_result_fwd,
+            wb_result_out       => wb_result,
+            wb_read_data_out    => wb_read_data,
+            wb_rd_addr_out      => wb_rd_addr,
+            wb_reg_write_out    => wb_reg_write,
+            wb_sel_out          => wb_sel
         );
 
-    -------------------------------------------------------------------
-    -- Pipeline Register: ID / EX
-    -------------------------------------------------------------------
-
-    U_ID_EX : ID_EX_Register
-        port map (
-            clk           => clk,
-            rst           => rst,
-            stall         => id_ex_stall,
-            flush         => id_ex_flush,
-            
-            pc_in         => id_pc,
-            pc_plus4_in   => pc_plus4_wire,
-            imm_ext_in    => id_imm_ext,
-            reg_data1_in  => id_rs1_data,
-            reg_data2_in  => id_rs2_data,
-            rs1_addr_in   => id_instruction(19 downto 15),
-            rs2_addr_in   => id_instruction(24 downto 20),
-            rd_addr_in    => id_instruction(11 downto 7),
-            funct3_in     => id_instruction(14 downto 12),
-            
-            alu_src_in    => id_alu_src,
-            alu_ctrl_in   => id_alu_ctrl,
-            is_m_ext_in   => id_is_m_ext,
-            mem_read_in   => id_mem_read,
-            mem_write_in  => id_mem_write,
-            branch_in     => id_branch,
-            jump_in       => id_jump,
-            reg_write_in  => id_reg_write,
-            wb_sel_in     => id_wb_sel,
-            
-            pc_out        => ex_pc,
-            pc_plus4_out  => ex_pc_plus4,
-            imm_ext_out   => ex_imm_ext,
-            reg_data1_out => ex_reg_data1,
-            reg_data2_out => ex_reg_data2,
-            rs1_addr_out  => ex_rs1_addr,
-            rs2_addr_out  => ex_rs2_addr,
-            rd_addr_out   => ex_rd_addr,
-            funct3_out    => ex_funct3,
-            
-            alu_src_out   => ex_alu_src,
-            alu_ctrl_out  => ex_alu_ctrl,
-            is_m_ext_out  => ex_is_m_ext,
-            mem_read_out  => ex_mem_read,
-            mem_write_out => ex_mem_write,
-            branch_out    => ex_branch,
-            jump_out      => ex_jump,
-            reg_write_out => ex_reg_write,
-            wb_sel_out    => ex_wb_sel
-        );
-
-    -------------------------------------------------------------------
-    -- EX Stage Datapath & Hardware Units
-    -------------------------------------------------------------------
-
-    -- ALU Operand B MUX (Register Data vs Extended Immediate)
-    ex_alu_operand_b <= ex_imm_ext when ex_alu_src = '1' else ex_operand_b_forwarded;
-
-    -- Base Integer ALU Instance
-    U_ALU : ALU
-        port map (
-            alu_ctrl   => ex_alu_ctrl,
-            operand_a  => ex_operand_a_forwarded,
-            operand_b  => ex_alu_operand_b,
-            alu_result => ex_base_alu_res,
-            zero_flag  => ex_zero_flag
-        );
-
-    -- M-Extension Hardware Unit Instance
-    U_M_EXT : M_Extension_Unit
-        port map (
-            clk       => clk,
-            reset     => rst,
-            is_m_ext  => ex_is_m_ext,
-            funct3    => ex_funct3,
-            operand_a => ex_operand_a_forwarded,
-            operand_b => ex_operand_b_forwarded,
-            m_result  => ex_m_ext_res,
-            stall_m   => stall_m_wire
-        );
-
-    -- Forwarding Unit Instance
-    U_FWD : Forwarding_Unit
-        port map (
-            ex_rs1_addr   => ex_rs1_addr,
-            ex_rs2_addr   => ex_rs2_addr,
-            mem_rd_addr   => mem_rd_addr,
-            mem_reg_write => mem_reg_write,
-            wb_rd_addr    => wb_rd_addr,
-            wb_reg_write  => wb_reg_write,
-            forward_a     => forward_a,
-            forward_b     => forward_b
-        );
-          
-    with forward_a select
-        ex_operand_a_forwarded <= ex_reg_data1 when "00",
-                                  mem_result   when "10",
-                                  wb_rd_data   when "01",
-                                  (others => '0') when others;
-    
-    with forward_b select
-        ex_operand_b_forwarded <= ex_reg_data2 when "00",
-                                  mem_result   when "10",
-                                  wb_rd_data   when "01",
-                                  (others => '0') when others;
-
-    -- Execution Stage Result Multiplexer (ALU vs M-Extension)
-    ex_final_result <= ex_m_ext_res when ex_is_m_ext = '1' else ex_base_alu_res;
-
-    -- EX/MEM Register Unit Instance
-    U_EX_MEM : EX_MEM_Register
-        port map (
-            clk                    => clk,
-            reset                  => rst,
-            stall                  => stall_m_wire,
-            flush                  => '0',
-            ex_final_result        => ex_final_result,
-            ex_operand_b_forwarded => ex_operand_b_forwarded,
-            ex_rd_addr             => ex_rd_addr,
-            ex_reg_write           => ex_reg_write,
-            ex_mem_read            => ex_mem_read,
-            ex_mem_write           => ex_mem_write,
-            ex_wb_sel              => ex_wb_sel(0),
-            ex_funct3              => ex_funct3,
-            mem_result             => mem_result,
-            mem_write_data         => mem_write_data,
-            mem_rd_addr            => mem_rd_addr,
-            mem_reg_write          => mem_reg_write,
-            mem_mem_read           => mem_mem_read,
-            mem_mem_write          => mem_mem_write,
-            mem_wb_sel             => mem_wb_sel,
-            mem_funct3             => mem_funct3
-        );
-
-    -------------------------------------------------------------------
-    -- Pipeline Hazard Unit Integration
-    -------------------------------------------------------------------
-
+    -- 5. Hazard Unit
     U_HAZARD : Hazard_Unit
         port map (
             stall_m     => stall_m_wire,
-            id_rs1_addr => id_instruction(19 downto 15),
-            id_rs2_addr => id_instruction(24 downto 20),
+            id_rs1_addr => id_rs1_addr,
+            id_rs2_addr => id_rs2_addr,
             ex_rd_addr  => ex_rd_addr,
             ex_mem_read => ex_mem_read,
             take_branch => take_branch_wire,
-            pc_write    => pc_write_enable,
-            if_id_stall => if_id_stall,
-            if_id_flush => if_id_flush,
-            id_ex_stall => id_ex_stall,
-            id_ex_flush => id_ex_flush
+            pc_write    => pc_write_wire,
+            if_id_stall => if_id_stall_wire,
+            if_id_flush => if_id_flush_wire,
+            id_ex_stall => id_ex_stall_wire,
+            id_ex_flush => id_ex_flush_wire
         );
 
-    -------------------------------------------------------------------
-    -- MEM Stage Hardware: Data Memory
-    -------------------------------------------------------------------
-
-    U_DMEM : Data_Memory
-        port map (
-            clk        => clk,
-            mem_write  => mem_mem_write,
-            mem_read   => mem_mem_read,
-            funct3     => mem_funct3,
-            addr       => mem_result,
-            write_data => mem_write_data,
-            read_data  => mem_read_data
-        );
-
-    -------------------------------------------------------------------
-    -- Pipeline Register: MEM / WB
-    -------------------------------------------------------------------
-
-    -- Expand 1-bit mem_wb_sel into 2-bit vector for WB MUX
-    mem_wb_sel_vector <= "0" & mem_wb_sel;
-
-    U_MEM_WB : MEM_WB_Register
-        port map (
-            clk              => clk,
-            reset            => rst,
-            stall            => '0',
-            flush            => '0',
-            mem_result_in    => mem_result,
-            mem_read_data_in => mem_read_data,
-            rd_addr_in       => mem_rd_addr,
-            reg_write_in     => mem_reg_write,
-            wb_sel_in        => mem_wb_sel_vector,
-            wb_result_out    => wb_result,
-            wb_read_data_out => wb_read_data,
-            wb_rd_addr_out   => wb_rd_addr,
-            wb_reg_write_out => wb_reg_write,
-            wb_sel_out       => wb_sel
-        );
-
-    -------------------------------------------------------------------
-    -- WB Stage Multiplexer & Closed Data Loop
-    -------------------------------------------------------------------
-
+    -- 6. WB Stage Multiplexer
     with wb_sel select
-        wb_rd_data <= wb_result       when "00", -- ALU / M-Extension Result
-                      wb_read_data    when "01", -- Memory Read Data
-                      ex_pc_plus4     when "10", -- PC + 4 (JAL / JALR)
+        wb_rd_data <= wb_result       when "00",
+                      wb_read_data    when "01",
+                      ex_pc_plus4     when "10",
                       (others => '0') when others;
 
-    -------------------------------------------------------------------
-    -- Output Debug Assignments
-    -------------------------------------------------------------------
+    -- Debug Signals
     pc_debug    <= pc_current;
-    instr_debug <= id_instruction;
-    rs1_debug   <= id_rs1_data;
-    rs2_debug   <= id_rs2_data;
+    instr_debug <= id_instr;
 
 end architecture Structural;
