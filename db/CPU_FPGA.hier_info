@@ -1,4 +1,9 @@
-|CPU_FPGA
+|Board_Top
+clk => CPU_FPGA:U_CPU.clk
+rst => CPU_FPGA:U_CPU.rst
+
+
+|Board_Top|CPU_FPGA:U_CPU
 clk => Program_Counter:U_PC.clk
 clk => Instruction_Memory:U_IMEM.clk
 clk => IF_ID_Register:U_IF_ID.clk
@@ -142,7 +147,7 @@ rs2_debug[30] <= RegFile:U_REGFILE.rs2_data[30]
 rs2_debug[31] <= RegFile:U_REGFILE.rs2_data[31]
 
 
-|CPU_FPGA|Program_Counter:U_PC
+|Board_Top|CPU_FPGA:U_CPU|Program_Counter:U_PC
 clk => pc_reg[0].CLK
 clk => pc_reg[1].CLK
 clk => pc_reg[2].CLK
@@ -369,7 +374,7 @@ pc_plus4[30] <= Add0.DB_MAX_OUTPUT_PORT_TYPE
 pc_plus4[31] <= Add0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|Instruction_Memory:U_IMEM
+|Board_Top|CPU_FPGA:U_CPU|Instruction_Memory:U_IMEM
 clk => instruction[0]~reg0.CLK
 clk => instruction[1]~reg0.CLK
 clk => instruction[2]~reg0.CLK
@@ -468,7 +473,7 @@ instruction[30] <= instruction[30]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 instruction[31] <= instruction[31]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|IF_ID_Register:U_IF_ID
+|Board_Top|CPU_FPGA:U_CPU|IF_ID_Register:U_IF_ID
 clk => instruction_out[0]~reg0.CLK
 clk => instruction_out[1]~reg0.CLK
 clk => instruction_out[2]~reg0.CLK
@@ -855,7 +860,7 @@ instruction_out[30] <= instruction_out[30]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 instruction_out[31] <= instruction_out[31]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|RegFile:U_REGFILE
+|Board_Top|CPU_FPGA:U_CPU|RegFile:U_REGFILE
 clk => registers[31][0].CLK
 clk => registers[31][1].CLK
 clk => registers[31][2].CLK
@@ -4335,7 +4340,7 @@ rs2_data[30] <= rs2_data.DB_MAX_OUTPUT_PORT_TYPE
 rs2_data[31] <= rs2_data.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|Control_Unit:U_CONTROL
+|Board_Top|CPU_FPGA:U_CPU|Control_Unit:U_CONTROL
 opcode[0] => Mux0.IN134
 opcode[0] => Mux1.IN134
 opcode[0] => Mux2.IN134
@@ -4484,7 +4489,7 @@ alu_ctrl[3] <= Mux17.DB_MAX_OUTPUT_PORT_TYPE
 is_m_ext <= Mux21.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|ImmGen:U_IMMGEN
+|Board_Top|CPU_FPGA:U_CPU|ImmGen:U_IMMGEN
 inst[0] => ~NO_FANOUT~
 inst[1] => ~NO_FANOUT~
 inst[2] => ~NO_FANOUT~
@@ -4768,7 +4773,7 @@ imm_ext[30] <= Mux1.DB_MAX_OUTPUT_PORT_TYPE
 imm_ext[31] <= Mux0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|ID_EX_Register:U_ID_EX
+|Board_Top|CPU_FPGA:U_CPU|ID_EX_Register:U_ID_EX
 clk => funct3_out[0]~reg0.CLK
 clk => funct3_out[1]~reg0.CLK
 clk => funct3_out[2]~reg0.CLK
@@ -5917,7 +5922,7 @@ wb_sel_out[0] <= wb_sel_out[0]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 wb_sel_out[1] <= wb_sel_out[1]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|ALU:U_ALU
+|Board_Top|CPU_FPGA:U_CPU|ALU:U_ALU
 alu_ctrl[0] => Mux0.IN18
 alu_ctrl[0] => Mux1.IN18
 alu_ctrl[0] => Mux2.IN18
@@ -6673,7 +6678,7 @@ alu_result[31] <= Mux0.DB_MAX_OUTPUT_PORT_TYPE
 zero_flag <= Equal0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|M_Extension_Unit:U_M_EXT
+|Board_Top|CPU_FPGA:U_CPU|M_Extension_Unit:U_M_EXT
 clk => overflow.CLK
 clk => div_by_zero.CLK
 clk => sign_remainder.CLK
@@ -7612,7 +7617,7 @@ m_result[31] <= Mux2.DB_MAX_OUTPUT_PORT_TYPE
 stall_m <= stall_m.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|Forwarding_Unit:U_FWD
+|Board_Top|CPU_FPGA:U_CPU|Forwarding_Unit:U_FWD
 ex_rs1_addr[0] => Equal1.IN4
 ex_rs1_addr[0] => Equal3.IN4
 ex_rs1_addr[1] => Equal1.IN3
@@ -7671,7 +7676,7 @@ forward_b[0] <= forward_b.DB_MAX_OUTPUT_PORT_TYPE
 forward_b[1] <= process_0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|EX_MEM_Register:U_EX_MEM
+|Board_Top|CPU_FPGA:U_CPU|EX_MEM_Register:U_EX_MEM
 clk => mem_funct3[0]~reg0.CLK
 clk => mem_funct3[1]~reg0.CLK
 clk => mem_funct3[2]~reg0.CLK
@@ -8130,7 +8135,7 @@ mem_funct3[1] <= mem_funct3[1]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 mem_funct3[2] <= mem_funct3[2]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|CPU_FPGA|Hazard_Unit:U_HAZARD
+|Board_Top|CPU_FPGA:U_CPU|Hazard_Unit:U_HAZARD
 stall_m => pc_write.OUTPUTSELECT
 stall_m => if_id_stall.OUTPUTSELECT
 stall_m => if_id_flush.OUTPUTSELECT

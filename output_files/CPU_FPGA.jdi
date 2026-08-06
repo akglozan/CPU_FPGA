@@ -1,8 +1,8 @@
 <sld_project_info>
   <project>
-    <hash md5_digest_80b="392f7769972714fe5308"/>
+    <hash md5_digest_80b="f7fea058867a6bfb4904"/>
   </project>
   <file_info>
-    <file device="EP4CGX30CF23C6" path="CPU_FPGA.sof" usercode="0xFFFFFFFF"/>
+    <file device="EP4CE6E22C8" path="CPU_FPGA.sof" usercode="0xFFFFFFFF"/>
   </file_info>
 </sld_project_info>

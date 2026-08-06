@@ -1,20 +1,16 @@
-Fitter Status : Successful - Thu Aug 06 02:42:28 2026
+Fitter Status : Successful - Thu Aug 06 11:26:24 2026
 Quartus II 64-Bit Version : 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition
 Revision Name : CPU_FPGA
-Top-level Entity Name : CPU_FPGA
-Family : Cyclone IV GX
-Device : EP4CGX30CF23C6
+Top-level Entity Name : Board_Top
+Family : Cyclone IV E
+Device : EP4CE6E22C8
 Timing Models : Final
-Total logic elements : 105 / 29,440 ( < 1 % )
-    Total combinational functions : 105 / 29,440 ( < 1 % )
-    Dedicated logic registers : 79 / 29,440 ( < 1 % )
-Total registers : 79
-Total pins : 130 / 307 ( 42 % )
+Total logic elements : 0 / 6,272 ( 0 % )
+    Total combinational functions : 0 / 6,272 ( 0 % )
+    Dedicated logic registers : 0 / 6,272 ( 0 % )
+Total registers : 0
+Total pins : 2 / 92 ( 2 % )
 Total virtual pins : 0
-Total memory bits : 32,768 / 1,105,920 ( 3 % )
-Embedded Multiplier 9-bit elements : 0 / 160 ( 0 % )
-Total GXB Receiver Channel PCS : 0 / 4 ( 0 % )
-Total GXB Receiver Channel PMA : 0 / 4 ( 0 % )
-Total GXB Transmitter Channel PCS : 0 / 4 ( 0 % )
-Total GXB Transmitter Channel PMA : 0 / 4 ( 0 % )
-Total PLLs : 0 / 6 ( 0 % )
+Total memory bits : 0 / 276,480 ( 0 % )
+Embedded Multiplier 9-bit elements : 0 / 30 ( 0 % )
+Total PLLs : 0 / 2 ( 0 % )

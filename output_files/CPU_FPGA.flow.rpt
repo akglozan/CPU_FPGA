@@ -1,5 +1,5 @@
 Flow report for CPU_FPGA
-Thu Aug 06 02:42:35 2026
+Thu Aug 06 11:26:28 2026
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -40,26 +40,22 @@ applicable agreement for further details.
 +--------------------------------------------------------------------------------------+
 ; Flow Summary                                                                         ;
 +------------------------------------+-------------------------------------------------+
-; Flow Status                        ; Successful - Thu Aug 06 02:42:32 2026           ;
+; Flow Status                        ; Successful - Thu Aug 06 11:26:26 2026           ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition ;
 ; Revision Name                      ; CPU_FPGA                                        ;
-; Top-level Entity Name              ; CPU_FPGA                                        ;
-; Family                             ; Cyclone IV GX                                   ;
-; Total logic elements               ; 105 / 29,440 ( < 1 % )                          ;
-;     Total combinational functions  ; 105 / 29,440 ( < 1 % )                          ;
-;     Dedicated logic registers      ; 79 / 29,440 ( < 1 % )                           ;
-; Total registers                    ; 79                                              ;
-; Total pins                         ; 130 / 307 ( 42 % )                              ;
-; Total virtual pins                 ; 0                                               ;
-; Total memory bits                  ; 32,768 / 1,105,920 ( 3 % )                      ;
-; Embedded Multiplier 9-bit elements ; 0 / 160 ( 0 % )                                 ;
-; Total GXB Receiver Channel PCS     ; 0 / 4 ( 0 % )                                   ;
-; Total GXB Receiver Channel PMA     ; 0 / 4 ( 0 % )                                   ;
-; Total GXB Transmitter Channel PCS  ; 0 / 4 ( 0 % )                                   ;
-; Total GXB Transmitter Channel PMA  ; 0 / 4 ( 0 % )                                   ;
-; Total PLLs                         ; 0 / 6 ( 0 % )                                   ;
-; Device                             ; EP4CGX30CF23C6                                  ;
+; Top-level Entity Name              ; Board_Top                                       ;
+; Family                             ; Cyclone IV E                                    ;
+; Device                             ; EP4CE6E22C8                                     ;
 ; Timing Models                      ; Final                                           ;
+; Total logic elements               ; 0 / 6,272 ( 0 % )                               ;
+;     Total combinational functions  ; 0 / 6,272 ( 0 % )                               ;
+;     Dedicated logic registers      ; 0 / 6,272 ( 0 % )                               ;
+; Total registers                    ; 0                                               ;
+; Total pins                         ; 2 / 92 ( 2 % )                                  ;
+; Total virtual pins                 ; 0                                               ;
+; Total memory bits                  ; 0 / 276,480 ( 0 % )                             ;
+; Embedded Multiplier 9-bit elements ; 0 / 30 ( 0 % )                                  ;
+; Total PLLs                         ; 0 / 2 ( 0 % )                                   ;
 +------------------------------------+-------------------------------------------------+
 
 
@@ -68,7 +64,7 @@ applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 08/06/2026 02:42:13 ;
+; Start date & time ; 08/06/2026 11:26:19 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; CPU_FPGA            ;
 +-------------------+---------------------+
@@ -79,11 +75,14 @@ applicable agreement for further details.
 +-------------------------------------+---------------------------------+---------------+-------------+------------+
 ; Assignment Name                     ; Value                           ; Default Value ; Entity Name ; Section Id ;
 +-------------------------------------+---------------------------------+---------------+-------------+------------+
-; COMPILER_SIGNATURE_ID               ; 242035505737454.178597693323068 ; --            ; --          ; --         ;
-; PARTITION_COLOR                     ; 16764057                        ; --            ; --          ; Top        ;
-; PARTITION_FITTER_PRESERVATION_LEVEL ; PLACEMENT_AND_ROUTING           ; --            ; --          ; Top        ;
-; PARTITION_NETLIST_TYPE              ; SOURCE                          ; --            ; --          ; Top        ;
+; COMPILER_SIGNATURE_ID               ; 242035505737454.178600837930724 ; --            ; --          ; --         ;
+; MAX_CORE_JUNCTION_TEMP              ; 85                              ; --            ; --          ; --         ;
+; MIN_CORE_JUNCTION_TEMP              ; 0                               ; --            ; --          ; --         ;
+; PARTITION_COLOR                     ; 16764057                        ; --            ; Board_Top   ; Top        ;
+; PARTITION_FITTER_PRESERVATION_LEVEL ; PLACEMENT_AND_ROUTING           ; --            ; Board_Top   ; Top        ;
+; PARTITION_NETLIST_TYPE              ; SOURCE                          ; --            ; Board_Top   ; Top        ;
 ; PROJECT_OUTPUT_DIRECTORY            ; output_files                    ; --            ; --          ; --         ;
+; TOP_LEVEL_ENTITY                    ; Board_Top                       ; CPU_FPGA      ; --          ; --         ;
 ; VHDL_INPUT_VERSION                  ; VHDL_2008                       ; VHDL_1993     ; --          ; --         ;
 ; VHDL_SHOW_LMF_MAPPING_MESSAGES      ; Off                             ; --            ; --          ; --         ;
 +-------------------------------------+---------------------------------+---------------+-------------+------------+
@@ -94,11 +93,11 @@ applicable agreement for further details.
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis      ; 00:00:02     ; 1.0                     ; 4700 MB             ; 00:00:02                           ;
-; Fitter                    ; 00:00:12     ; 1.0                     ; 5097 MB             ; 00:00:12                           ;
-; Assembler                 ; 00:00:03     ; 1.0                     ; 4628 MB             ; 00:00:02                           ;
-; TimeQuest Timing Analyzer ; 00:00:02     ; 1.0                     ; 4657 MB             ; 00:00:02                           ;
-; Total                     ; 00:00:19     ; --                      ; --                  ; 00:00:18                           ;
+; Analysis & Synthesis      ; 00:00:01     ; 1.0                     ; 4648 MB             ; 00:00:02                           ;
+; Fitter                    ; 00:00:03     ; 1.0                     ; 4852 MB             ; 00:00:03                           ;
+; Assembler                 ; 00:00:01     ; 1.0                     ; 4548 MB             ; 00:00:01                           ;
+; TimeQuest Timing Analyzer ; 00:00:01     ; 1.0                     ; 4598 MB             ; 00:00:01                           ;
+; Total                     ; 00:00:06     ; --                      ; --                  ; 00:00:07                           ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
