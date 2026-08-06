@@ -1,5 +1,5 @@
 Analysis & Synthesis report for CPU_FPGA
-Wed Aug 05 01:48:24 2026
+Thu Aug 06 02:18:56 2026
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -25,14 +25,15 @@ Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edit
  17. Parameter Settings for User Entity Instance: Program_Counter:U_PC
  18. Parameter Settings for Inferred Entity Instance: Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0
  19. altsyncram Parameter Settings by Entity Instance
- 20. Port Connectivity Checks: "M_Extension_Unit:U_M_EXT"
- 21. Port Connectivity Checks: "ALU:U_ALU"
- 22. Port Connectivity Checks: "ID_EX_Register:U_ID_EX"
- 23. Port Connectivity Checks: "RegFile:U_REGFILE"
- 24. Port Connectivity Checks: "IF_ID_Register:U_IF_ID"
- 25. Port Connectivity Checks: "Program_Counter:U_PC"
- 26. Elapsed Time Per Partition
- 27. Analysis & Synthesis Messages
+ 20. Port Connectivity Checks: "EX_MEM_Register:U_EX_MEM"
+ 21. Port Connectivity Checks: "Forwarding_Unit:U_FWD"
+ 22. Port Connectivity Checks: "ALU:U_ALU"
+ 23. Port Connectivity Checks: "ID_EX_Register:U_ID_EX"
+ 24. Port Connectivity Checks: "RegFile:U_REGFILE"
+ 25. Port Connectivity Checks: "IF_ID_Register:U_IF_ID"
+ 26. Port Connectivity Checks: "Program_Counter:U_PC"
+ 27. Elapsed Time Per Partition
+ 28. Analysis & Synthesis Messages
 
 
 
@@ -58,7 +59,7 @@ applicable agreement for further details.
 +--------------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                         ;
 +------------------------------------+-------------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Wed Aug 05 01:48:24 2026           ;
+; Analysis & Synthesis Status        ; Successful - Thu Aug 06 02:18:56 2026           ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition ;
 ; Revision Name                      ; CPU_FPGA                                        ;
 ; Top-level Entity Name              ; CPU_FPGA                                        ;
@@ -192,6 +193,8 @@ Parallel compilation was disabled, but you have multiple processors available. E
 ; Control_Unit.vhd                                     ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/Control_Unit.vhd                                     ;         ;
 ; ALU.vhd                                              ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/ALU.vhd                                              ;         ;
 ; M_Extension_Unit.vhd                                 ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/M_Extension_Unit.vhd                                 ;         ;
+; Forwarding_Unit.vhd                                  ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/Forwarding_Unit.vhd                                  ;         ;
+; EX_MEM_Register.vhd                                  ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/EX_MEM_Register.vhd                                  ;         ;
 ; altsyncram.tdf                                       ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/altsyncram.tdf                     ;         ;
 ; stratix_ram_block.inc                                ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/stratix_ram_block.inc              ;         ;
 ; lpm_mux.inc                                          ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/lpm_mux.inc                        ;         ;
@@ -1449,24 +1452,41 @@ Note: In order to hide this table in the UI and the text report file, please set
 +-------------------------------------------+------------------------------------------------+
 
 
-+--------------------------------------------------------------------------------------------------------------------+
-; Port Connectivity Checks: "M_Extension_Unit:U_M_EXT"                                                               ;
-+----------+--------+----------+-------------------------------------------------------------------------------------+
-; Port     ; Type   ; Severity ; Details                                                                             ;
-+----------+--------+----------+-------------------------------------------------------------------------------------+
-; m_result ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; stall_m  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-+----------+--------+----------+-------------------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "EX_MEM_Register:U_EX_MEM"                                                                     ;
++----------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port           ; Type   ; Severity ; Details                                                                             ;
++----------------+--------+----------+-------------------------------------------------------------------------------------+
+; flush          ; Input  ; Info     ; Stuck at GND                                                                        ;
+; mem_result     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; mem_write_data ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; mem_rd_addr    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; mem_mem_read   ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; mem_mem_write  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; mem_wb_sel     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; mem_funct3     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++----------------+--------+----------+-------------------------------------------------------------------------------------+
 
 
-+----------------------------------------------------------------------------------------------------------------------+
-; Port Connectivity Checks: "ALU:U_ALU"                                                                                ;
-+------------+--------+----------+-------------------------------------------------------------------------------------+
-; Port       ; Type   ; Severity ; Details                                                                             ;
-+------------+--------+----------+-------------------------------------------------------------------------------------+
-; alu_result ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; zero_flag  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-+------------+--------+----------+-------------------------------------------------------------------------------------+
++------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "Forwarding_Unit:U_FWD"                                                                      ;
++--------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port         ; Type   ; Severity ; Details                                                                             ;
++--------------+--------+----------+-------------------------------------------------------------------------------------+
+; wb_rd_addr   ; Input  ; Info     ; Stuck at GND                                                                        ;
+; wb_reg_write ; Input  ; Info     ; Stuck at GND                                                                        ;
+; forward_a[1] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; forward_b[1] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++--------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "ALU:U_ALU"                                                                               ;
++-----------+--------+----------+-------------------------------------------------------------------------------------+
+; Port      ; Type   ; Severity ; Details                                                                             ;
++-----------+--------+----------+-------------------------------------------------------------------------------------+
+; zero_flag ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++-----------+--------+----------+-------------------------------------------------------------------------------------+
 
 
 +-------------------------------------------------------------------------------------------------------------------------+
@@ -1478,15 +1498,9 @@ Note: In order to hide this table in the UI and the text report file, please set
 ; flush         ; Input  ; Info     ; Stuck at GND                                                                        ;
 ; pc_out        ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
 ; pc_plus4_out  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; rs1_addr_out  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; rs2_addr_out  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; rd_addr_out   ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; mem_read_out  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; mem_write_out ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
 ; branch_out    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
 ; jump_out      ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; reg_write_out ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
-; wb_sel_out    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; wb_sel_out[1] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
 +---------------+--------+----------+-------------------------------------------------------------------------------------+
 
 
@@ -1537,7 +1551,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Analysis & Synthesis
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-    Info: Processing started: Wed Aug 05 01:48:22 2026
+    Info: Processing started: Thu Aug 06 02:18:54 2026
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off CPU_FPGA -c CPU_FPGA
 Warning (20028): Parallel compilation is not licensed and has been disabled
 Info (12021): Found 2 design units, including 1 entities, in source file program_counter.vhd
@@ -1582,31 +1596,37 @@ Info (12021): Found 2 design units, including 1 entities, in source file m_exten
 Info (12021): Found 2 design units, including 1 entities, in source file m_extension_unit_tb.vhd
     Info (12022): Found design unit 1: M_Extension_Unit_tb-Testbench
     Info (12023): Found entity 1: M_Extension_Unit_tb
+Info (12021): Found 2 design units, including 1 entities, in source file hazard_unit.vhd
+    Info (12022): Found design unit 1: Hazard_Unit-Behavioral
+    Info (12023): Found entity 1: Hazard_Unit
+Info (12021): Found 2 design units, including 1 entities, in source file forwarding_unit.vhd
+    Info (12022): Found design unit 1: Forwarding_Unit-Behavioral
+    Info (12023): Found entity 1: Forwarding_Unit
+Info (12021): Found 2 design units, including 1 entities, in source file ex_mem_register.vhd
+    Info (12022): Found design unit 1: EX_MEM_Register-Behavioral
+    Info (12023): Found entity 1: EX_MEM_Register
 Info (12127): Elaborating entity "CPU_FPGA" for the top level hierarchy
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(190): used explicit default value for signal "pc_write_enable" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(191): used explicit default value for signal "pc_src_select" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(192): used explicit default value for signal "pc_target_addr" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(195): used explicit default value for signal "if_id_stall" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(196): used explicit default value for signal "if_id_flush" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(218): used explicit default value for signal "id_ex_stall" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(219): used explicit default value for signal "id_ex_flush" because signal was never assigned a value
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(222): object "ex_pc" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(223): object "ex_pc_plus4" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(227): object "ex_rs1_addr" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(228): object "ex_rs2_addr" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(229): object "ex_rd_addr" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(234): object "ex_mem_read" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(235): object "ex_mem_write" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(236): object "ex_branch" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(237): object "ex_jump" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(238): object "ex_reg_write" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(239): object "ex_wb_sel" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(244): object "ex_zero_flag" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(246): object "ex_final_result" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(247): object "stall_m_wire" assigned a value but never read
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(250): used explicit default value for signal "wb_reg_write" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(251): used explicit default value for signal "wb_rd_addr" because signal was never assigned a value
-Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(252): used explicit default value for signal "wb_rd_data" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(246): used explicit default value for signal "pc_write_enable" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(247): used explicit default value for signal "pc_src_select" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(248): used explicit default value for signal "pc_target_addr" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(251): used explicit default value for signal "if_id_stall" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(252): used explicit default value for signal "if_id_flush" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(274): used explicit default value for signal "id_ex_stall" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(275): used explicit default value for signal "id_ex_flush" because signal was never assigned a value
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(278): object "ex_pc" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(279): object "ex_pc_plus4" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(292): object "ex_branch" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(293): object "ex_jump" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(300): object "ex_zero_flag" assigned a value but never read
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(306): used explicit default value for signal "wb_reg_write" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(307): used explicit default value for signal "wb_rd_addr" because signal was never assigned a value
+Warning (10540): VHDL Signal Declaration warning at CPU_FPGA.vhd(308): used explicit default value for signal "wb_rd_data" because signal was never assigned a value
+Warning (10541): VHDL Signal Declaration warning at CPU_FPGA.vhd(319): used implicit default value for signal "mem_rd_addr" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations.
+Warning (10541): VHDL Signal Declaration warning at CPU_FPGA.vhd(320): used implicit default value for signal "mem_result" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations.
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(325): object "mem_mem_read" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(326): object "mem_mem_write" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(327): object "mem_wb_sel" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(328): object "mem_funct3" assigned a value but never read
 Info (12128): Elaborating entity "Program_Counter" for hierarchy "Program_Counter:U_PC"
 Info (12128): Elaborating entity "Instruction_Memory" for hierarchy "Instruction_Memory:U_IMEM"
 Info (12128): Elaborating entity "IF_ID_Register" for hierarchy "IF_ID_Register:U_IF_ID"
@@ -1619,6 +1639,8 @@ Info (12128): Elaborating entity "ImmGen" for hierarchy "ImmGen:U_IMMGEN"
 Info (12128): Elaborating entity "ID_EX_Register" for hierarchy "ID_EX_Register:U_ID_EX"
 Info (12128): Elaborating entity "ALU" for hierarchy "ALU:U_ALU"
 Info (12128): Elaborating entity "M_Extension_Unit" for hierarchy "M_Extension_Unit:U_M_EXT"
+Info (12128): Elaborating entity "Forwarding_Unit" for hierarchy "Forwarding_Unit:U_FWD"
+Info (12128): Elaborating entity "EX_MEM_Register" for hierarchy "EX_MEM_Register:U_EX_MEM"
 Info (19000): Inferred 1 megafunctions from design logic
     Info (276029): Inferred altsyncram megafunction from the following design logic: "Instruction_Memory:U_IMEM|ram_rtl_0" 
         Info (286033): Parameter OPERATION_MODE set to ROM
@@ -1721,10 +1743,10 @@ Info (21057): Implemented 224 device resources after synthesis - the final resou
     Info (21059): Implemented 128 output pins
     Info (21061): Implemented 62 logic cells
     Info (21064): Implemented 32 RAM segments
-Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 93 warnings
-    Info: Peak virtual memory: 4704 megabytes
-    Info: Processing ended: Wed Aug 05 01:48:25 2026
-    Info: Elapsed time: 00:00:03
+Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 90 warnings
+    Info: Peak virtual memory: 4700 megabytes
+    Info: Processing ended: Thu Aug 06 02:18:56 2026
+    Info: Elapsed time: 00:00:02
     Info: Total CPU time (on all processors): 00:00:02
 
 

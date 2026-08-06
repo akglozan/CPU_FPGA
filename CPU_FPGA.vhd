@@ -194,6 +194,44 @@ architecture Structural of CPU_FPGA is
 		 
 	 
 	 end component;
+	 
+	 -- 11. EX/MEM Register
+	 component EX_MEM_Register is
+
+		port (
+	
+				-- System & Pipeline Controls
+				clk		:	in	std_logic;
+				reset		:	in std_logic;
+				flush		:	in std_logic;
+				stall		:	in std_logic;
+				
+				-- Data Inputs (from EX Stage)
+				ex_final_result			:	in std_logic_vector(31 downto 0);
+				ex_operand_b_forwarded	:	in std_logic_vector(31 downto 0);
+				ex_rd_addr					:  in std_logic_vector(4 downto 0);
+				
+				-- Control Inputs (from EX Stage)
+				ex_reg_write	:	in std_logic;
+				ex_mem_read		:	in	std_logic;
+				ex_mem_write	:	in std_logic;
+				ex_wb_sel		:  in std_logic; --Can be designed to be 2 bit if it causes future problems
+				ex_funct3		:	in std_logic_vector(2 downto 0);
+				
+				-- Data Outputs (to MEM Stage & Forwarding Unit)
+				mem_result		:	out std_logic_vector(31 downto 0);
+				mem_write_data	:	out std_logic_vector(31 downto 0);
+				mem_rd_addr		:  out std_logic_vector(4 downto 0);
+				
+				-- Control Outputs (to MEM Stage & Forwarding Unit)
+				mem_reg_write	:	out std_logic;
+				mem_mem_read	:	out std_logic;
+				mem_mem_write	:	out std_logic;
+				mem_wb_sel		:	out std_logic;
+				mem_funct3		:  out std_logic_vector(2 downto 0)
+				);
+
+		end component;
 
     -------------------------------------------------------------------
     -- Internal Interconnect Signals
@@ -277,10 +315,17 @@ architecture Structural of CPU_FPGA is
 	 signal ex_operand_a_forwarded : std_logic_vector(31 downto 0);
 	 signal ex_operand_b_forwarded : std_logic_vector(31 downto 0);
 	 
-	 --
+	 -- EX/MEM Register Data Signals
 	 signal mem_rd_addr		:	std_logic_vector(4 downto 0);
-	 signal mem_reg_write	:	std_logic;
 	 signal mem_result		:	std_logic_vector(31 downto 0);
+	 signal mem_write_data	:	std_logic_vector(31 downto 0);
+	 
+	 -- EX/MEM Register Control Signals
+	 signal mem_reg_write	:	std_logic;
+	 signal mem_mem_read		:	std_logic;
+	 signal mem_mem_write	:	std_logic;
+	 signal mem_wb_sel		:	std_logic;
+	 signal mem_funct3		:	std_logic_vector(2 downto 0);
 	 
 	 
 begin
@@ -484,6 +529,42 @@ begin
     -- Execution Stage Result Multiplexer (ALU vs M-Extension)
     ex_final_result <= ex_m_ext_res when ex_is_m_ext = '1' else ex_base_alu_res;
 
+	 
+	 -- EX/MEM Register Unit Instance
+	 U_EX_MEM	: Ex_MEM_Register
+			port map (
+				--System Inputs
+				clk       => clk,
+				reset     => rst,
+				
+				--Pipeline Controls
+				stall		=> stall_m_wire,
+				flush 	=> '0',
+				
+				--EX Data Inputs
+				ex_final_result	=> ex_final_result,
+				ex_operand_b_forwarded => ex_operand_b_forwarded,
+				ex_rd_addr => ex_rd_addr,
+				
+				--EX Control Inputs
+				ex_reg_write => ex_reg_write,
+				ex_mem_read => ex_mem_read,
+				ex_mem_write => ex_mem_write,
+				ex_wb_sel => ex_wb_sel(0),
+				ex_funct3 => ex_funct3,
+				
+				--MEM Outputs
+				mem_reg_write	=>	mem_reg_write,
+				mem_mem_read	=>	mem_mem_read,
+				mem_mem_write	=> mem_mem_write,
+				mem_wb_sel		=>	mem_wb_sel,
+				mem_funct3		=>	mem_funct3
+			
+			
+			);
+			
+	 
+	 
     -------------------------------------------------------------------
     -- Output Debug Assignments
     -------------------------------------------------------------------
