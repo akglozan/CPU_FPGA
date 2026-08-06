@@ -24,6 +24,8 @@ entity ID_Stage is
         -- Outputs to Hazard Unit
         id_rs1_addr_out : out std_logic_vector(4 downto 0);
         id_rs2_addr_out : out std_logic_vector(4 downto 0);
+		  id_rs1_data_out : out std_logic_vector(31 downto 0); -- NEW DEBUG OUTPUT
+        id_rs2_data_out : out std_logic_vector(31 downto 0); -- NEW DEBUG OUTPUT
         
         -- Outputs from ID/EX Pipeline Register to EX Stage
         ex_pc_out       : out std_logic_vector(31 downto 0);
@@ -167,6 +169,10 @@ begin
 
     id_rs1_addr_out <= rs1_addr_wire;
     id_rs2_addr_out <= rs2_addr_wire;
+	 
+	 -- Drive Debug Data Outputs Directly
+    id_rs1_data_out <= reg_data1_wire;
+    id_rs2_data_out <= reg_data2_wire;
 
     U_REGFILE : RegFile
         port map (

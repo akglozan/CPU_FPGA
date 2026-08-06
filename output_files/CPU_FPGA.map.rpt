@@ -1,5 +1,5 @@
 Analysis & Synthesis report for CPU_FPGA
-Thu Aug 06 16:04:06 2026
+Thu Aug 06 16:37:06 2026
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -66,7 +66,7 @@ applicable agreement for further details.
 +--------------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                         ;
 +------------------------------------+-------------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Thu Aug 06 16:04:05 2026           ;
+; Analysis & Synthesis Status        ; Successful - Thu Aug 06 16:37:06 2026           ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition ;
 ; Revision Name                      ; CPU_FPGA                                        ;
 ; Top-level Entity Name              ; Board_Top                                       ;
@@ -3273,7 +3273,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:04     ;
+; Top            ; 00:00:03     ;
 +----------------+--------------+
 
 
@@ -3283,7 +3283,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Analysis & Synthesis
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-    Info: Processing started: Thu Aug 06 16:03:58 2026
+    Info: Processing started: Thu Aug 06 16:36:59 2026
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off CPU_FPGA -c CPU_FPGA
 Warning (20028): Parallel compilation is not licensed and has been disabled
 Info (12021): Found 2 design units, including 1 entities, in source file program_counter.vhd
@@ -3296,7 +3296,7 @@ Info (12021): Found 2 design units, including 1 entities, in source file instruc
     Info (12022): Found design unit 1: Instruction_Memory-Behavioral
     Info (12023): Found entity 1: Instruction_Memory
 Info (12021): Found 2 design units, including 1 entities, in source file tb_cpu_fpga.vhd
-    Info (12022): Found design unit 1: tb_CPU_FPGA-Behavior
+    Info (12022): Found design unit 1: tb_CPU_FPGA-Behavioral
     Info (12023): Found entity 1: tb_CPU_FPGA
 Info (12021): Found 2 design units, including 1 entities, in source file if_id_register.vhd
     Info (12022): Found design unit 1: IF_ID_Register-Behavioral
@@ -3364,8 +3364,6 @@ Warning (10036): Verilog HDL or VHDL warning at Board_Top.vhd(29): object "instr
 Warning (10036): Verilog HDL or VHDL warning at Board_Top.vhd(30): object "rs1_debug_int" assigned a value but never read
 Warning (10036): Verilog HDL or VHDL warning at Board_Top.vhd(31): object "rs2_debug_int" assigned a value but never read
 Info (12128): Elaborating entity "CPU_FPGA" for hierarchy "CPU_FPGA:U_CPU"
-Warning (10541): VHDL Signal Declaration warning at CPU_FPGA.vhd(16): used implicit default value for signal "rs1_debug" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations.
-Warning (10541): VHDL Signal Declaration warning at CPU_FPGA.vhd(17): used implicit default value for signal "rs2_debug" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations.
 Info (12128): Elaborating entity "IF_Stage" for hierarchy "CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF"
 Warning (10036): Verilog HDL or VHDL warning at IF_Stage.vhd(72): object "pc_plus4_wire" assigned a value but never read
 Info (12128): Elaborating entity "Program_Counter" for hierarchy "CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC"
@@ -3524,21 +3522,21 @@ Info (17049): 1534 registers lost all their fanouts during netlist optimizations
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
 Warning (15752): Ignored 5 Virtual Pin logic option assignments
+    Warning (15751): Ignored Virtual Pin assignment to "*_debug*".
     Warning (15751): Ignored Virtual Pin assignment to "rs2_debug".
     Warning (15751): Ignored Virtual Pin assignment to "rs1_debug".
     Warning (15751): Ignored Virtual Pin assignment to "pc_debug".
     Warning (15751): Ignored Virtual Pin assignment to "instr_debug".
-    Warning (15751): Ignored Virtual Pin assignment to "*_debug*".
 Warning (21074): Design contains 2 input pin(s) that do not drive logic
     Warning (15610): No output dependent on input pin "clk"
     Warning (15610): No output dependent on input pin "rst"
 Info (21057): Implemented 2 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 2 input pins
     Info (21059): Implemented 0 output pins
-Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 93 warnings
+Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 91 warnings
     Info: Peak virtual memory: 4734 megabytes
-    Info: Processing ended: Thu Aug 06 16:04:06 2026
-    Info: Elapsed time: 00:00:08
+    Info: Processing ended: Thu Aug 06 16:37:06 2026
+    Info: Elapsed time: 00:00:07
     Info: Total CPU time (on all processors): 00:00:07
 
 

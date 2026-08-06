@@ -51,6 +51,8 @@ architecture Structural of CPU_FPGA is
             wb_rd_data      : in  std_logic_vector(31 downto 0);
             id_rs1_addr_out : out std_logic_vector(4 downto 0);
             id_rs2_addr_out : out std_logic_vector(4 downto 0);
+				id_rs1_data_out : out std_logic_vector(31 downto 0); -- NEW
+            id_rs2_data_out : out std_logic_vector(31 downto 0); -- NEW
             ex_pc_out       : out std_logic_vector(31 downto 0);
             ex_pc_plus4_out : out std_logic_vector(31 downto 0);
             ex_imm_ext_out  : out std_logic_vector(31 downto 0);
@@ -165,6 +167,8 @@ architecture Structural of CPU_FPGA is
     signal id_instr          : std_logic_vector(31 downto 0);
     signal id_rs1_addr       : std_logic_vector(4 downto 0);
     signal id_rs2_addr       : std_logic_vector(4 downto 0);
+	 signal id_rs1_data       : std_logic_vector(31 downto 0);
+    signal id_rs2_data       : std_logic_vector(31 downto 0);
 
     signal ex_pc             : std_logic_vector(31 downto 0);
     signal ex_pc_plus4       : std_logic_vector(31 downto 0);
@@ -234,6 +238,8 @@ begin
             wb_rd_data      => wb_rd_data,
             id_rs1_addr_out => id_rs1_addr,
             id_rs2_addr_out => id_rs2_addr,
+				id_rs1_data_out => id_rs1_data, -- NEW CONNECTION
+            id_rs2_data_out => id_rs2_data, -- NEW CONNECTION
             ex_pc_out       => ex_pc,
             ex_pc_plus4_out => ex_pc_plus4,
             ex_imm_ext_out  => ex_imm_ext,
@@ -342,5 +348,7 @@ begin
     -- Debug Signals
     pc_debug    <= pc_current;
     instr_debug <= id_instr;
+	 rs1_debug   <= id_rs1_data; -- CONNECTED HERE
+    rs2_debug   <= id_rs2_data; -- CONNECTED HERE
 
 end architecture Structural;
