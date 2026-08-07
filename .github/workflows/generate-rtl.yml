@@ -3,6 +3,7 @@ name: Generate RTL Schematic
 on:
   push:
     branches:
+      - main
       - master
       - Factorizing_stages
 
@@ -25,6 +26,12 @@ jobs:
       - name: Install netlistsvg
         run: npm install -g netlistsvg
 
+      - name: Prepare Memory Initialization Files
+        run: |
+          # Copy hex file to root and rtl/core/ so GHDL finds it in any working directory
+          cp sw/boot_bram.hex ./boot_bram.hex 2>/dev/null || true
+          cp sw/boot_bram.hex ./rtl/core/boot_bram.hex 2>/dev/null || true
+
       - name: Generate RTL Schematic using Yosys & GHDL Container
         uses: addnab/docker-run-action@v3
         with:
@@ -35,6 +42,7 @@ jobs:
 
             # Added 'setundef -zero' to sanitize undefined/high-Z bit enum values for netlistsvg
             yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed --latches $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; setundef -zero; write_json -compat-int rtl.json"
+
       - name: Convert JSON to SVG Schematic & Bake Light Background
         run: |
           netlistsvg rtl.json -o rtl_schematic.svg
@@ -47,9 +55,3 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add rtl_schematic.svg
           git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update RTL schematic" && git push)
-      # GitHub Actions / Runner Step Example
-      - name: Run GHDL Analysis
-        run: |
-          # Ensure sw/ folder and hex file exist at root execution level
-          ls -la sw/boot_bram.hex
-          ghdl -a --std=08 rtl/core/*.vhd          
