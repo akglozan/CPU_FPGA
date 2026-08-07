@@ -28,9 +28,7 @@ jobs:
 
       - name: Prepare Memory Initialization Files
         run: |
-          # Copy hex file to root and rtl/core/ so GHDL finds it in any working directory
-          cp sw/boot_bram.hex ./boot_bram.hex 2>/dev/null || true
-          cp sw/boot_bram.hex ./rtl/core/boot_bram.hex 2>/dev/null || true
+          cp sw/boot_bram.hex ./boot_bram.hex
 
       - name: Generate RTL Schematic using Yosys & GHDL Container
         uses: addnab/docker-run-action@v3
