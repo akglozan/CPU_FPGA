@@ -19,7 +19,6 @@
 *.jbc
 *.ekp
 *.rbf
-*.hex
 *.ttf
 
 # Reports, summaries, and tool messages
