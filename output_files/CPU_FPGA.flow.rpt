@@ -1,5 +1,5 @@
 Flow report for CPU_FPGA
-Fri Aug 07 16:36:58 2026
+Fri Aug 07 16:44:10 2026
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -40,7 +40,7 @@ applicable agreement for further details.
 +--------------------------------------------------------------------------------------+
 ; Flow Summary                                                                         ;
 +------------------------------------+-------------------------------------------------+
-; Flow Status                        ; Successful - Fri Aug 07 16:36:53 2026           ;
+; Flow Status                        ; Successful - Fri Aug 07 16:44:05 2026           ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition ;
 ; Revision Name                      ; CPU_FPGA                                        ;
 ; Top-level Entity Name              ; CPU_Top_Wrapper                                 ;
@@ -64,7 +64,7 @@ applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 08/07/2026 16:36:16 ;
+; Start date & time ; 08/07/2026 16:43:27 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; CPU_FPGA            ;
 +-------------------+---------------------+
@@ -75,7 +75,7 @@ applicable agreement for further details.
 +-------------------------------------+---------------------------------+---------------+-----------------+------------+
 ; Assignment Name                     ; Value                           ; Default Value ; Entity Name     ; Section Id ;
 +-------------------------------------+---------------------------------+---------------+-----------------+------------+
-; COMPILER_SIGNATURE_ID               ; 242035505737454.178611337637120 ; --            ; --              ; --         ;
+; COMPILER_SIGNATURE_ID               ; 242035505737454.178611380706804 ; --            ; --              ; --         ;
 ; MAX_CORE_JUNCTION_TEMP              ; 85                              ; --            ; --              ; --         ;
 ; MIN_CORE_JUNCTION_TEMP              ; 0                               ; --            ; --              ; --         ;
 ; PARTITION_COLOR                     ; 16764057                        ; --            ; CPU_Top_Wrapper ; Top        ;
@@ -93,11 +93,11 @@ applicable agreement for further details.
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis      ; 00:00:10     ; 1.0                     ; 4713 MB             ; 00:00:10                           ;
-; Fitter                    ; 00:00:23     ; 1.0                     ; 4955 MB             ; 00:00:23                           ;
+; Analysis & Synthesis      ; 00:00:10     ; 1.0                     ; 4738 MB             ; 00:00:10                           ;
+; Fitter                    ; 00:00:23     ; 1.0                     ; 4956 MB             ; 00:00:24                           ;
 ; Assembler                 ; 00:00:01     ; 1.0                     ; 4569 MB             ; 00:00:01                           ;
-; TimeQuest Timing Analyzer ; 00:00:04     ; 1.0                     ; 4667 MB             ; 00:00:04                           ;
-; Total                     ; 00:00:38     ; --                      ; --                  ; 00:00:38                           ;
+; TimeQuest Timing Analyzer ; 00:00:04     ; 1.0                     ; 4662 MB             ; 00:00:04                           ;
+; Total                     ; 00:00:38     ; --                      ; --                  ; 00:00:39                           ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 

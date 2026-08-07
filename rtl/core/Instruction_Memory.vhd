@@ -6,10 +6,6 @@ use STD.textio.all;
 
 entity Instruction_Memory is
 
-generic (
-        HEX_FILE_PATH : string := "sw/boot_bram.hex"
-    );
-
 port(
 	clk		:	in std_logic;
 	
@@ -43,7 +39,7 @@ begin
     return temp_ram;
 end function;
 	
-	signal ram : memory_type := init_ram_from_file(HEX_FILE_PATH);
+	signal ram : memory_type := init_ram_from_file("boot_bram.hex");
 	
 begin
 
