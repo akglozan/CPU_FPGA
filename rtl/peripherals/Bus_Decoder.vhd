@@ -11,7 +11,7 @@ entity Bus_Decoder is
     );
 end entity Bus_Decoder;
 
-architecture of Bus_Decoder is
+architecture Behavioral of Bus_Decoder is
 
 begin
 
