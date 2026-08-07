@@ -10,3 +10,5 @@ Address Range,Target Peripheral,Description / Function
 Bus interconnect: Wishbone B4
 
 Program counter <= Done
+
+finished phase 1
