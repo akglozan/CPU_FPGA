@@ -72,6 +72,9 @@ begin
     -- Pass-through execution result for EX forwarding
     mem_result_fwd_out <= mem_result_in;
 
+    -- FIX: Drive the unassigned output port to prevent Yosys synthesis errors
+    wb_pc_plus4_out <= (others => '0');
+
     -- Data Memory Instantiation
     U_DMEM : Data_Memory
         port map (
