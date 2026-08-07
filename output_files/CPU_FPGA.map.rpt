@@ -1,5 +1,5 @@
-Analysis & Synthesis report for CPU_FPGA
-Fri Aug 07 16:43:38 2026
+Analysis & Elaboration report for CPU_FPGA
+Fri Aug 07 17:24:55 2026
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -7,44 +7,27 @@ Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edit
 ; Table of Contents ;
 ---------------------
   1. Legal Notice
-  2. Analysis & Synthesis Summary
-  3. Analysis & Synthesis Settings
-  4. Parallel Compilation
-  5. Analysis & Synthesis Source Files Read
-  6. Analysis & Synthesis Resource Usage Summary
-  7. Analysis & Synthesis Resource Utilization by Entity
-  8. Analysis & Synthesis RAM Summary
-  9. Analysis & Synthesis DSP Block Usage Summary
- 10. State Machine - |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|current_state
- 11. User-Specified and Inferred Latches
- 12. Registers Removed During Synthesis
- 13. Removed Registers Triggering Further Register Optimizations
- 14. General Register Statistics
- 15. Registers Packed Into Inferred Megafunctions
- 16. Multiplexer Restructuring Statistics (Restructuring Performed)
- 17. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1|altsyncram_1f81:auto_generated
- 18. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2|altsyncram_1f81:auto_generated
- 19. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3|altsyncram_1f81:auto_generated
- 20. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4|altsyncram_1f81:auto_generated
- 21. Source assignments for CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0|altsyncram_9b81:auto_generated
- 22. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU
- 23. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF
- 24. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC
- 25. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1
- 26. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2
- 27. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3
- 28. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4
- 29. Parameter Settings for Inferred Entity Instance: CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0
- 30. Parameter Settings for Inferred Entity Instance: CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0
- 31. altsyncram Parameter Settings by Entity Instance
- 32. lpm_mult Parameter Settings by Entity Instance
- 33. Port Connectivity Checks: "CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB"
- 34. Port Connectivity Checks: "CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|EX_MEM_Register:U_EX_MEM"
- 35. Port Connectivity Checks: "CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID"
- 36. Port Connectivity Checks: "CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC"
- 37. Port Connectivity Checks: "CPU_FPGA:U_CPU"
- 38. Elapsed Time Per Partition
- 39. Analysis & Synthesis Messages
+  2. Analysis & Elaboration Summary
+  3. Parallel Compilation
+  4. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1|altsyncram_1f81:auto_generated
+  5. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2|altsyncram_1f81:auto_generated
+  6. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3|altsyncram_1f81:auto_generated
+  7. Source assignments for CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4|altsyncram_1f81:auto_generated
+  8. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU
+  9. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF
+ 10. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC
+ 11. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1
+ 12. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2
+ 13. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3
+ 14. Parameter Settings for User Entity Instance: CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4
+ 15. altsyncram Parameter Settings by Entity Instance
+ 16. Analysis & Elaboration Settings
+ 17. Port Connectivity Checks: "CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB"
+ 18. Port Connectivity Checks: "CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|EX_MEM_Register:U_EX_MEM"
+ 19. Port Connectivity Checks: "CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID"
+ 20. Port Connectivity Checks: "CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC"
+ 21. Port Connectivity Checks: "CPU_FPGA:U_CPU"
+ 22. Analysis & Elaboration Messages
 
 
 
@@ -68,111 +51,23 @@ applicable agreement for further details.
 
 
 +--------------------------------------------------------------------------------------+
-; Analysis & Synthesis Summary                                                         ;
+; Analysis & Elaboration Summary                                                       ;
 +------------------------------------+-------------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Fri Aug 07 16:43:38 2026           ;
+; Analysis & Elaboration Status      ; Successful - Fri Aug 07 17:24:55 2026           ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition ;
 ; Revision Name                      ; CPU_FPGA                                        ;
 ; Top-level Entity Name              ; CPU_Top_Wrapper                                 ;
 ; Family                             ; Cyclone IV E                                    ;
-; Total logic elements               ; 4,398                                           ;
-;     Total combinational functions  ; 3,423                                           ;
-;     Dedicated logic registers      ; 1,443                                           ;
-; Total registers                    ; 1443                                            ;
-; Total pins                         ; 12                                              ;
-; Total virtual pins                 ; 0                                               ;
-; Total memory bits                  ; 65,536                                          ;
-; Embedded Multiplier 9-bit elements ; 8                                               ;
-; Total PLLs                         ; 0                                               ;
+; Total logic elements               ; N/A until Partition Merge                       ;
+;     Total combinational functions  ; N/A until Partition Merge                       ;
+;     Dedicated logic registers      ; N/A until Partition Merge                       ;
+; Total registers                    ; N/A until Partition Merge                       ;
+; Total pins                         ; N/A until Partition Merge                       ;
+; Total virtual pins                 ; N/A until Partition Merge                       ;
+; Total memory bits                  ; N/A until Partition Merge                       ;
+; Embedded Multiplier 9-bit elements ; N/A until Partition Merge                       ;
+; Total PLLs                         ; N/A until Partition Merge                       ;
 +------------------------------------+-------------------------------------------------+
-
-
-+----------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Settings                                                                                        ;
-+----------------------------------------------------------------------------+--------------------+--------------------+
-; Option                                                                     ; Setting            ; Default Value      ;
-+----------------------------------------------------------------------------+--------------------+--------------------+
-; Device                                                                     ; EP4CE6E22C8        ;                    ;
-; Top-level entity name                                                      ; CPU_Top_Wrapper    ; CPU_FPGA           ;
-; Family name                                                                ; Cyclone IV E       ; Cyclone IV GX      ;
-; VHDL Show LMF Mapping Messages                                             ; Off                ;                    ;
-; VHDL Version                                                               ; VHDL_2008          ; VHDL_1993          ;
-; Use smart compilation                                                      ; Off                ; Off                ;
-; Enable parallel Assembler and TimeQuest Timing Analyzer during compilation ; On                 ; On                 ;
-; Enable compact report table                                                ; Off                ; Off                ;
-; Restructure Multiplexers                                                   ; Auto               ; Auto               ;
-; Create Debugging Nodes for IP Cores                                        ; Off                ; Off                ;
-; Preserve fewer node names                                                  ; On                 ; On                 ;
-; Disable OpenCore Plus hardware evaluation                                  ; Off                ; Off                ;
-; Verilog Version                                                            ; Verilog_2001       ; Verilog_2001       ;
-; State Machine Processing                                                   ; Auto               ; Auto               ;
-; Safe State Machine                                                         ; Off                ; Off                ;
-; Extract Verilog State Machines                                             ; On                 ; On                 ;
-; Extract VHDL State Machines                                                ; On                 ; On                 ;
-; Ignore Verilog initial constructs                                          ; Off                ; Off                ;
-; Iteration limit for constant Verilog loops                                 ; 5000               ; 5000               ;
-; Iteration limit for non-constant Verilog loops                             ; 250                ; 250                ;
-; Add Pass-Through Logic to Inferred RAMs                                    ; On                 ; On                 ;
-; Infer RAMs from Raw Logic                                                  ; On                 ; On                 ;
-; Parallel Synthesis                                                         ; On                 ; On                 ;
-; DSP Block Balancing                                                        ; Auto               ; Auto               ;
-; NOT Gate Push-Back                                                         ; On                 ; On                 ;
-; Power-Up Don't Care                                                        ; On                 ; On                 ;
-; Remove Redundant Logic Cells                                               ; Off                ; Off                ;
-; Remove Duplicate Registers                                                 ; On                 ; On                 ;
-; Ignore CARRY Buffers                                                       ; Off                ; Off                ;
-; Ignore CASCADE Buffers                                                     ; Off                ; Off                ;
-; Ignore GLOBAL Buffers                                                      ; Off                ; Off                ;
-; Ignore ROW GLOBAL Buffers                                                  ; Off                ; Off                ;
-; Ignore LCELL Buffers                                                       ; Off                ; Off                ;
-; Ignore SOFT Buffers                                                        ; On                 ; On                 ;
-; Limit AHDL Integers to 32 Bits                                             ; Off                ; Off                ;
-; Optimization Technique                                                     ; Balanced           ; Balanced           ;
-; Carry Chain Length                                                         ; 70                 ; 70                 ;
-; Auto Carry Chains                                                          ; On                 ; On                 ;
-; Auto Open-Drain Pins                                                       ; On                 ; On                 ;
-; Perform WYSIWYG Primitive Resynthesis                                      ; Off                ; Off                ;
-; Auto ROM Replacement                                                       ; On                 ; On                 ;
-; Auto RAM Replacement                                                       ; On                 ; On                 ;
-; Auto DSP Block Replacement                                                 ; On                 ; On                 ;
-; Auto Shift Register Replacement                                            ; Auto               ; Auto               ;
-; Allow Shift Register Merging across Hierarchies                            ; Auto               ; Auto               ;
-; Auto Clock Enable Replacement                                              ; On                 ; On                 ;
-; Strict RAM Replacement                                                     ; Off                ; Off                ;
-; Allow Synchronous Control Signals                                          ; On                 ; On                 ;
-; Force Use of Synchronous Clear Signals                                     ; Off                ; Off                ;
-; Auto RAM Block Balancing                                                   ; On                 ; On                 ;
-; Auto RAM to Logic Cell Conversion                                          ; Off                ; Off                ;
-; Auto Resource Sharing                                                      ; Off                ; Off                ;
-; Allow Any RAM Size For Recognition                                         ; Off                ; Off                ;
-; Allow Any ROM Size For Recognition                                         ; Off                ; Off                ;
-; Allow Any Shift Register Size For Recognition                              ; Off                ; Off                ;
-; Use LogicLock Constraints during Resource Balancing                        ; On                 ; On                 ;
-; Ignore translate_off and synthesis_off directives                          ; Off                ; Off                ;
-; Timing-Driven Synthesis                                                    ; On                 ; On                 ;
-; Report Parameter Settings                                                  ; On                 ; On                 ;
-; Report Source Assignments                                                  ; On                 ; On                 ;
-; Report Connectivity Checks                                                 ; On                 ; On                 ;
-; Ignore Maximum Fan-Out Assignments                                         ; Off                ; Off                ;
-; Synchronization Register Chain Length                                      ; 2                  ; 2                  ;
-; PowerPlay Power Optimization                                               ; Normal compilation ; Normal compilation ;
-; HDL message level                                                          ; Level2             ; Level2             ;
-; Suppress Register Optimization Related Messages                            ; Off                ; Off                ;
-; Number of Removed Registers Reported in Synthesis Report                   ; 5000               ; 5000               ;
-; Number of Swept Nodes Reported in Synthesis Report                         ; 5000               ; 5000               ;
-; Number of Inverted Registers Reported in Synthesis Report                  ; 100                ; 100                ;
-; Clock MUX Protection                                                       ; On                 ; On                 ;
-; Auto Gated Clock Conversion                                                ; Off                ; Off                ;
-; Block Design Naming                                                        ; Auto               ; Auto               ;
-; SDC constraint protection                                                  ; Off                ; Off                ;
-; Synthesis Effort                                                           ; Auto               ; Auto               ;
-; Shift Register Replacement - Allow Asynchronous Clear Signal               ; On                 ; On                 ;
-; Pre-Mapping Resynthesis Optimization                                       ; Off                ; Off                ;
-; Analysis & Synthesis Message Level                                         ; Medium             ; Medium             ;
-; Disable Register Merging Across Hierarchies                                ; Auto               ; Auto               ;
-; Resource Aware Inference For Block RAM                                     ; On                 ; On                 ;
-; Synthesis Seed                                                             ; 1                  ; 1                  ;
-+----------------------------------------------------------------------------+--------------------+--------------------+
 
 
 Parallel compilation was disabled, but you have multiple processors available. Enable parallel compilation to reduce compilation time.
@@ -184,380 +79,6 @@ Parallel compilation was disabled, but you have multiple processors available. E
 ; Number detected on machine ; 16     ;
 ; Maximum allowed            ; 1      ;
 +----------------------------+--------+
-
-
-+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Source Files Read                                                                                                                                                                                          ;
-+------------------------------------------------------+-----------------+-------------------------------------------------------+--------------------------------------------------------------------------------------+---------+
-; File Name with User-Entered Path                     ; Used in Netlist ; File Type                                             ; File Name with Absolute Path                                                         ; Library ;
-+------------------------------------------------------+-----------------+-------------------------------------------------------+--------------------------------------------------------------------------------------+---------+
-; rtl/core/Program_Counter.vhd                         ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/Program_Counter.vhd                         ;         ;
-; rtl/core/Instruction_Memory.vhd                      ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/Instruction_Memory.vhd                      ;         ;
-; rtl/core/IF_ID_Register.vhd                          ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/IF_ID_Register.vhd                          ;         ;
-; rtl/core/RegFile.vhd                                 ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/RegFile.vhd                                 ;         ;
-; rtl/core/ImmGen.vhd                                  ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/ImmGen.vhd                                  ;         ;
-; rtl/core/ID_EX_Register.vhd                          ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/ID_EX_Register.vhd                          ;         ;
-; rtl/core/Control_Unit.vhd                            ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/Control_Unit.vhd                            ;         ;
-; rtl/core/ALU.vhd                                     ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/ALU.vhd                                     ;         ;
-; rtl/core/M_Extension_Unit.vhd                        ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/M_Extension_Unit.vhd                        ;         ;
-; rtl/core/Hazard_Unit.vhd                             ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/Hazard_Unit.vhd                             ;         ;
-; rtl/core/Forwarding_Unit.vhd                         ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/Forwarding_Unit.vhd                         ;         ;
-; rtl/core/EX_MEM_Register.vhd                         ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/EX_MEM_Register.vhd                         ;         ;
-; rtl/core/Data_Memory.vhd                             ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/Data_Memory.vhd                             ;         ;
-; rtl/core/MEM_WB_Register.vhd                         ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/MEM_WB_Register.vhd                         ;         ;
-; rtl/core/IF_Stage.vhd                                ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/IF_Stage.vhd                                ;         ;
-; rtl/core/ID_Stage.vhd                                ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/ID_Stage.vhd                                ;         ;
-; rtl/core/EX_Stage.vhd                                ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/EX_Stage.vhd                                ;         ;
-; rtl/core/MEM_Stage.vhd                               ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/MEM_Stage.vhd                               ;         ;
-; rtl/core/CPU_FPGA.vhd                                ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/CPU_FPGA.vhd                                ;         ;
-; rtl/core/CPU_Top_Wrapper.vhd                         ; yes             ; User VHDL File                                        ; C:/Users/ozana/Desktop/CPU_FPGA/rtl/core/CPU_Top_Wrapper.vhd                         ;         ;
-; altsyncram.tdf                                       ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/altsyncram.tdf                     ;         ;
-; stratix_ram_block.inc                                ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/stratix_ram_block.inc              ;         ;
-; lpm_mux.inc                                          ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/lpm_mux.inc                        ;         ;
-; lpm_decode.inc                                       ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/lpm_decode.inc                     ;         ;
-; aglobal130.inc                                       ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/aglobal130.inc                     ;         ;
-; a_rdenreg.inc                                        ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/a_rdenreg.inc                      ;         ;
-; altrom.inc                                           ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/altrom.inc                         ;         ;
-; altram.inc                                           ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/altram.inc                         ;         ;
-; altdpram.inc                                         ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/altdpram.inc                       ;         ;
-; db/altsyncram_1f81.tdf                               ; yes             ; Auto-Generated Megafunction                           ; C:/Users/ozana/Desktop/CPU_FPGA/db/altsyncram_1f81.tdf                               ;         ;
-; db/altsyncram_9b81.tdf                               ; yes             ; Auto-Generated Megafunction                           ; C:/Users/ozana/Desktop/CPU_FPGA/db/altsyncram_9b81.tdf                               ;         ;
-; db/cpu_fpga.ram0_instruction_memory_6c21a04c.hdl.mif ; yes             ; Auto-Generated Auto-Found Memory Initialization File  ; C:/Users/ozana/Desktop/CPU_FPGA/db/cpu_fpga.ram0_instruction_memory_6c21a04c.hdl.mif ;         ;
-; lpm_mult.tdf                                         ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/lpm_mult.tdf                       ;         ;
-; lpm_add_sub.inc                                      ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/lpm_add_sub.inc                    ;         ;
-; multcore.inc                                         ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/multcore.inc                       ;         ;
-; bypassff.inc                                         ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/bypassff.inc                       ;         ;
-; altshift.inc                                         ; yes             ; Megafunction                                          ; c:/altera/13.0sp1/quartus/libraries/megafunctions/altshift.inc                       ;         ;
-; db/mult_86t.tdf                                      ; yes             ; Auto-Generated Megafunction                           ; C:/Users/ozana/Desktop/CPU_FPGA/db/mult_86t.tdf                                      ;         ;
-+------------------------------------------------------+-----------------+-------------------------------------------------------+--------------------------------------------------------------------------------------+---------+
-
-
-+---------------------------------------------------------+
-; Analysis & Synthesis Resource Usage Summary             ;
-+---------------------------------------------+-----------+
-; Resource                                    ; Usage     ;
-+---------------------------------------------+-----------+
-; Estimated Total logic elements              ; 4,398     ;
-;                                             ;           ;
-; Total combinational functions               ; 3423      ;
-; Logic element usage by number of LUT inputs ;           ;
-;     -- 4 input functions                    ; 2346      ;
-;     -- 3 input functions                    ; 844       ;
-;     -- <=2 input functions                  ; 233       ;
-;                                             ;           ;
-; Logic elements by mode                      ;           ;
-;     -- normal mode                          ; 3016      ;
-;     -- arithmetic mode                      ; 407       ;
-;                                             ;           ;
-; Total registers                             ; 1443      ;
-;     -- Dedicated logic registers            ; 1443      ;
-;     -- I/O registers                        ; 0         ;
-;                                             ;           ;
-; I/O pins                                    ; 12        ;
-; Total memory bits                           ; 65536     ;
-; Embedded Multiplier 9-bit elements          ; 8         ;
-; Maximum fan-out node                        ; clk~input ;
-; Maximum fan-out                             ; 1507      ;
-; Total fan-out                               ; 17948     ;
-; Average fan-out                             ; 3.62      ;
-+---------------------------------------------+-----------+
-
-
-+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                                                                                                                                            ;
-+-------------------------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------------+--------------+
-; Compilation Hierarchy Node                      ; LC Combinationals ; LC Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                               ; Library Name ;
-+-------------------------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------------+--------------+
-; |CPU_Top_Wrapper                                ; 3423 (17)         ; 1443 (0)     ; 65536       ; 8            ; 0       ; 4         ; 12   ; 0            ; |CPU_Top_Wrapper                                                                                                                  ; work         ;
-;    |CPU_FPGA:U_CPU|                             ; 3406 (32)         ; 1443 (0)     ; 65536       ; 8            ; 0       ; 4         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU                                                                                                   ; work         ;
-;       |EX_Stage:U_STAGE_EX|                     ; 1579 (331)        ; 184 (0)      ; 0           ; 8            ; 0       ; 4         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX                                                                               ; work         ;
-;          |ALU:U_ALU|                            ; 668 (668)         ; 0 (0)        ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|ALU:U_ALU                                                                     ; work         ;
-;          |EX_MEM_Register:U_EX_MEM|             ; 23 (23)           ; 75 (75)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|EX_MEM_Register:U_EX_MEM                                                      ; work         ;
-;          |Forwarding_Unit:U_FWD|                ; 20 (20)           ; 0 (0)        ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|Forwarding_Unit:U_FWD                                                         ; work         ;
-;          |M_Extension_Unit:U_M_EXT|             ; 537 (445)         ; 109 (109)    ; 0           ; 8            ; 0       ; 4         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT                                                      ; work         ;
-;             |lpm_mult:Mult0|                    ; 92 (0)            ; 0 (0)        ; 0           ; 8            ; 0       ; 4         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0                                       ; work         ;
-;                |mult_86t:auto_generated|        ; 92 (92)           ; 0 (0)        ; 0           ; 8            ; 0       ; 4         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0|mult_86t:auto_generated               ; work         ;
-;       |Hazard_Unit:U_HAZARD|                    ; 10 (10)           ; 0 (0)        ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|Hazard_Unit:U_HAZARD                                                                              ; work         ;
-;       |ID_Stage:U_STAGE_ID|                     ; 1564 (0)          ; 1129 (0)     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID                                                                               ; work         ;
-;          |Control_Unit:U_CONTROL|               ; 24 (24)           ; 0 (0)        ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|Control_Unit:U_CONTROL                                                        ; work         ;
-;          |ID_EX_Register:U_ID_EX|               ; 1119 (1119)       ; 137 (137)    ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX                                                        ; work         ;
-;          |ImmGen:U_IMMGEN|                      ; 3 (3)             ; 0 (0)        ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ImmGen:U_IMMGEN                                                               ; work         ;
-;          |RegFile:U_REGFILE|                    ; 418 (418)         ; 992 (992)    ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE                                                             ; work         ;
-;       |IF_Stage:U_STAGE_IF|                     ; 77 (0)            ; 56 (0)       ; 32768       ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF                                                                               ; work         ;
-;          |IF_ID_Register:U_IF_ID|               ; 45 (45)           ; 44 (44)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID                                                        ; work         ;
-;          |Instruction_Memory:U_IMEM|            ; 0 (0)             ; 0 (0)        ; 32768       ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM                                                     ; work         ;
-;             |altsyncram:ram_rtl_0|              ; 0 (0)             ; 0 (0)        ; 32768       ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0                                ; work         ;
-;                |altsyncram_9b81:auto_generated| ; 0 (0)             ; 0 (0)        ; 32768       ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0|altsyncram_9b81:auto_generated ; work         ;
-;          |Program_Counter:U_PC|                 ; 32 (32)           ; 12 (12)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC                                                          ; work         ;
-;       |MEM_Stage:U_STAGE_MEM|                   ; 144 (0)           ; 74 (0)       ; 32768       ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM                                                                             ; work         ;
-;          |Data_Memory:U_DMEM|                   ; 68 (68)           ; 3 (3)        ; 32768       ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM                                                          ; work         ;
-;             |altsyncram:ram[0][15]__3|          ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3                                 ; work         ;
-;                |altsyncram_1f81:auto_generated| ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3|altsyncram_1f81:auto_generated  ; work         ;
-;             |altsyncram:ram[0][23]__2|          ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2                                 ; work         ;
-;                |altsyncram_1f81:auto_generated| ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2|altsyncram_1f81:auto_generated  ; work         ;
-;             |altsyncram:ram[0][31]__1|          ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1                                 ; work         ;
-;                |altsyncram_1f81:auto_generated| ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1|altsyncram_1f81:auto_generated  ; work         ;
-;             |altsyncram:ram[0][7]__4|           ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4                                  ; work         ;
-;                |altsyncram_1f81:auto_generated| ; 0 (0)             ; 0 (0)        ; 8192        ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4|altsyncram_1f81:auto_generated   ; work         ;
-;          |MEM_WB_Register:U_MEM_WB|             ; 76 (76)           ; 71 (71)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB                                                    ; work         ;
-+-------------------------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------------+--------------+
-Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
-
-
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis RAM Summary                                                                                                                                                                                                                                            ;
-+-----------------------------------------------------------------------------------------------------------------------------+------+-------------+--------------+--------------+--------------+--------------+-------+------------------------------------------------------+
-; Name                                                                                                                        ; Type ; Mode        ; Port A Depth ; Port A Width ; Port B Depth ; Port B Width ; Size  ; MIF                                                  ;
-+-----------------------------------------------------------------------------------------------------------------------------+------+-------------+--------------+--------------+--------------+--------------+-------+------------------------------------------------------+
-; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0|altsyncram_9b81:auto_generated|ALTSYNCRAM ; AUTO ; ROM         ; 1024         ; 32           ; --           ; --           ; 32768 ; db/CPU_FPGA.ram0_Instruction_Memory_6c21a04c.hdl.mif ;
-; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3|altsyncram_1f81:auto_generated|ALTSYNCRAM  ; AUTO ; Single Port ; 1024         ; 8            ; --           ; --           ; 8192  ; None                                                 ;
-; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2|altsyncram_1f81:auto_generated|ALTSYNCRAM  ; AUTO ; Single Port ; 1024         ; 8            ; --           ; --           ; 8192  ; None                                                 ;
-; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1|altsyncram_1f81:auto_generated|ALTSYNCRAM  ; AUTO ; Single Port ; 1024         ; 8            ; --           ; --           ; 8192  ; None                                                 ;
-; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4|altsyncram_1f81:auto_generated|ALTSYNCRAM   ; AUTO ; Single Port ; 1024         ; 8            ; --           ; --           ; 8192  ; None                                                 ;
-+-----------------------------------------------------------------------------------------------------------------------------+------+-------------+--------------+--------------+--------------+--------------+-------+------------------------------------------------------+
-
-
-+-----------------------------------------------------+
-; Analysis & Synthesis DSP Block Usage Summary        ;
-+---------------------------------------+-------------+
-; Statistic                             ; Number Used ;
-+---------------------------------------+-------------+
-; Simple Multipliers (9-bit)            ; 0           ;
-; Simple Multipliers (18-bit)           ; 4           ;
-; Embedded Multiplier Blocks            ; --          ;
-; Embedded Multiplier 9-bit elements    ; 8           ;
-; Signed Embedded Multipliers           ; 1           ;
-; Unsigned Embedded Multipliers         ; 1           ;
-; Mixed Sign Embedded Multipliers       ; 2           ;
-; Variable Sign Embedded Multipliers    ; 0           ;
-; Dedicated Input Shift Register Chains ; 0           ;
-+---------------------------------------+-------------+
-Note: number of Embedded Multiplier Blocks used is only available after a successful fit.
-
-
-Encoding Type:  One-Hot
-+------------------------------------------------------------------------------------------------------------+
-; State Machine - |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|current_state ;
-+-----------------------+--------------------+-----------------------+---------------------------------------+
-; Name                  ; current_state.DONE ; current_state.COMPUTE ; current_state.IDLE                    ;
-+-----------------------+--------------------+-----------------------+---------------------------------------+
-; current_state.IDLE    ; 0                  ; 0                     ; 0                                     ;
-; current_state.COMPUTE ; 0                  ; 1                     ; 1                                     ;
-; current_state.DONE    ; 1                  ; 0                     ; 1                                     ;
-+-----------------------+--------------------+-----------------------+---------------------------------------+
-
-
-+----------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; User-Specified and Inferred Latches                                                                                                                            ;
-+---------------------------------------------------------------------+-----------------------------------------------------------------+------------------------+
-; Latch Name                                                          ; Latch Enable Signal                                             ; Free of Timing Hazards ;
-+---------------------------------------------------------------------+-----------------------------------------------------------------+------------------------+
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|Control_Unit:U_CONTROL|alu_op[1] ; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|Control_Unit:U_CONTROL|Mux23 ; yes                    ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|Control_Unit:U_CONTROL|alu_op[0] ; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|Control_Unit:U_CONTROL|Mux23 ; yes                    ;
-; Number of user-specified and inferred latches = 2                   ;                                                                 ;                        ;
-+---------------------------------------------------------------------+-----------------------------------------------------------------+------------------------+
-Note: All latches listed above may not be present at the end of synthesis due to various synthesis optimizations.
-
-
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Registers Removed During Synthesis                                                                                                                                 ;
-+-----------------------------------------------------------------------------+--------------------------------------------------------------------------------------+
-; Register name                                                               ; Reason for Removal                                                                   ;
-+-----------------------------------------------------------------------------+--------------------------------------------------------------------------------------+
-; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB|wb_sel_out[1] ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|EX_MEM_Register:U_EX_MEM|mem_wb_sel      ; Merged with CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|EX_MEM_Register:U_EX_MEM|mem_mem_read ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|wb_sel_out[0]     ; Merged with CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|mem_read_out   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][0]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][1]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][2]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][3]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][4]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][5]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][6]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][7]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][31]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][30]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][29]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][28]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][27]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][26]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][25]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][24]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][23]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][22]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][21]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][20]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][19]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][18]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][17]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][16]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][15]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][14]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][13]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][12]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][11]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][10]       ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][9]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][8]        ; Stuck at GND due to stuck port data_in                                               ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[12..31]    ; Lost fanout                                                                          ;
-; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[12..31]      ; Lost fanout                                                                          ;
-; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[12..31]    ; Lost fanout                                                                          ;
-; Total Number of Removed Registers = 95                                      ;                                                                                      ;
-+-----------------------------------------------------------------------------+--------------------------------------------------------------------------------------+
-
-
-+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Removed Registers Triggering Further Register Optimizations                                                                                                                      ;
-+-----------------------------------------------------------------------------+---------------------------+------------------------------------------------------------------------+
-; Register name                                                               ; Reason for Removal        ; Registers Removed due to This Register                                 ;
-+-----------------------------------------------------------------------------+---------------------------+------------------------------------------------------------------------+
-; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[31]          ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[30],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[29],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[28],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[27],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[26],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[25],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[24],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[23],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[22],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[21],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[20],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[19],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[18],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[17],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[16],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[15],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[14],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[13],    ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[12]     ;
-; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB|wb_sel_out[1] ; Stuck at GND              ; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][31], ;
-;                                                                             ; due to stuck port data_in ; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][29], ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][28], ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][27], ;
-;                                                                             ;                           ; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][26]  ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[30]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[30]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[29]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[29]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[28]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[28]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[27]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[27]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[26]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[26]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[25]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[25]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[24]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[24]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[23]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[23]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[22]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[22]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[21]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[21]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[20]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[20]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[19]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[19]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[18]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[18]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[17]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[17]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[16]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[16]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[15]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[15]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[14]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[14]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[13]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[13]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[12]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[12]   ;
-; CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|pc_out[31]        ; Lost Fanouts              ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|pc_out[31]   ;
-+-----------------------------------------------------------------------------+---------------------------+------------------------------------------------------------------------+
-
-
-+------------------------------------------------------+
-; General Register Statistics                          ;
-+----------------------------------------------+-------+
-; Statistic                                    ; Value ;
-+----------------------------------------------+-------+
-; Total registers                              ; 1443  ;
-; Number of registers using Synchronous Clear  ; 125   ;
-; Number of registers using Synchronous Load   ; 120   ;
-; Number of registers using Asynchronous Clear ; 75    ;
-; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 1324  ;
-; Number of registers using Preset             ; 0     ;
-+----------------------------------------------+-------+
-
-
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Registers Packed Into Inferred Megafunctions                                                                                                                    ;
-+---------------------------------------------------------------------------------+------------------------------------------------------------------------+------+
-; Register Name                                                                   ; Megafunction                                                           ; Type ;
-+---------------------------------------------------------------------------------+------------------------------------------------------------------------+------+
-; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|instruction[0..31] ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|ram_rtl_0 ; RAM  ;
-+---------------------------------------------------------------------------------+------------------------------------------------------------------------+------+
-
-
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                                                                                    ;
-+--------------------+-----------+---------------+----------------------+------------------------+------------+-----------------------------------------------------------------------------------------------------+
-; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                                                                          ;
-+--------------------+-----------+---------------+----------------------+------------------------+------------+-----------------------------------------------------------------------------------------------------+
-; 3:1                ; 6 bits    ; 12 LEs        ; 6 LEs                ; 6 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|count[0]               ;
-; 3:1                ; 66 bits   ; 132 LEs       ; 66 LEs               ; 66 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|rs1_addr_out[0]          ;
-; 4:1                ; 64 bits   ; 128 LEs       ; 64 LEs               ; 64 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[13]      ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[31][12]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[30][4]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[29][13]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[28][1]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[27][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[26][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[25][30]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[24][3]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[23][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[22][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[21][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[20][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[19][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[18][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[17][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[16][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[15][7]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[14][10]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[13][18]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[12][28]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[11][15]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[10][17]             ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[9][23]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[8][15]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[7][8]               ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[6][22]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[5][30]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[4][30]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[3][30]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[2][30]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[1][30]              ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|registers[0][30]              ;
-; 5:1                ; 2 bits    ; 6 LEs         ; 4 LEs                ; 2 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[0]                  ;
-; 5:1                ; 30 bits   ; 90 LEs        ; 60 LEs               ; 30 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Program_Counter:U_PC|pc_reg[25]                 ;
-; 9:1                ; 32 bits   ; 192 LEs       ; 96 LEs               ; 96 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|EX_MEM_Register:U_EX_MEM|mem_result[8]          ;
-; 4:1                ; 6 bits    ; 12 LEs        ; 6 LEs                ; 6 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|mem_write_out            ;
-; 5:1                ; 7 bits    ; 21 LEs        ; 14 LEs               ; 7 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|imm_ext_out[30]          ;
-; 5:1                ; 3 bits    ; 9 LEs         ; 3 LEs                ; 6 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|sign_remainder         ;
-; 5:1                ; 32 bits   ; 96 LEs        ; 64 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|divisor_reg[0]         ;
-; 6:1                ; 6 bits    ; 24 LEs        ; 12 LEs               ; 12 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|imm_ext_out[6]           ;
-; 6:1                ; 16 bits   ; 64 LEs        ; 32 LEs               ; 32 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB|wb_read_data_out[20] ;
-; 6:1                ; 4 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|imm_ext_out[3]           ;
-; 6:1                ; 4 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|imm_ext_out[21]          ;
-; 7:1                ; 7 bits    ; 28 LEs        ; 14 LEs               ; 14 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB|wb_read_data_out[14] ;
-; 9:1                ; 7 bits    ; 42 LEs        ; 14 LEs               ; 28 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB|wb_read_data_out[4]  ;
-; 8:1                ; 8 bits    ; 40 LEs        ; 16 LEs               ; 24 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|imm_ext_out[18]          ;
-; 35:1               ; 24 bits   ; 552 LEs       ; 528 LEs              ; 24 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|reg_data1_out[27]        ;
-; 35:1               ; 24 bits   ; 552 LEs       ; 528 LEs              ; 24 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|reg_data2_out[15]        ;
-; 9:1                ; 32 bits   ; 192 LEs       ; 128 LEs              ; 64 LEs                 ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|quotient_reg[28]       ;
-; 15:1               ; 2 bits    ; 20 LEs        ; 16 LEs               ; 4 LEs                  ; Yes        ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|ID_EX_Register:U_ID_EX|alu_ctrl_out[1]          ;
-; 4:1                ; 8 bits    ; 16 LEs        ; 16 LEs               ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|Mux3                                                                               ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 64 LEs               ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|Mux27                                           ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 64 LEs               ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|Mux32                                           ;
-; 3:1                ; 2 bits    ; 4 LEs         ; 4 LEs                ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|Hazard_Unit:U_HAZARD|if_id_flush                                    ;
-; 3:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|Mux32                      ;
-; 3:1                ; 8 bits    ; 16 LEs        ; 16 LEs               ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|Mux27                      ;
-; 4:1                ; 16 bits   ; 32 LEs        ; 32 LEs               ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|Mux10                      ;
-; 4:1                ; 32 bits   ; 64 LEs        ; 64 LEs               ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|v_final_rem            ;
-; 5:1                ; 4 bits    ; 12 LEs        ; 8 LEs                ; 4 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|byte_enable[0]             ;
-; 33:1               ; 8 bits    ; 176 LEs       ; 176 LEs              ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|rs1_data[6]                   ;
-; 33:1               ; 8 bits    ; 176 LEs       ; 176 LEs              ; 0 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|RegFile:U_REGFILE|rs2_data[6]                   ;
-; 18:1               ; 7 bits    ; 84 LEs        ; 56 LEs               ; 28 LEs                 ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|ALU:U_ALU|Mux9                                  ;
-; 17:1               ; 8 bits    ; 88 LEs        ; 56 LEs               ; 32 LEs                 ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|ALU:U_ALU|Mux17                                 ;
-; 19:1               ; 4 bits    ; 48 LEs        ; 36 LEs               ; 12 LEs                 ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|ALU:U_ALU|Mux5                                  ;
-; 18:1               ; 4 bits    ; 48 LEs        ; 32 LEs               ; 16 LEs                 ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|ALU:U_ALU|Mux24                                 ;
-; 20:1               ; 2 bits    ; 26 LEs        ; 18 LEs               ; 8 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|ALU:U_ALU|Mux3                                  ;
-; 19:1               ; 2 bits    ; 24 LEs        ; 18 LEs               ; 6 LEs                  ; No         ; |CPU_Top_Wrapper|CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|ALU:U_ALU|Mux28                                 ;
-+--------------------+-----------+---------------+----------------------+------------------------+------------+-----------------------------------------------------------------------------------------------------+
 
 
 +----------------------------------------------------------------------------------------------------------------------------------------+
@@ -594,15 +115,6 @@ Note: All latches listed above may not be present at the end of synthesis due to
 +---------------------------------+--------------------+------+-------------------------------------------------------------------------+
 ; OPTIMIZE_POWER_DURING_SYNTHESIS ; NORMAL_COMPILATION ; -    ; -                                                                       ;
 +---------------------------------+--------------------+------+-------------------------------------------------------------------------+
-
-
-+-----------------------------------------------------------------------------------------------------------------------------------------+
-; Source assignments for CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0|altsyncram_9b81:auto_generated ;
-+---------------------------------+--------------------+------+---------------------------------------------------------------------------+
-; Assignment                      ; Value              ; From ; To                                                                        ;
-+---------------------------------+--------------------+------+---------------------------------------------------------------------------+
-; OPTIMIZE_POWER_DURING_SYNTHESIS ; NORMAL_COMPILATION ; -    ; -                                                                         ;
-+---------------------------------+--------------------+------+---------------------------------------------------------------------------+
 
 
 +-------------------------------------------------------------+
@@ -879,184 +391,145 @@ Note: In order to hide this table in the UI and the text report file, please set
 Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
 
 
-+------------------------------------------------------------------------------------------------------------------------------------+
-; Parameter Settings for Inferred Entity Instance: CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0 ;
-+------------------------------------+------------------------------------------------------+----------------------------------------+
-; Parameter Name                     ; Value                                                ; Type                                   ;
-+------------------------------------+------------------------------------------------------+----------------------------------------+
-; BYTE_SIZE_BLOCK                    ; 8                                                    ; Untyped                                ;
-; AUTO_CARRY_CHAINS                  ; ON                                                   ; AUTO_CARRY                             ;
-; IGNORE_CARRY_BUFFERS               ; OFF                                                  ; IGNORE_CARRY                           ;
-; AUTO_CASCADE_CHAINS                ; ON                                                   ; AUTO_CASCADE                           ;
-; IGNORE_CASCADE_BUFFERS             ; OFF                                                  ; IGNORE_CASCADE                         ;
-; WIDTH_BYTEENA                      ; 1                                                    ; Untyped                                ;
-; OPERATION_MODE                     ; ROM                                                  ; Untyped                                ;
-; WIDTH_A                            ; 32                                                   ; Untyped                                ;
-; WIDTHAD_A                          ; 10                                                   ; Untyped                                ;
-; NUMWORDS_A                         ; 1024                                                 ; Untyped                                ;
-; OUTDATA_REG_A                      ; UNREGISTERED                                         ; Untyped                                ;
-; ADDRESS_ACLR_A                     ; NONE                                                 ; Untyped                                ;
-; OUTDATA_ACLR_A                     ; NONE                                                 ; Untyped                                ;
-; WRCONTROL_ACLR_A                   ; NONE                                                 ; Untyped                                ;
-; INDATA_ACLR_A                      ; NONE                                                 ; Untyped                                ;
-; BYTEENA_ACLR_A                     ; NONE                                                 ; Untyped                                ;
-; WIDTH_B                            ; 1                                                    ; Untyped                                ;
-; WIDTHAD_B                          ; 1                                                    ; Untyped                                ;
-; NUMWORDS_B                         ; 1                                                    ; Untyped                                ;
-; INDATA_REG_B                       ; CLOCK1                                               ; Untyped                                ;
-; WRCONTROL_WRADDRESS_REG_B          ; CLOCK1                                               ; Untyped                                ;
-; RDCONTROL_REG_B                    ; CLOCK1                                               ; Untyped                                ;
-; ADDRESS_REG_B                      ; CLOCK1                                               ; Untyped                                ;
-; OUTDATA_REG_B                      ; UNREGISTERED                                         ; Untyped                                ;
-; BYTEENA_REG_B                      ; CLOCK1                                               ; Untyped                                ;
-; INDATA_ACLR_B                      ; NONE                                                 ; Untyped                                ;
-; WRCONTROL_ACLR_B                   ; NONE                                                 ; Untyped                                ;
-; ADDRESS_ACLR_B                     ; NONE                                                 ; Untyped                                ;
-; OUTDATA_ACLR_B                     ; NONE                                                 ; Untyped                                ;
-; RDCONTROL_ACLR_B                   ; NONE                                                 ; Untyped                                ;
-; BYTEENA_ACLR_B                     ; NONE                                                 ; Untyped                                ;
-; WIDTH_BYTEENA_A                    ; 1                                                    ; Untyped                                ;
-; WIDTH_BYTEENA_B                    ; 1                                                    ; Untyped                                ;
-; RAM_BLOCK_TYPE                     ; AUTO                                                 ; Untyped                                ;
-; BYTE_SIZE                          ; 8                                                    ; Untyped                                ;
-; READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                            ; Untyped                                ;
-; READ_DURING_WRITE_MODE_PORT_A      ; NEW_DATA_NO_NBE_READ                                 ; Untyped                                ;
-; READ_DURING_WRITE_MODE_PORT_B      ; NEW_DATA_NO_NBE_READ                                 ; Untyped                                ;
-; INIT_FILE                          ; db/CPU_FPGA.ram0_Instruction_Memory_6c21a04c.hdl.mif ; Untyped                                ;
-; INIT_FILE_LAYOUT                   ; PORT_A                                               ; Untyped                                ;
-; MAXIMUM_DEPTH                      ; 0                                                    ; Untyped                                ;
-; CLOCK_ENABLE_INPUT_A               ; NORMAL                                               ; Untyped                                ;
-; CLOCK_ENABLE_INPUT_B               ; NORMAL                                               ; Untyped                                ;
-; CLOCK_ENABLE_OUTPUT_A              ; NORMAL                                               ; Untyped                                ;
-; CLOCK_ENABLE_OUTPUT_B              ; NORMAL                                               ; Untyped                                ;
-; CLOCK_ENABLE_CORE_A                ; USE_INPUT_CLKEN                                      ; Untyped                                ;
-; CLOCK_ENABLE_CORE_B                ; USE_INPUT_CLKEN                                      ; Untyped                                ;
-; ENABLE_ECC                         ; FALSE                                                ; Untyped                                ;
-; ECC_PIPELINE_STAGE_ENABLED         ; FALSE                                                ; Untyped                                ;
-; WIDTH_ECCSTATUS                    ; 3                                                    ; Untyped                                ;
-; DEVICE_FAMILY                      ; Cyclone IV E                                         ; Untyped                                ;
-; CBXI_PARAMETER                     ; altsyncram_9b81                                      ; Untyped                                ;
-+------------------------------------+------------------------------------------------------+----------------------------------------+
-Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
++------------------------------------------------------------------------------------------------------------------------------+
+; altsyncram Parameter Settings by Entity Instance                                                                             ;
++-------------------------------------------+----------------------------------------------------------------------------------+
+; Name                                      ; Value                                                                            ;
++-------------------------------------------+----------------------------------------------------------------------------------+
+; Number of entity instances                ; 4                                                                                ;
+; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1 ;
+;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                      ;
+;     -- WIDTH_A                            ; 8                                                                                ;
+;     -- NUMWORDS_A                         ; 1024                                                                             ;
+;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                     ;
+;     -- WIDTH_B                            ; 1                                                                                ;
+;     -- NUMWORDS_B                         ; 1                                                                                ;
+;     -- ADDRESS_REG_B                      ; CLOCK1                                                                           ;
+;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                     ;
+;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                             ;
+;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                        ;
+; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2 ;
+;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                      ;
+;     -- WIDTH_A                            ; 8                                                                                ;
+;     -- NUMWORDS_A                         ; 1024                                                                             ;
+;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                     ;
+;     -- WIDTH_B                            ; 1                                                                                ;
+;     -- NUMWORDS_B                         ; 1                                                                                ;
+;     -- ADDRESS_REG_B                      ; CLOCK1                                                                           ;
+;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                     ;
+;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                             ;
+;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                        ;
+; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3 ;
+;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                      ;
+;     -- WIDTH_A                            ; 8                                                                                ;
+;     -- NUMWORDS_A                         ; 1024                                                                             ;
+;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                     ;
+;     -- WIDTH_B                            ; 1                                                                                ;
+;     -- NUMWORDS_B                         ; 1                                                                                ;
+;     -- ADDRESS_REG_B                      ; CLOCK1                                                                           ;
+;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                     ;
+;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                             ;
+;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                        ;
+; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4  ;
+;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                      ;
+;     -- WIDTH_A                            ; 8                                                                                ;
+;     -- NUMWORDS_A                         ; 1024                                                                             ;
+;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                     ;
+;     -- WIDTH_B                            ; 1                                                                                ;
+;     -- NUMWORDS_B                         ; 1                                                                                ;
+;     -- ADDRESS_REG_B                      ; CLOCK1                                                                           ;
+;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                     ;
+;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                             ;
+;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                        ;
++-------------------------------------------+----------------------------------------------------------------------------------+
 
 
-+-----------------------------------------------------------------------------------------------------------------------------+
-; Parameter Settings for Inferred Entity Instance: CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0 ;
-+------------------------------------------------+--------------+-------------------------------------------------------------+
-; Parameter Name                                 ; Value        ; Type                                                        ;
-+------------------------------------------------+--------------+-------------------------------------------------------------+
-; AUTO_CARRY_CHAINS                              ; ON           ; AUTO_CARRY                                                  ;
-; IGNORE_CARRY_BUFFERS                           ; OFF          ; IGNORE_CARRY                                                ;
-; AUTO_CASCADE_CHAINS                            ; ON           ; AUTO_CASCADE                                                ;
-; IGNORE_CASCADE_BUFFERS                         ; OFF          ; IGNORE_CASCADE                                              ;
-; LPM_WIDTHA                                     ; 33           ; Untyped                                                     ;
-; LPM_WIDTHB                                     ; 33           ; Untyped                                                     ;
-; LPM_WIDTHP                                     ; 66           ; Untyped                                                     ;
-; LPM_WIDTHR                                     ; 66           ; Untyped                                                     ;
-; LPM_WIDTHS                                     ; 1            ; Untyped                                                     ;
-; LPM_REPRESENTATION                             ; SIGNED       ; Untyped                                                     ;
-; LPM_PIPELINE                                   ; 0            ; Untyped                                                     ;
-; LATENCY                                        ; 0            ; Untyped                                                     ;
-; INPUT_A_IS_CONSTANT                            ; NO           ; Untyped                                                     ;
-; INPUT_B_IS_CONSTANT                            ; NO           ; Untyped                                                     ;
-; USE_EAB                                        ; OFF          ; Untyped                                                     ;
-; MAXIMIZE_SPEED                                 ; 5            ; Untyped                                                     ;
-; DEVICE_FAMILY                                  ; Cyclone IV E ; Untyped                                                     ;
-; CARRY_CHAIN                                    ; MANUAL       ; Untyped                                                     ;
-; APEX20K_TECHNOLOGY_MAPPER                      ; LUT          ; TECH_MAPPER_APEX20K                                         ;
-; DEDICATED_MULTIPLIER_CIRCUITRY                 ; AUTO         ; Untyped                                                     ;
-; DEDICATED_MULTIPLIER_MIN_INPUT_WIDTH_FOR_AUTO  ; 0            ; Untyped                                                     ;
-; DEDICATED_MULTIPLIER_MIN_OUTPUT_WIDTH_FOR_AUTO ; 0            ; Untyped                                                     ;
-; CBXI_PARAMETER                                 ; mult_86t     ; Untyped                                                     ;
-; INPUT_A_FIXED_VALUE                            ; Bx           ; Untyped                                                     ;
-; INPUT_B_FIXED_VALUE                            ; Bx           ; Untyped                                                     ;
-; USE_AHDL_IMPLEMENTATION                        ; OFF          ; Untyped                                                     ;
-+------------------------------------------------+--------------+-------------------------------------------------------------+
-Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
-
-
-+-------------------------------------------------------------------------------------------------------------------------------+
-; altsyncram Parameter Settings by Entity Instance                                                                              ;
-+-------------------------------------------+-----------------------------------------------------------------------------------+
-; Name                                      ; Value                                                                             ;
-+-------------------------------------------+-----------------------------------------------------------------------------------+
-; Number of entity instances                ; 5                                                                                 ;
-; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1  ;
-;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                       ;
-;     -- WIDTH_A                            ; 8                                                                                 ;
-;     -- NUMWORDS_A                         ; 1024                                                                              ;
-;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                      ;
-;     -- WIDTH_B                            ; 1                                                                                 ;
-;     -- NUMWORDS_B                         ; 1                                                                                 ;
-;     -- ADDRESS_REG_B                      ; CLOCK1                                                                            ;
-;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                      ;
-;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                              ;
-;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                         ;
-; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][23]__2  ;
-;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                       ;
-;     -- WIDTH_A                            ; 8                                                                                 ;
-;     -- NUMWORDS_A                         ; 1024                                                                              ;
-;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                      ;
-;     -- WIDTH_B                            ; 1                                                                                 ;
-;     -- NUMWORDS_B                         ; 1                                                                                 ;
-;     -- ADDRESS_REG_B                      ; CLOCK1                                                                            ;
-;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                      ;
-;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                              ;
-;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                         ;
-; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][15]__3  ;
-;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                       ;
-;     -- WIDTH_A                            ; 8                                                                                 ;
-;     -- NUMWORDS_A                         ; 1024                                                                              ;
-;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                      ;
-;     -- WIDTH_B                            ; 1                                                                                 ;
-;     -- NUMWORDS_B                         ; 1                                                                                 ;
-;     -- ADDRESS_REG_B                      ; CLOCK1                                                                            ;
-;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                      ;
-;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                              ;
-;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                         ;
-; Entity Instance                           ; CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][7]__4   ;
-;     -- OPERATION_MODE                     ; SINGLE_PORT                                                                       ;
-;     -- WIDTH_A                            ; 8                                                                                 ;
-;     -- NUMWORDS_A                         ; 1024                                                                              ;
-;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                      ;
-;     -- WIDTH_B                            ; 1                                                                                 ;
-;     -- NUMWORDS_B                         ; 1                                                                                 ;
-;     -- ADDRESS_REG_B                      ; CLOCK1                                                                            ;
-;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                      ;
-;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                              ;
-;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                         ;
-; Entity Instance                           ; CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0 ;
-;     -- OPERATION_MODE                     ; ROM                                                                               ;
-;     -- WIDTH_A                            ; 32                                                                                ;
-;     -- NUMWORDS_A                         ; 1024                                                                              ;
-;     -- OUTDATA_REG_A                      ; UNREGISTERED                                                                      ;
-;     -- WIDTH_B                            ; 1                                                                                 ;
-;     -- NUMWORDS_B                         ; 1                                                                                 ;
-;     -- ADDRESS_REG_B                      ; CLOCK1                                                                            ;
-;     -- OUTDATA_REG_B                      ; UNREGISTERED                                                                      ;
-;     -- RAM_BLOCK_TYPE                     ; AUTO                                                                              ;
-;     -- READ_DURING_WRITE_MODE_MIXED_PORTS ; DONT_CARE                                                                         ;
-+-------------------------------------------+-----------------------------------------------------------------------------------+
-
-
-+--------------------------------------------------------------------------------------------------------------------+
-; lpm_mult Parameter Settings by Entity Instance                                                                     ;
-+---------------------------------------+----------------------------------------------------------------------------+
-; Name                                  ; Value                                                                      ;
-+---------------------------------------+----------------------------------------------------------------------------+
-; Number of entity instances            ; 1                                                                          ;
-; Entity Instance                       ; CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0 ;
-;     -- LPM_WIDTHA                     ; 33                                                                         ;
-;     -- LPM_WIDTHB                     ; 33                                                                         ;
-;     -- LPM_WIDTHP                     ; 66                                                                         ;
-;     -- LPM_REPRESENTATION             ; SIGNED                                                                     ;
-;     -- INPUT_A_IS_CONSTANT            ; NO                                                                         ;
-;     -- INPUT_B_IS_CONSTANT            ; NO                                                                         ;
-;     -- USE_EAB                        ; OFF                                                                        ;
-;     -- DEDICATED_MULTIPLIER_CIRCUITRY ; AUTO                                                                       ;
-;     -- INPUT_A_FIXED_VALUE            ; Bx                                                                         ;
-;     -- INPUT_B_FIXED_VALUE            ; Bx                                                                         ;
-+---------------------------------------+----------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------------------------+
+; Analysis & Elaboration Settings                                                                                      ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+; Option                                                                     ; Setting            ; Default Value      ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+; Device                                                                     ; EP4CE6E22C8        ;                    ;
+; Top-level entity name                                                      ; CPU_Top_Wrapper    ; CPU_FPGA           ;
+; Family name                                                                ; Cyclone IV E       ; Cyclone IV GX      ;
+; VHDL Show LMF Mapping Messages                                             ; Off                ;                    ;
+; VHDL Version                                                               ; VHDL_2008          ; VHDL_1993          ;
+; Use smart compilation                                                      ; Off                ; Off                ;
+; Enable parallel Assembler and TimeQuest Timing Analyzer during compilation ; On                 ; On                 ;
+; Enable compact report table                                                ; Off                ; Off                ;
+; Restructure Multiplexers                                                   ; Auto               ; Auto               ;
+; Create Debugging Nodes for IP Cores                                        ; Off                ; Off                ;
+; Preserve fewer node names                                                  ; On                 ; On                 ;
+; Disable OpenCore Plus hardware evaluation                                  ; Off                ; Off                ;
+; Verilog Version                                                            ; Verilog_2001       ; Verilog_2001       ;
+; State Machine Processing                                                   ; Auto               ; Auto               ;
+; Safe State Machine                                                         ; Off                ; Off                ;
+; Extract Verilog State Machines                                             ; On                 ; On                 ;
+; Extract VHDL State Machines                                                ; On                 ; On                 ;
+; Ignore Verilog initial constructs                                          ; Off                ; Off                ;
+; Iteration limit for constant Verilog loops                                 ; 5000               ; 5000               ;
+; Iteration limit for non-constant Verilog loops                             ; 250                ; 250                ;
+; Add Pass-Through Logic to Inferred RAMs                                    ; On                 ; On                 ;
+; Infer RAMs from Raw Logic                                                  ; On                 ; On                 ;
+; Parallel Synthesis                                                         ; On                 ; On                 ;
+; DSP Block Balancing                                                        ; Auto               ; Auto               ;
+; NOT Gate Push-Back                                                         ; On                 ; On                 ;
+; Power-Up Don't Care                                                        ; On                 ; On                 ;
+; Remove Redundant Logic Cells                                               ; Off                ; Off                ;
+; Remove Duplicate Registers                                                 ; On                 ; On                 ;
+; Ignore CARRY Buffers                                                       ; Off                ; Off                ;
+; Ignore CASCADE Buffers                                                     ; Off                ; Off                ;
+; Ignore GLOBAL Buffers                                                      ; Off                ; Off                ;
+; Ignore ROW GLOBAL Buffers                                                  ; Off                ; Off                ;
+; Ignore LCELL Buffers                                                       ; Off                ; Off                ;
+; Ignore SOFT Buffers                                                        ; On                 ; On                 ;
+; Limit AHDL Integers to 32 Bits                                             ; Off                ; Off                ;
+; Optimization Technique                                                     ; Balanced           ; Balanced           ;
+; Carry Chain Length                                                         ; 70                 ; 70                 ;
+; Auto Carry Chains                                                          ; On                 ; On                 ;
+; Auto Open-Drain Pins                                                       ; On                 ; On                 ;
+; Perform WYSIWYG Primitive Resynthesis                                      ; Off                ; Off                ;
+; Auto ROM Replacement                                                       ; On                 ; On                 ;
+; Auto RAM Replacement                                                       ; On                 ; On                 ;
+; Auto DSP Block Replacement                                                 ; On                 ; On                 ;
+; Auto Shift Register Replacement                                            ; Auto               ; Auto               ;
+; Allow Shift Register Merging across Hierarchies                            ; Auto               ; Auto               ;
+; Auto Clock Enable Replacement                                              ; On                 ; On                 ;
+; Strict RAM Replacement                                                     ; Off                ; Off                ;
+; Allow Synchronous Control Signals                                          ; On                 ; On                 ;
+; Force Use of Synchronous Clear Signals                                     ; Off                ; Off                ;
+; Auto RAM Block Balancing                                                   ; On                 ; On                 ;
+; Auto RAM to Logic Cell Conversion                                          ; Off                ; Off                ;
+; Auto Resource Sharing                                                      ; Off                ; Off                ;
+; Allow Any RAM Size For Recognition                                         ; Off                ; Off                ;
+; Allow Any ROM Size For Recognition                                         ; Off                ; Off                ;
+; Allow Any Shift Register Size For Recognition                              ; Off                ; Off                ;
+; Use LogicLock Constraints during Resource Balancing                        ; On                 ; On                 ;
+; Ignore translate_off and synthesis_off directives                          ; Off                ; Off                ;
+; Timing-Driven Synthesis                                                    ; On                 ; On                 ;
+; Report Parameter Settings                                                  ; On                 ; On                 ;
+; Report Source Assignments                                                  ; On                 ; On                 ;
+; Report Connectivity Checks                                                 ; On                 ; On                 ;
+; Ignore Maximum Fan-Out Assignments                                         ; Off                ; Off                ;
+; Synchronization Register Chain Length                                      ; 2                  ; 2                  ;
+; PowerPlay Power Optimization                                               ; Normal compilation ; Normal compilation ;
+; HDL message level                                                          ; Level2             ; Level2             ;
+; Suppress Register Optimization Related Messages                            ; Off                ; Off                ;
+; Number of Removed Registers Reported in Synthesis Report                   ; 5000               ; 5000               ;
+; Number of Swept Nodes Reported in Synthesis Report                         ; 5000               ; 5000               ;
+; Number of Inverted Registers Reported in Synthesis Report                  ; 100                ; 100                ;
+; Clock MUX Protection                                                       ; On                 ; On                 ;
+; Auto Gated Clock Conversion                                                ; Off                ; Off                ;
+; Block Design Naming                                                        ; Auto               ; Auto               ;
+; SDC constraint protection                                                  ; Off                ; Off                ;
+; Synthesis Effort                                                           ; Auto               ; Auto               ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal               ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                       ; Off                ; Off                ;
+; Analysis & Synthesis Message Level                                         ; Medium             ; Medium             ;
+; Disable Register Merging Across Hierarchies                                ; Auto               ; Auto               ;
+; Resource Aware Inference For Block RAM                                     ; On                 ; On                 ;
+; Synthesis Seed                                                             ; 1                  ; 1                  ;
++----------------------------------------------------------------------------+--------------------+--------------------+
 
 
 +-------------------------------------------------------------------------------------------+
@@ -1108,23 +581,14 @@ Note: In order to hide this table in the UI and the text report file, please set
 +--------------------+--------+----------+-------------------------------------------------------------------------------------+
 
 
-+-------------------------------+
-; Elapsed Time Per Partition    ;
-+----------------+--------------+
-; Partition Name ; Elapsed Time ;
-+----------------+--------------+
-; Top            ; 00:00:07     ;
-+----------------+--------------+
-
-
-+-------------------------------+
-; Analysis & Synthesis Messages ;
-+-------------------------------+
++---------------------------------+
+; Analysis & Elaboration Messages ;
++---------------------------------+
 Info: *******************************************************************
-Info: Running Quartus II 64-Bit Analysis & Synthesis
+Info: Running Quartus II 64-Bit Analysis & Elaboration
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-    Info: Processing started: Fri Aug 07 16:43:27 2026
-Info: Command: quartus_map --read_settings_files=on --write_settings_files=off CPU_FPGA -c CPU_FPGA
+    Info: Processing started: Fri Aug 07 17:24:52 2026
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off CPU_FPGA -c CPU_FPGA --analysis_and_elaboration
 Warning (20028): Parallel compilation is not licensed and has been disabled
 Info (12021): Found 2 design units, including 1 entities, in source file rtl/core/program_counter.vhd
     Info (12022): Found design unit 1: Program_Counter-Behavioral
@@ -1198,6 +662,9 @@ Info (12021): Found 2 design units, including 1 entities, in source file sim/alu
 Info (12021): Found 2 design units, including 1 entities, in source file sim/m_extension_unit_tb.vhd
     Info (12022): Found design unit 1: M_Extension_Unit_tb-Testbench
     Info (12023): Found entity 1: M_Extension_Unit_tb
+Info (12021): Found 2 design units, including 1 entities, in source file rtl/peripherals/uart_tx.vhd
+    Info (12022): Found design unit 1: uart_tx-Behavioral
+    Info (12023): Found entity 1: uart_tx
 Info (12127): Elaborating entity "CPU_Top_Wrapper" for the top level hierarchy
 Info (12128): Elaborating entity "CPU_FPGA" for hierarchy "CPU_FPGA:U_CPU"
 Warning (10036): Verilog HDL or VHDL warning at CPU_FPGA.vhd(175): object "ex_pc_plus4" assigned a value but never read
@@ -1239,73 +706,10 @@ Info (12021): Found 1 design units, including 1 entities, in source file db/alts
 Info (12128): Elaborating entity "altsyncram_1f81" for hierarchy "CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|Data_Memory:U_DMEM|altsyncram:ram[0][31]__1|altsyncram_1f81:auto_generated"
 Info (12128): Elaborating entity "MEM_WB_Register" for hierarchy "CPU_FPGA:U_CPU|MEM_Stage:U_STAGE_MEM|MEM_WB_Register:U_MEM_WB"
 Info (12128): Elaborating entity "Hazard_Unit" for hierarchy "CPU_FPGA:U_CPU|Hazard_Unit:U_HAZARD"
-Info (19000): Inferred 1 megafunctions from design logic
-    Info (276029): Inferred altsyncram megafunction from the following design logic: "CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|ram_rtl_0" 
-        Info (286033): Parameter OPERATION_MODE set to ROM
-        Info (286033): Parameter WIDTH_A set to 32
-        Info (286033): Parameter WIDTHAD_A set to 10
-        Info (286033): Parameter NUMWORDS_A set to 1024
-        Info (286033): Parameter OUTDATA_REG_A set to UNREGISTERED
-        Info (286033): Parameter ADDRESS_ACLR_A set to NONE
-        Info (286033): Parameter OUTDATA_ACLR_A set to NONE
-        Info (286033): Parameter INDATA_ACLR_A set to NONE
-        Info (286033): Parameter WRCONTROL_ACLR_A set to NONE
-        Info (286033): Parameter INIT_FILE set to db/CPU_FPGA.ram0_Instruction_Memory_6c21a04c.hdl.mif
-Info (278001): Inferred 1 megafunctions from design logic
-    Info (278003): Inferred multiplier megafunction ("lpm_mult") from the following logic: "CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|Mult0"
-Info (12130): Elaborated megafunction instantiation "CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0"
-Info (12133): Instantiated megafunction "CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|Instruction_Memory:U_IMEM|altsyncram:ram_rtl_0" with the following parameter:
-    Info (12134): Parameter "OPERATION_MODE" = "ROM"
-    Info (12134): Parameter "WIDTH_A" = "32"
-    Info (12134): Parameter "WIDTHAD_A" = "10"
-    Info (12134): Parameter "NUMWORDS_A" = "1024"
-    Info (12134): Parameter "OUTDATA_REG_A" = "UNREGISTERED"
-    Info (12134): Parameter "ADDRESS_ACLR_A" = "NONE"
-    Info (12134): Parameter "OUTDATA_ACLR_A" = "NONE"
-    Info (12134): Parameter "INDATA_ACLR_A" = "NONE"
-    Info (12134): Parameter "WRCONTROL_ACLR_A" = "NONE"
-    Info (12134): Parameter "INIT_FILE" = "db/CPU_FPGA.ram0_Instruction_Memory_6c21a04c.hdl.mif"
-Info (12021): Found 1 design units, including 1 entities, in source file db/altsyncram_9b81.tdf
-    Info (12023): Found entity 1: altsyncram_9b81
-Info (12130): Elaborated megafunction instantiation "CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0"
-Info (12133): Instantiated megafunction "CPU_FPGA:U_CPU|EX_Stage:U_STAGE_EX|M_Extension_Unit:U_M_EXT|lpm_mult:Mult0" with the following parameter:
-    Info (12134): Parameter "LPM_WIDTHA" = "33"
-    Info (12134): Parameter "LPM_WIDTHB" = "33"
-    Info (12134): Parameter "LPM_WIDTHP" = "66"
-    Info (12134): Parameter "LPM_WIDTHR" = "66"
-    Info (12134): Parameter "LPM_WIDTHS" = "1"
-    Info (12134): Parameter "LPM_REPRESENTATION" = "SIGNED"
-    Info (12134): Parameter "INPUT_A_IS_CONSTANT" = "NO"
-    Info (12134): Parameter "INPUT_B_IS_CONSTANT" = "NO"
-    Info (12134): Parameter "MAXIMIZE_SPEED" = "5"
-Info (12021): Found 1 design units, including 1 entities, in source file db/mult_86t.tdf
-    Info (12023): Found entity 1: mult_86t
-Info (13014): Ignored 250 buffer(s)
-    Info (13019): Ignored 250 SOFT buffer(s)
-Warning (13012): Latch CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|Control_Unit:U_CONTROL|alu_op[1] has unsafe behavior
-    Warning (13013): Ports D and ENA on the latch are fed by the same signal CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]
-Warning (13012): Latch CPU_FPGA:U_CPU|ID_Stage:U_STAGE_ID|Control_Unit:U_CONTROL|alu_op[0] has unsafe behavior
-    Warning (13013): Ports D and ENA on the latch are fed by the same signal CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[2]
-Info (286030): Timing-Driven Synthesis is running
-Info (17049): 60 registers lost all their fanouts during netlist optimizations.
-Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
-    Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
-Warning (15752): Ignored 5 Virtual Pin logic option assignments
-    Warning (15751): Ignored Virtual Pin assignment to "*_debug*".
-    Warning (15751): Ignored Virtual Pin assignment to "pc_debug".
-    Warning (15751): Ignored Virtual Pin assignment to "rs2_debug".
-    Warning (15751): Ignored Virtual Pin assignment to "instr_debug".
-    Warning (15751): Ignored Virtual Pin assignment to "rs1_debug".
-Info (21057): Implemented 4567 device resources after synthesis - the final resource count might be different
-    Info (21058): Implemented 4 input pins
-    Info (21059): Implemented 8 output pins
-    Info (21061): Implemented 4483 logic cells
-    Info (21064): Implemented 64 RAM segments
-    Info (21062): Implemented 8 DSP elements
-Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 14 warnings
-    Info: Peak virtual memory: 4738 megabytes
-    Info: Processing ended: Fri Aug 07 16:43:38 2026
-    Info: Elapsed time: 00:00:11
-    Info: Total CPU time (on all processors): 00:00:11
+Info: Quartus II 64-Bit Analysis & Elaboration was successful. 0 errors, 4 warnings
+    Info: Peak virtual memory: 4734 megabytes
+    Info: Processing ended: Fri Aug 07 17:24:55 2026
+    Info: Elapsed time: 00:00:03
+    Info: Total CPU time (on all processors): 00:00:03
 
 
