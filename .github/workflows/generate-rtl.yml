@@ -41,7 +41,7 @@ jobs:
             FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | paste -sd " " -)
 
             # Added 'setundef -zero' to sanitize undefined/high-Z bit enum values for netlistsvg
-            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed --latches $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; setundef -zero; write_json -compat-int rtl.json"
+            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed -fexplicit --latches --work=work $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; setundef -zero; write_json -compat-int rtl.json"
 
       - name: Convert JSON to SVG Schematic & Bake Light Background
         run: |
