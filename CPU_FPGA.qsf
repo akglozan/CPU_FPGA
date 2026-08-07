@@ -44,38 +44,45 @@ set_global_assignment -name PROJECT_CREATION_TIME_DATE "23:40:56  JULY 25, 2026"
 set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name SOURCE_FILE main
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
-set_global_assignment -name VHDL_FILE Program_Counter.vhd
-set_global_assignment -name VHDL_FILE CPU_FPGA.vhd
-set_global_assignment -name VHDL_FILE Instruction_Memory.vhd
-set_global_assignment -name VHDL_FILE tb_CPU_FPGA.vhd
-set_global_assignment -name VHDL_FILE IF_ID_Register.vhd
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
-set_global_assignment -name VHDL_FILE RegFile.vhd
-set_global_assignment -name VHDL_FILE ImmGen.vhd
-set_global_assignment -name VHDL_FILE ImmGen_tb.vhd
-set_global_assignment -name VHDL_FILE ID_EX_Register.vhd
-set_global_assignment -name VHDL_FILE Control_Unit.vhd
-set_global_assignment -name VHDL_FILE ALU.vhd
-set_global_assignment -name VHDL_FILE ALU_tb.vhd
-set_global_assignment -name VHDL_FILE M_Extension_Unit.vhd
-set_global_assignment -name VHDL_FILE M_Extension_Unit_tb.vhd
-set_global_assignment -name VHDL_FILE Hazard_Unit.vhd
-set_global_assignment -name VHDL_FILE Forwarding_Unit.vhd
-set_global_assignment -name VHDL_FILE EX_MEM_Register.vhd
-set_global_assignment -name VHDL_FILE Data_Memory.vhd
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name DEVICE_FILTER_PACKAGE "ANY QFP"
 set_global_assignment -name DEVICE_FILTER_PIN_COUNT 144
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
 
-set_global_assignment -name VHDL_FILE MEM_WB_Register.vhd
-set_global_assignment -name VHDL_FILE IF_Stage.vhd
-set_global_assignment -name VHDL_FILE ID_Stage.vhd
-set_global_assignment -name VHDL_FILE EX_Stage.vhd
-set_global_assignment -name VHDL_FILE MEM_Stage.vhd
-set_global_assignment -name VHDL_FILE CPU_Top_Wrapper.vhd
+# -------------------------------------------------------------------------- #
+# RTL Core Source Files (Phase 1 Pipeline)
+# -------------------------------------------------------------------------- #
+set_global_assignment -name VHDL_FILE rtl/core/Program_Counter.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Instruction_Memory.vhd
+set_global_assignment -name VHDL_FILE rtl/core/IF_ID_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/RegFile.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ImmGen.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ID_EX_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Control_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ALU.vhd
+set_global_assignment -name VHDL_FILE rtl/core/M_Extension_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Hazard_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Forwarding_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/EX_MEM_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Data_Memory.vhd
+set_global_assignment -name VHDL_FILE rtl/core/MEM_WB_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/IF_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ID_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/EX_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/MEM_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/CPU_FPGA.vhd
+set_global_assignment -name VHDL_FILE rtl/core/CPU_Top_Wrapper.vhd
+
+# -------------------------------------------------------------------------- #
+# Simulation Testbenches
+# -------------------------------------------------------------------------- #
+set_global_assignment -name VHDL_FILE sim/tb_CPU_FPGA.vhd
+set_global_assignment -name VHDL_FILE sim/ImmGen_tb.vhd
+set_global_assignment -name VHDL_FILE sim/ALU_tb.vhd
+set_global_assignment -name VHDL_FILE sim/M_Extension_Unit_tb.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
