@@ -7,7 +7,7 @@ entity CPU_Top_Wrapper is
         clk           : in  std_logic;                      -- Physical Board Clock
         rst_n           : in  std_logic;                      -- Physical Reset Switch
         debug_sel     : in  std_logic_vector(1 downto 0);   -- MUX Select (Switches)
-        led_out       : out std_logic_vector(7 downto 0)    -- 4 Onboard Diagnostic LEDs
+        led_out       : out std_logic_vector(3 downto 0)    -- 4 Onboard Diagnostic LEDs
     );							--here there is a problem with my current resources which has 4 leds onboard
 									--and i dont plan on adding anymore so i have to adjust some vectors when i get back
 end entity CPU_Top_Wrapper;
@@ -48,10 +48,10 @@ begin
     process(debug_sel, pc_dbg, instr_dbg, rs1_dbg, rs2_dbg)
     begin
         case debug_sel is
-            when "00"   => led_out <= pc_dbg(7 downto 0);        -- Low byte of PC
-            when "01"   => led_out <= instr_dbg(7 downto 0);     -- Low byte of Instruction
-            when "10"   => led_out <= rs1_dbg(7 downto 0);       -- Low byte of RS1
-            when "11"   => led_out <= rs2_dbg(7 downto 0);       -- Low byte of RS2
+            when "00"   => led_out <= pc_dbg(3 downto 0);        -- Low byte of PC
+            when "01"   => led_out <= instr_dbg(3 downto 0);     -- Low byte of Instruction
+            when "10"   => led_out <= rs1_dbg(3 downto 0);       -- Low byte of RS1
+            when "11"   => led_out <= rs2_dbg(3 downto 0);       -- Low byte of RS2
             when others => led_out <= (others => '0');
         end case;
     end process;

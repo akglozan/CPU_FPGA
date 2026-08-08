@@ -3,19 +3,19 @@ TimeQuest Timing Analyzer Summary
 ------------------------------------------------------------
 
 Type  : Slow 1200mV 85C Model Setup 'clk'
-Slack : -17.730
-TNS   : -11629.582
+Slack : -18.531
+TNS   : -11619.002
 
 Type  : Slow 1200mV 85C Model Setup 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : -0.695
-TNS   : -1.312
+Slack : -1.044
+TNS   : -1.988
 
 Type  : Slow 1200mV 85C Model Hold 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : -1.380
-TNS   : -1.384
+Slack : -0.860
+TNS   : -0.860
 
 Type  : Slow 1200mV 85C Model Hold 'clk'
-Slack : 0.082
+Slack : 0.203
 TNS   : 0.000
 
 Type  : Slow 1200mV 85C Model Minimum Pulse Width 'clk'
@@ -23,23 +23,23 @@ Slack : -3.201
 TNS   : -2199.957
 
 Type  : Slow 1200mV 85C Model Minimum Pulse Width 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : 0.251
+Slack : 0.416
 TNS   : 0.000
 
 Type  : Slow 1200mV 0C Model Setup 'clk'
-Slack : -16.816
-TNS   : -10986.655
+Slack : -17.612
+TNS   : -10923.248
 
 Type  : Slow 1200mV 0C Model Setup 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : -0.699
-TNS   : -1.348
+Slack : -1.020
+TNS   : -1.957
 
 Type  : Slow 1200mV 0C Model Hold 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : -1.219
-TNS   : -1.219
+Slack : -0.711
+TNS   : -0.711
 
 Type  : Slow 1200mV 0C Model Hold 'clk'
-Slack : 0.061
+Slack : 0.142
 TNS   : 0.000
 
 Type  : Slow 1200mV 0C Model Minimum Pulse Width 'clk'
@@ -47,31 +47,31 @@ Slack : -3.201
 TNS   : -2199.957
 
 Type  : Slow 1200mV 0C Model Minimum Pulse Width 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : 0.049
+Slack : 0.201
 TNS   : 0.000
 
 Type  : Fast 1200mV 0C Model Setup 'clk'
-Slack : -7.248
-TNS   : -4373.383
+Slack : -7.589
+TNS   : -4485.780
 
 Type  : Fast 1200mV 0C Model Setup 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : 0.063
-TNS   : 0.000
+Slack : -0.122
+TNS   : -0.204
 
 Type  : Fast 1200mV 0C Model Hold 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : -0.582
-TNS   : -0.582
+Slack : -0.180
+TNS   : -0.180
 
 Type  : Fast 1200mV 0C Model Hold 'clk'
-Slack : -0.076
-TNS   : -0.215
+Slack : 0.053
+TNS   : 0.000
 
 Type  : Fast 1200mV 0C Model Minimum Pulse Width 'clk'
 Slack : -3.000
-TNS   : -1560.416
+TNS   : -1561.007
 
 Type  : Fast 1200mV 0C Model Minimum Pulse Width 'CPU_FPGA:U_CPU|IF_Stage:U_STAGE_IF|IF_ID_Register:U_IF_ID|instruction_out[0]'
-Slack : 0.326
+Slack : 0.288
 TNS   : 0.000
 
 ------------------------------------------------------------
