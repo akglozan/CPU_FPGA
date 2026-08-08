@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.all;
 entity ID_Stage is
     port (
         clk             : in  std_logic;
-        rst             : in  std_logic;
+        rst_n             : in  std_logic;
         
         -- Hazard Controls from Hazard_Unit
         id_ex_stall     : in  std_logic;
@@ -57,7 +57,7 @@ architecture Structural of ID_Stage is
     component RegFile is
         port (
             clk       : in  std_logic;
-            rst       : in  std_logic;
+            rst_n       : in  std_logic;
             reg_write : in  std_logic;
             rd_addr   : in  std_logic_vector(4 downto 0);
             rs1_addr  : in  std_logic_vector(4 downto 0);
@@ -97,7 +97,7 @@ architecture Structural of ID_Stage is
     component ID_EX_Register is
         port (
             clk           : in  std_logic;
-            rst           : in  std_logic;
+            rst_n           : in  std_logic;
             stall         : in  std_logic;
             flush         : in  std_logic;
             pc_in         : in  std_logic_vector(31 downto 0);
@@ -177,7 +177,7 @@ begin
     U_REGFILE : RegFile
         port map (
             clk       => clk,
-            rst       => rst,
+            rst_n       => rst_n,
             reg_write => wb_reg_write,
             rd_addr   => wb_rd_addr,
             rs1_addr  => rs1_addr_wire,
@@ -214,7 +214,7 @@ begin
     U_ID_EX : ID_EX_Register
         port map (
             clk           => clk,
-            rst           => rst,
+            rst_n           => rst_n,
             stall         => id_ex_stall,
             flush         => id_ex_flush,
             pc_in         => id_pc_in,

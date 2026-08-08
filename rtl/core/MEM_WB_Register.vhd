@@ -9,7 +9,7 @@ entity MEM_WB_Register is
 	
 	--System Inputs
 		clk					:	in	std_logic;
-		reset					:	in	std_logic;
+		rst_n					:	in	std_logic;
 		stall					:	in std_logic;
 		flush					:	in std_logic;
 		
@@ -43,7 +43,7 @@ process(clk)
 begin
 
 	if rising_edge(clk) then
-		if reset = '1' or flush = '1' then
+		if rst_n = '0' or flush = '1' then
 			wb_result_out    <= (others => '0');
 			 wb_read_data_out <= (others => '0');
 			 wb_rd_addr_out   <= (others => '0');

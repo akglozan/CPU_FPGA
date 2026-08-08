@@ -9,7 +9,7 @@ entity uart_tx is
     );
     port (
         clk      : in  std_logic;
-        rst      : in  std_logic;
+        rst_n      : in  std_logic;
         -- MMIO Interface
         tx_data  : in  std_logic_vector(7 downto 0);
         tx_start : in  std_logic;
@@ -33,9 +33,9 @@ architecture Behavioral of uart_tx is
 begin
 
     -- Synchronous Process: State update, Baud Prescaler, and Datapath Outputs
-    process(clk, rst)
+    process(clk)
     begin
-        if rst = '1' then
+        if rst_n = '0' then
             current_state <= IDLE;
             counter       <= (others => '0');
             baud_tick     <= '0';

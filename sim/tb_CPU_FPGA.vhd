@@ -22,7 +22,7 @@ architecture Behavioral of tb_CPU_FPGA is
         );
         port (
             clk         : in  std_logic;
-            rst         : in  std_logic;
+            rst_n         : in  std_logic;
             pc_debug    : out std_logic_vector(DATA_WIDTH-1 downto 0);
             instr_debug : out std_logic_vector(DATA_WIDTH-1 downto 0);
             rs1_debug   : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -34,7 +34,7 @@ architecture Behavioral of tb_CPU_FPGA is
     -- UUT Interface Signals
     -------------------------------------------------------------------
     signal clk         : std_logic := '0';
-    signal rst         : std_logic := '1';
+    signal rst_n         : std_logic := '1';
     signal pc_debug    : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal instr_debug : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal rs1_debug   : std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -53,7 +53,7 @@ begin
         )
         port map (
             clk         => clk,
-            rst         => rst,
+            rst_n         => rst_n,
             pc_debug    => pc_debug,
             instr_debug => instr_debug,
             rs1_debug   => rs1_debug,
@@ -80,11 +80,11 @@ begin
     stim_process : process
     begin
         -- Assert Active-High Reset
-        rst <= '1';
+        rst_n <= '1';
         wait for 100 ns;
         
         -- De-assert Reset
-        rst <= '0';
+        rst_n <= '0';
         
         -- Execution timeout threshold
         wait for 10000 ns;
@@ -100,7 +100,7 @@ begin
     monitor_process : process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '0' then
+            if rst_n = '0' then
                 -- VHDL-93 compliant assertion halt for ModelSim/GHDL
                 if instr_debug = x"0000006f" then
                     assert false report "Halt instruction (0x0000006f) detected. Terminating simulation." severity failure;

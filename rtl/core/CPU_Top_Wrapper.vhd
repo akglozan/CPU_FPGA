@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.all;
 entity CPU_Top_Wrapper is
     port (
         clk           : in  std_logic;                      -- Physical Board Clock
-        rst           : in  std_logic;                      -- Physical Reset Switch
+        rst_n           : in  std_logic;                      -- Physical Reset Switch
         debug_sel     : in  std_logic_vector(1 downto 0);   -- MUX Select (Switches)
         led_out       : out std_logic_vector(7 downto 0)    -- 8 Onboard Diagnostic LEDs
     );
@@ -17,7 +17,7 @@ architecture Structural of CPU_Top_Wrapper is
         generic ( DATA_WIDTH : integer := 32 );
         port (
             clk         : in  std_logic;
-            rst         : in  std_logic;
+            rst_n         : in  std_logic;
             pc_debug    : out std_logic_vector(31 downto 0);
             instr_debug : out std_logic_vector(31 downto 0);
             rs1_debug   : out std_logic_vector(31 downto 0);
@@ -36,7 +36,7 @@ begin
     U_CPU : CPU_FPGA
         port map (
             clk         => clk,
-            rst         => rst,
+            rst_n         => rst_n,
             pc_debug    => pc_dbg,
             instr_debug => instr_dbg,
             rs1_debug   => rs1_dbg,

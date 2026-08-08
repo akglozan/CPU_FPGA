@@ -6,7 +6,7 @@ use IEEE.NUMERIC_STD.all;
 entity ID_EX_Register is
     port(
         clk             : in std_logic;
-        rst             : in std_logic;
+        rst_n             : in std_logic;
         
         -- Hazard control signal. When stall = '1', holds current values (freezes execution).
         stall           : in std_logic;
@@ -79,7 +79,7 @@ process(clk)
 begin
 
 	if rising_edge(clk) then
-		if rst = '1' then
+		if rst_n = '0' then
 			 -- Reset ALL control outputs to safe defaults (NOP)
 			 alu_src_out     <= '0';
 			 alu_ctrl_out    <= (others => '0');

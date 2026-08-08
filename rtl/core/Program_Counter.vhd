@@ -12,7 +12,7 @@ entity Program_Counter is
 	port(
 		clk		:	in	std_logic;
 		
-		rst		:	in	std_logic;
+		rst_n		:	in	std_logic;
 		
 		pc_write :	in	std_logic; -- Write Enable / Stall Signal
 		
@@ -37,7 +37,7 @@ begin
 process(clk)
 begin
 	if rising_edge(clk) then
-		if rst = '1' then
+		if rst_n = '0' then
 				pc_reg <= (others => '0');
 		elsif pc_write = '1' then
 				if pc_src ='1' then

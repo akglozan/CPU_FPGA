@@ -8,7 +8,7 @@ entity EX_MEM_Register is
 	
 		-- System & Pipeline Controls
 		clk		:	in	std_logic;
-		reset		:	in std_logic;
+		rst_n		:	in std_logic;
 		flush		:	in std_logic;
 		stall		:	in std_logic;
 		
@@ -43,10 +43,10 @@ architecture Behavioral of EX_MEM_Register is
 
 begin
 
-process(clk,reset)
+process(clk,rst_n)
 begin
 	
-	if reset = '1' then
+	if rst_n = '0' then
 	
 		mem_reg_write 	<= '0';
 		mem_mem_read	<= '0';

@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.all;
 entity EX_Stage is
     port (
         clk                     : in  std_logic;
-        rst                     : in  std_logic;
+        rst_n                     : in  std_logic;
         
         -- Inputs from ID/EX Register
         ex_pc_in                : in  std_logic_vector(31 downto 0);
@@ -69,7 +69,7 @@ architecture Structural of EX_Stage is
     component M_Extension_Unit is
         port (
             clk       : in  std_logic;
-            reset     : in  std_logic;
+            rst_n     : in  std_logic;
             is_m_ext  : in  std_logic;
             funct3    : in  std_logic_vector(2 downto 0);
             operand_a : in  std_logic_vector(31 downto 0);
@@ -95,7 +95,7 @@ architecture Structural of EX_Stage is
     component EX_MEM_Register is
         port (
             clk                     : in std_logic;
-            reset                   : in std_logic;
+            rst_n                   : in std_logic;
             flush                   : in std_logic;
             stall                   : in std_logic;
             ex_final_result         : in std_logic_vector(31 downto 0);
@@ -176,7 +176,7 @@ begin
     U_M_EXT : M_Extension_Unit
         port map (
             clk       => clk,
-            reset     => rst,
+            rst_n     => rst_n,
             is_m_ext  => ex_is_m_ext_in,
             funct3    => ex_funct3_in,
             operand_a => ex_operand_a_forwarded,
@@ -246,7 +246,7 @@ begin
     U_EX_MEM : EX_MEM_Register
         port map (
             clk                    => clk,
-            reset                  => rst,
+            rst_n                  => rst_n,
             stall                  => stall_m_wire,
             flush                  => '0',
             ex_final_result        => ex_final_result,

@@ -8,7 +8,7 @@ entity M_Extension_Unit is
 	
 	--System Inputs
 		clk	:	in std_logic;
-		reset	:	in std_logic;
+		rst_n	:	in std_logic;
 		
 	--Control Inputs
 		is_m_ext	: 	in std_logic;
@@ -84,7 +84,7 @@ end process;
 
 
 -- Sequential Process (Clocked)
-process(clk, reset)
+process(clk, rst_n)
     variable v_shift_acc  : unsigned(32 downto 0);
     variable v_shift_quot : std_logic_vector(31 downto 0);
     variable v_trial_sub  : unsigned(32 downto 0);
@@ -92,7 +92,7 @@ process(clk, reset)
     variable v_final_rem  : std_logic_vector(31 downto 0);
 begin
     if rising_edge(clk) then
-        if reset = '1' then
+        if rst_n = '0' then
             current_state  <= IDLE; 
             quotient_reg   <= (others => '0');
             divisor_reg    <= (others => '0');

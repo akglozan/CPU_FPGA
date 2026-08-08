@@ -7,7 +7,7 @@ entity IF_ID_Register is
 	port(
 	
 		clk		: in std_logic;
-		rst		: in std_logic;
+		rst_n		: in std_logic;
 
 		/*Hazard control signal. 
 		When stall = '1', the register holds its current value 
@@ -47,7 +47,7 @@ process(clk)
 begin
 
 	if rising_edge(clk) then
-		if rst = '1' then
+		if rst_n = '0' then
 			pc_out <= (others => '0');
 			instruction_out <= x"00000013";
 		elsif flush = '1' then

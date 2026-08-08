@@ -11,7 +11,7 @@ architecture Testbench of M_Extension_Unit_tb is
     component M_Extension_Unit
         port(
             clk        : in  std_logic;
-            reset      : in  std_logic;
+            rst_n      : in  std_logic;
             is_m_ext   : in  std_logic;
             funct3     : in  std_logic_vector(2 downto 0);
             operand_a  : in  std_logic_vector(31 downto 0);
@@ -23,7 +23,7 @@ architecture Testbench of M_Extension_Unit_tb is
 
     -- Testbench Signals
     signal clk        : std_logic := '0';
-    signal reset      : std_logic := '0';
+    signal rst_n      : std_logic := '0';
     signal is_m_ext   : std_logic := '0';
     signal funct3     : std_logic_vector(2 downto 0) := "000";
     signal operand_a  : std_logic_vector(31 downto 0) := (others => '0');
@@ -39,7 +39,7 @@ begin
     uut: M_Extension_Unit
         port map (
             clk       => clk,
-            reset     => reset,
+            rst_n     => rst_n,
             is_m_ext  => is_m_ext,
             funct3    => funct3,
             operand_a => operand_a,
@@ -61,9 +61,9 @@ begin
     stim_proc: process
     begin
         -- 1. System Reset
-        reset <= '1';
+        rst_n <= '1';
         wait for CLK_PERIOD * 2;
-        reset <= '0';
+        rst_n <= '0';
         wait for CLK_PERIOD;
 
         --------------------------------------------------------------------

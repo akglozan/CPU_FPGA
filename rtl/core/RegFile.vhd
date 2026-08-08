@@ -7,7 +7,7 @@ entity RegFile is
 	port(
 	
 	clk	: in std_logic;
-	rst	: in std_logic;
+	rst_n	: in std_logic;
 	reg_write	: in std_logic;
 	rd_addr	: in std_logic_vector(4 downto 0);
 	rs1_addr	: in std_logic_vector(4 downto 0);
@@ -41,7 +41,7 @@ process(clk)
 begin
 
 	if rising_edge(clk) then
-		if rst ='1' then
+		if rst_n ='1' then
 			registers <= (others => (others => '0'));
 		elsif reg_write = '1' and rd_addr /= "00000" then
 			registers(to_integer(unsigned(rd_addr))) <= rd_data;

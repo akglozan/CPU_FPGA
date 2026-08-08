@@ -8,7 +8,7 @@ entity CPU_FPGA is
     );
     port (
         clk         : in  std_logic;
-        rst         : in  std_logic;
+        rst_n         : in  std_logic;
         
         -- External debug outputs
         pc_debug    : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -25,7 +25,7 @@ architecture Structural of CPU_FPGA is
         generic ( DATA_WIDTH : integer := 32 );
         port (
             clk             : in  std_logic;
-            rst             : in  std_logic;
+            rst_n             : in  std_logic;
             pc_write        : in  std_logic;
             if_id_stall     : in  std_logic;
             if_id_flush     : in  std_logic;
@@ -40,7 +40,7 @@ architecture Structural of CPU_FPGA is
     component ID_Stage is
         port (
             clk             : in  std_logic;
-            rst             : in  std_logic;
+            rst_n             : in  std_logic;
             id_ex_stall     : in  std_logic;
             id_ex_flush     : in  std_logic;
             id_pc_in        : in  std_logic_vector(31 downto 0);
@@ -77,7 +77,7 @@ architecture Structural of CPU_FPGA is
     component EX_Stage is
         port (
             clk                     : in  std_logic;
-            rst                     : in  std_logic;
+            rst_n                     : in  std_logic;
             ex_pc_in                : in  std_logic_vector(31 downto 0);
             ex_imm_ext_in           : in  std_logic_vector(31 downto 0);
             ex_reg_data1_in         : in  std_logic_vector(31 downto 0);
@@ -118,7 +118,7 @@ architecture Structural of CPU_FPGA is
     component MEM_Stage is
         port (
             clk                 : in  std_logic;
-            rst                 : in  std_logic;
+            rst_n                 : in  std_logic;
             mem_result_in       : in  std_logic_vector(31 downto 0);
             mem_write_data_in   : in  std_logic_vector(31 downto 0);
             mem_rd_addr_in      : in  std_logic_vector(4 downto 0);
@@ -214,7 +214,7 @@ begin
     U_STAGE_IF : IF_Stage
         port map (
             clk             => clk,
-            rst             => rst,
+            rst_n             => rst_n,
             pc_write        => pc_write_wire,
             if_id_stall     => if_id_stall_wire,
             if_id_flush     => if_id_flush_wire,
@@ -229,7 +229,7 @@ begin
     U_STAGE_ID : ID_Stage
         port map (
             clk             => clk,
-            rst             => rst,
+            rst_n             => rst_n,
             id_ex_stall     => id_ex_stall_wire,
             id_ex_flush     => id_ex_flush_wire,
             id_pc_in        => id_pc,
@@ -266,7 +266,7 @@ begin
     U_STAGE_EX : EX_Stage
         port map (
             clk                     => clk,
-            rst                     => rst,
+            rst_n                     => rst_n,
             ex_pc_in                => ex_pc,
             ex_imm_ext_in           => ex_imm_ext,
             ex_reg_data1_in         => ex_reg_data1,
@@ -307,7 +307,7 @@ begin
     U_STAGE_MEM : MEM_Stage
         port map (
             clk                 => clk,
-            rst                 => rst,
+            rst_n                 => rst_n,
             mem_result_in       => mem_result,
             mem_write_data_in   => mem_write_data,
             mem_rd_addr_in      => mem_rd_addr,

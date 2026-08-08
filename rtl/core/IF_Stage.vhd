@@ -10,7 +10,7 @@ entity IF_Stage is
     );
     port (
         clk             : in  std_logic;
-        rst             : in  std_logic;
+        rst_n             : in  std_logic;
         
         -- Hazard Controls
         pc_write        : in  std_logic;
@@ -35,7 +35,7 @@ architecture Structural of IF_Stage is
         generic ( DATA_WIDTH : integer := 32 );
         port (
             clk       : in  std_logic;
-            rst       : in  std_logic;
+            rst_n       : in  std_logic;
             pc_write  : in  std_logic;
             pc_src    : in  std_logic;
             target_pc : in  std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -57,7 +57,7 @@ architecture Structural of IF_Stage is
     component IF_ID_Register is
         port (
             clk             : in  std_logic;
-            rst             : in  std_logic;
+            rst_n             : in  std_logic;
             stall           : in  std_logic;
             flush           : in  std_logic;
             pc_in           : in  std_logic_vector(31 downto 0);
@@ -81,7 +81,7 @@ begin
         generic map ( DATA_WIDTH => DATA_WIDTH )
         port map (
             clk       => clk,
-            rst       => rst,
+            rst_n       => rst_n,
             pc_write  => pc_write,
             pc_src    => pc_src,
             target_pc => target_pc,
@@ -99,7 +99,7 @@ begin
     U_IF_ID : IF_ID_Register
         port map (
             clk             => clk,
-            rst             => rst,
+            rst_n             => rst_n,
             stall           => if_id_stall,
             flush           => if_id_flush,
             pc_in           => pc_wire,
