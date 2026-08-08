@@ -7,8 +7,9 @@ entity CPU_Top_Wrapper is
         clk           : in  std_logic;                      -- Physical Board Clock
         rst_n           : in  std_logic;                      -- Physical Reset Switch
         debug_sel     : in  std_logic_vector(1 downto 0);   -- MUX Select (Switches)
-        led_out       : out std_logic_vector(7 downto 0)    -- 8 Onboard Diagnostic LEDs
-    );
+        led_out       : out std_logic_vector(7 downto 0)    -- 4 Onboard Diagnostic LEDs
+    );							--here there is a problem with my current resources which has 4 leds onboard
+									--and i dont plan on adding anymore so i have to adjust some vectors when i get back
 end entity CPU_Top_Wrapper;
 
 architecture Structural of CPU_Top_Wrapper is
