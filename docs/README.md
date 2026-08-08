@@ -91,5 +91,5 @@
 ## Hardware Schematic
 
 <div align="center">
-  <img src="./rtl_schematic.svg?raw=true" alt="RTL Schematic" width="100%" style="background-color: white; padding: 10px; border-radius: 8px;">
+ <img src="./rtl_schematic.svg?v=2" alt="RTL Schematic" width="100%" style="background-color: white; padding: 10px; border-radius: 8px;">
 </div>
