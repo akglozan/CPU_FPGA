@@ -85,7 +85,11 @@
   - [ ] Run Quartus II TimeQuest Timing Analyzer to fix setup/hold violations.
   - [ ] Optimize VHDL code to keep total logic usage strictly under ~5,000 LEs.
 
+## Hardware Schematic
 
+<div align="center">
+ <img src="./rtl_schematic.svg?v=2" alt="RTL Schematic" width="100%" style="background-color: white; padding: 10px; border-radius: 8px;">
+</div>
 
 
 
