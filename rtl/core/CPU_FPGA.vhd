@@ -14,7 +14,17 @@ entity CPU_FPGA is
         pc_debug    : out std_logic_vector(DATA_WIDTH-1 downto 0);
         instr_debug : out std_logic_vector(DATA_WIDTH-1 downto 0);
         rs1_debug   : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        rs2_debug   : out std_logic_vector(DATA_WIDTH-1 downto 0)
+        rs2_debug   : out std_logic_vector(DATA_WIDTH-1 downto 0);
+		  
+		  --Memory Bus Interface Ports
+		  mem_addr_out	: out std_logic_vector(DATA_WIDTH-1 downto 0);
+		  mem_wdata_out: out std_logic_vector(DATA_WIDTH-1 downto 0);
+		  mem_we_out	: out std_logic;
+		  mem_re_out	: out std_logic;
+		  mem_rdata_in	: in std_logic_vector(DATA_WIDTH-1 downto 0);
+		  
+		  funct3_out : out std_logic_vector(2 downto 0)
+		  
     );
 end entity CPU_FPGA;
 
@@ -25,7 +35,7 @@ architecture Structural of CPU_FPGA is
         generic ( DATA_WIDTH : integer := 32 );
         port (
             clk             : in  std_logic;
-            rst_n             : in  std_logic;
+            rst_n           : in  std_logic;
             pc_write        : in  std_logic;
             if_id_stall     : in  std_logic;
             if_id_flush     : in  std_logic;
@@ -207,8 +217,18 @@ architecture Structural of CPU_FPGA is
     signal wb_sel            : std_logic_vector(1 downto 0);
     signal wb_rd_data        : std_logic_vector(31 downto 0);
 	 signal wb_pc_plus4 : std_logic_vector(31 downto 0);
+	 
+	 
 
 begin
+
+	--Concurrent Output Assignments
+	 mem_addr_out <= mem_result;
+	 mem_wdata_out <= mem_write_data;
+	 mem_we_out <= mem_mem_write;
+	 mem_re_out <= mem_mem_read;
+	 funct3_out <= mem_funct3;
+	 
 
     -- 1. IF Stage
     U_STAGE_IF : IF_Stage
@@ -309,7 +329,7 @@ begin
             clk                 => clk,
             rst_n                 => rst_n,
             mem_result_in       => mem_result,
-            mem_write_data_in   => mem_write_data,
+            mem_write_data_in   => mem_rdata_in,
             mem_rd_addr_in      => mem_rd_addr,
             mem_reg_write_in    => mem_reg_write,
             mem_mem_read_in     => mem_mem_read,
