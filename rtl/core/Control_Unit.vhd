@@ -36,6 +36,7 @@ begin
 process(opcode)
 
 begin
+		-- Default assignments to prevent inferred latches
 		imm_src	<=	"000";
 		alu_src 	<= '0';
 		reg_write<= '0';
@@ -44,6 +45,7 @@ begin
 		wb_sel	<= "00";
 		branch	<= '0';
 		jump		<= '0';
+		alu_op   <= "00";
 	
 	case opcode is
 		when "0110011" => -- R-Type
@@ -82,6 +84,7 @@ begin
 			jump <= '1';
 			wb_sel <= "10";
 			imm_src <= "100";
+			alu_op <= "00";
 			
 		when "1100111" => -- JALR
 			reg_write <= '1';
