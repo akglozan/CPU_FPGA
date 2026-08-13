@@ -1,0 +1,2453 @@
+write format transcript transcript_saved.txt
+# unknown or ambiguous subcommand "transcript": must be analysis, assertions, breakpoints, coverdirective, export_column_layout, list, memory, restart, testbrowser, watch, or wave
+set f [open "transcript_history.txt" w]; puts $f [.main_pane.transcript get 1.0 end]; close $f
+# bad option "get": should be one of...
+#   .main_pane.transcript Activate ?arg arg ...?
+#   .main_pane.transcript AddDedicatedTb
+#   .main_pane.transcript AddDefaultMenu menu_bar
+#   .main_pane.transcript AddDefaultToolbar toolbar
+#   .main_pane.transcript AddHeaderIcon
+#   .main_pane.transcript AnimateImage
+#   .main_pane.transcript ClearData
+#   .main_pane.transcript DataExist varName
+#   .main_pane.transcript DataRef varName
+#   .main_pane.transcript Deactivate
+#   .main_pane.transcript DelayedAnimation ?arg arg ...?
+#   .main_pane.transcript DestroyDedicatedTb
+#   .main_pane.transcript Dock
+#   .main_pane.transcript DumpAll where
+#   .main_pane.transcript DumpData where
+#   .main_pane.transcript FindSubWidget w
+#   .main_pane.transcript FindSubWidgetRecursive w
+#   .main_pane.transcript FrameName
+#   .main_pane.transcript GetBody
+#   .main_pane.transcript GetClientFooter
+#   .main_pane.transcript GetData ?name?
+#   .main_pane.transcript GetDedicatedTbPath
+#   .main_pane.transcript GetMenuBar
+#   .main_pane.transcript GetRegisteredChild
+#   .main_pane.transcript GetRegisteredView
+#   .main_pane.transcript GetTabIcon
+#   .main_pane.transcript GetToolbar
+#   .main_pane.transcript GetUndockGeom
+#   .main_pane.transcript GetUndockGeomHistory
+#   .main_pane.transcript HeaderIcon
+#   .main_pane.transcript HideDedicatedTb
+#   .main_pane.transcript IsActivated ?arg arg ...?
+#   .main_pane.transcript IsIconified
+#   .main_pane.transcript IsViable
+#   .main_pane.transcript PageSelected
+#   .main_pane.transcript RemoveData name
+#   .main_pane.transcript RemoveHeaderIcon
+#   .main_pane.transcript Reset
+#   .main_pane.transcript ResetBody
+#   .main_pane.transcript SetData name value
+#   .main_pane.transcript SetMaxButtonIcon
+#   .main_pane.transcript SetTabIcon tab
+#   .main_pane.transcript SetUndockGeom geom
+#   .main_pane.transcript SetUndockGeomHistory geom
+#   .main_pane.transcript ShowDedicatedTb
+#   .main_pane.transcript StopAnimateImage
+#   .main_pane.transcript SubWidgetActivate
+#   .main_pane.transcript SubWidgetDeActivate
+#   .main_pane.transcript TabLabel
+#   .main_pane.transcript TestCallBacks
+#   .main_pane.transcript TestForCallBack callback
+#   .main_pane.transcript Title
+#   .main_pane.transcript ToggleDedicatedTb
+#   .main_pane.transcript UnDock
+#   .main_pane.transcript UpdateText
+#   .main_pane.transcript WindowClosing
+#   .main_pane.transcript WindowInTransition
+#   .main_pane.transcript WindowOpening
+#   .main_pane.transcript WindowUnDocked
+#   .main_pane.transcript _Dock
+#   .main_pane.transcript _UnDock
+#   .main_pane.transcript _dump_queue
+#   .main_pane.transcript _hidecommand_
+#   .main_pane.transcript _trigger_show_cmd W ?general_update?
+#   .main_pane.transcript cget option
+#   .main_pane.transcript childsite
+#   .main_pane.transcript component ?name? ?arg arg ...?
+#   .main_pane.transcript config ?option? ?arg arg ...?
+#   .main_pane.transcript configure ?option? ?arg arg ...?
+#   .main_pane.transcript invoke what
+#   .main_pane.transcript isa className
+#   .main_pane.transcript winInside w
+set f [open "transcript_history.txt" w]; puts $f [.main_pane.transcript.contents get 1.0 end]; close $f
+# invalid command name ".main_pane.transcript.contents"
+do run_sim.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Errors: 0, Warnings: 1
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work work 
+# ** Note: (vmap-220) 'modelsim.ini' is used as the ini file.
+# Modifying modelsim.ini
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:11 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Program_Counter.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Program_Counter
+# -- Compiling architecture Behavioral of Program_Counter
+# End time: 01:39:11 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:11 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Instruction_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity Instruction_Memory
+# -- Compiling architecture Behavioral of Instruction_Memory
+# End time: 01:39:11 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:11 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_ID_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity IF_ID_Register
+# -- Compiling architecture Behavioral of IF_ID_Register
+# End time: 01:39:11 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:11 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/RegFile.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity RegFile
+# -- Compiling architecture Behavioral of RegFile
+# End time: 01:39:11 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:12 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ImmGen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ImmGen
+# -- Compiling architecture Behavioral of ImmGen
+# End time: 01:39:12 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:12 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_EX_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_EX_Register
+# -- Compiling architecture Behavioral of ID_EX_Register
+# End time: 01:39:12 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:12 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Control_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Control_Unit
+# -- Compiling architecture Behavioral of Control_Unit
+# End time: 01:39:12 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:12 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ALU.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ALU
+# -- Compiling architecture Behavioral of ALU
+# End time: 01:39:12 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:13 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/M_Extension_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity M_Extension_Unit
+# -- Compiling architecture Behavioral of M_Extension_Unit
+# End time: 01:39:13 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:13 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Hazard_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Hazard_Unit
+# -- Compiling architecture Behavioral of Hazard_Unit
+# End time: 01:39:13 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:13 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Forwarding_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Forwarding_Unit
+# -- Compiling architecture Behavioral of Forwarding_Unit
+# End time: 01:39:13 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:13 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_MEM_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_MEM_Register
+# -- Compiling architecture Behavioral of EX_MEM_Register
+# End time: 01:39:13 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:14 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Data_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Data_Memory
+# -- Compiling architecture Behavioral of Data_Memory
+# End time: 01:39:14 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:14 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_WB_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_WB_Register
+# -- Compiling architecture Behavioral of MEM_WB_Register
+# End time: 01:39:14 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:14 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity IF_Stage
+# -- Compiling architecture Structural of IF_Stage
+# End time: 01:39:14 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:15 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_Stage
+# -- Compiling architecture Structural of ID_Stage
+# End time: 01:39:15 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:15 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_Stage
+# -- Compiling architecture Structural of EX_Stage
+# End time: 01:39:15 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:15 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_Stage
+# -- Compiling architecture Structural of MEM_Stage
+# End time: 01:39:15 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:16 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/CPU_FPGA.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity CPU_FPGA
+# -- Compiling architecture Structural of CPU_FPGA
+# End time: 01:39:16 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:16 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bram_4kb.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bram_4kb
+# -- Compiling architecture rtl of bram_4kb
+# End time: 01:39:16 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:16 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bus_interconnect.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bus_interconnect
+# -- Compiling architecture rtl of bus_interconnect
+# End time: 01:39:16 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:16 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/uart_tx.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity uart_tx
+# -- Compiling architecture Behavioral of uart_tx
+# End time: 01:39:16 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:17 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_led.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_led
+# -- Compiling architecture Behavioral of gpio_led
+# End time: 01:39:17 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:17 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_key.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_key
+# -- Compiling architecture Behavioral of gpio_key
+# End time: 01:39:17 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:17 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/timer.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity timer
+# -- Compiling architecture Behavioral of timer
+# End time: 01:39:17 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:17 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity rv32im_soc
+# -- Compiling architecture Structural of rv32im_soc
+# -- Loading entity CPU_FPGA
+# -- Loading entity bram_4kb
+# -- Loading entity bus_interconnect
+# -- Loading entity uart_tx
+# -- Loading entity gpio_led
+# -- Loading entity gpio_key
+# -- Loading entity timer
+# End time: 01:39:17 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:39:18 on Aug 13,2026
+# vcom -reportprogress 300 -2008 tb_rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_rv32im_soc
+# -- Compiling architecture Behavioral of tb_rv32im_soc
+# -- Loading entity rv32im_soc
+# End time: 01:39:18 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 01:39:19 on Aug 13,2026, Elapsed time: 0:08:20
+# Errors: 0, Warnings: 7
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -t 1ns -voptargs=""+acc"" work.tb_rv32im_soc 
+# Start time: 01:39:19 on Aug 13,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_rv32im_soc(behavioral)#1
+# Loading work.rv32im_soc(structural)#1
+# Loading work.cpu_fpga(structural)#1
+# Loading ieee.std_logic_textio(body)
+# Loading work.if_stage(structural)#1
+# Loading work.program_counter(behavioral)#1
+# Loading work.instruction_memory(behavioral)#1
+# Loading work.if_id_register(behavioral)#1
+# Loading work.id_stage(structural)#1
+# Loading work.regfile(behavioral)#1
+# Loading work.control_unit(behavioral)#1
+# Loading work.immgen(behavioral)#1
+# Loading work.id_ex_register(behavioral)#1
+# Loading work.ex_stage(structural)#1
+# Loading work.forwarding_unit(behavioral)#1
+# Loading work.alu(behavioral)#1
+# Loading work.m_extension_unit(behavioral)#1
+# Loading work.ex_mem_register(behavioral)#1
+# Loading work.mem_stage(structural)#1
+# Loading work.data_memory(behavioral)#1
+# Loading work.mem_wb_register(behavioral)#1
+# Loading work.hazard_unit(behavioral)#1
+# Loading work.bram_4kb(rtl)#1
+# Loading work.bus_interconnect(rtl)#1
+# Loading work.uart_tx(behavioral)#1
+# Loading work.gpio_led(behavioral)#1
+# Loading work.gpio_key(behavioral)#1
+# Loading work.timer(behavioral)#1
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 1  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 2  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+do run_sim.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Errors: 0, Warnings: 1
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work work 
+# ** Note: (vmap-220) 'modelsim.ini' is used as the ini file.
+# Modifying modelsim.ini
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:32 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Program_Counter.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Program_Counter
+# -- Compiling architecture Behavioral of Program_Counter
+# End time: 01:43:32 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:32 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Instruction_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity Instruction_Memory
+# -- Compiling architecture Behavioral of Instruction_Memory
+# End time: 01:43:32 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:32 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_ID_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity IF_ID_Register
+# -- Compiling architecture Behavioral of IF_ID_Register
+# End time: 01:43:32 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:32 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/RegFile.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity RegFile
+# -- Compiling architecture Behavioral of RegFile
+# End time: 01:43:32 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:33 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ImmGen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ImmGen
+# -- Compiling architecture Behavioral of ImmGen
+# End time: 01:43:33 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:33 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_EX_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_EX_Register
+# -- Compiling architecture Behavioral of ID_EX_Register
+# End time: 01:43:33 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:33 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Control_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Control_Unit
+# -- Compiling architecture Behavioral of Control_Unit
+# End time: 01:43:33 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:33 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ALU.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ALU
+# -- Compiling architecture Behavioral of ALU
+# End time: 01:43:33 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:34 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/M_Extension_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity M_Extension_Unit
+# -- Compiling architecture Behavioral of M_Extension_Unit
+# End time: 01:43:34 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:34 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Hazard_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Hazard_Unit
+# -- Compiling architecture Behavioral of Hazard_Unit
+# End time: 01:43:34 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:34 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Forwarding_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Forwarding_Unit
+# -- Compiling architecture Behavioral of Forwarding_Unit
+# End time: 01:43:34 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:34 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_MEM_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_MEM_Register
+# -- Compiling architecture Behavioral of EX_MEM_Register
+# End time: 01:43:34 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:34 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Data_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Data_Memory
+# -- Compiling architecture Behavioral of Data_Memory
+# End time: 01:43:35 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:35 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_WB_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_WB_Register
+# -- Compiling architecture Behavioral of MEM_WB_Register
+# End time: 01:43:35 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:35 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity IF_Stage
+# -- Compiling architecture Structural of IF_Stage
+# End time: 01:43:35 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:35 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_Stage
+# -- Compiling architecture Structural of ID_Stage
+# End time: 01:43:35 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:36 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_Stage
+# -- Compiling architecture Structural of EX_Stage
+# End time: 01:43:36 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:36 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_Stage
+# -- Compiling architecture Structural of MEM_Stage
+# End time: 01:43:36 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:36 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/CPU_FPGA.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity CPU_FPGA
+# -- Compiling architecture Structural of CPU_FPGA
+# End time: 01:43:36 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:36 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bram_4kb.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bram_4kb
+# -- Compiling architecture rtl of bram_4kb
+# End time: 01:43:36 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:36 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bus_interconnect.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bus_interconnect
+# -- Compiling architecture rtl of bus_interconnect
+# End time: 01:43:37 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:37 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/uart_tx.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity uart_tx
+# -- Compiling architecture Behavioral of uart_tx
+# End time: 01:43:37 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:37 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_led.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_led
+# -- Compiling architecture Behavioral of gpio_led
+# End time: 01:43:37 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:37 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_key.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_key
+# -- Compiling architecture Behavioral of gpio_key
+# End time: 01:43:37 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:37 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/timer.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity timer
+# -- Compiling architecture Behavioral of timer
+# End time: 01:43:38 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:38 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity rv32im_soc
+# -- Compiling architecture Structural of rv32im_soc
+# -- Loading entity CPU_FPGA
+# -- Loading entity bram_4kb
+# -- Loading entity bus_interconnect
+# -- Loading entity uart_tx
+# -- Loading entity gpio_led
+# -- Loading entity gpio_key
+# -- Loading entity timer
+# End time: 01:43:38 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:43:38 on Aug 13,2026
+# vcom -reportprogress 300 -2008 tb_rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_rv32im_soc
+# -- Compiling architecture Behavioral of tb_rv32im_soc
+# -- Loading entity rv32im_soc
+# End time: 01:43:38 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 01:43:39 on Aug 13,2026, Elapsed time: 0:04:20
+# Errors: 0, Warnings: 7
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -t 1ns -voptargs=""+acc"" work.tb_rv32im_soc 
+# Start time: 01:43:40 on Aug 13,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_rv32im_soc(behavioral)#1
+# Loading work.rv32im_soc(structural)#1
+# Loading work.cpu_fpga(structural)#1
+# Loading ieee.std_logic_textio(body)
+# Loading work.if_stage(structural)#1
+# Loading work.program_counter(behavioral)#1
+# Loading work.instruction_memory(behavioral)#1
+# Loading work.if_id_register(behavioral)#1
+# Loading work.id_stage(structural)#1
+# Loading work.regfile(behavioral)#1
+# Loading work.control_unit(behavioral)#1
+# Loading work.immgen(behavioral)#1
+# Loading work.id_ex_register(behavioral)#1
+# Loading work.ex_stage(structural)#1
+# Loading work.forwarding_unit(behavioral)#1
+# Loading work.alu(behavioral)#1
+# Loading work.m_extension_unit(behavioral)#1
+# Loading work.ex_mem_register(behavioral)#1
+# Loading work.mem_stage(structural)#1
+# Loading work.data_memory(behavioral)#1
+# Loading work.mem_wb_register(behavioral)#1
+# Loading work.hazard_unit(behavioral)#1
+# Loading work.bram_4kb(rtl)#1
+# Loading work.bus_interconnect(rtl)#1
+# Loading work.uart_tx(behavioral)#1
+# Loading work.gpio_led(behavioral)#1
+# Loading work.gpio_key(behavioral)#1
+# Loading work.timer(behavioral)#1
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 1  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 2  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+do run_sim.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Errors: 0, Warnings: 1
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work work 
+# ** Note: (vmap-220) 'modelsim.ini' is used as the ini file.
+# Modifying modelsim.ini
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:40 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Program_Counter.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Program_Counter
+# -- Compiling architecture Behavioral of Program_Counter
+# End time: 01:49:40 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:40 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Instruction_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity Instruction_Memory
+# -- Compiling architecture Behavioral of Instruction_Memory
+# End time: 01:49:40 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:40 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_ID_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity IF_ID_Register
+# -- Compiling architecture Behavioral of IF_ID_Register
+# End time: 01:49:40 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:41 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/RegFile.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity RegFile
+# -- Compiling architecture Behavioral of RegFile
+# End time: 01:49:41 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:41 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ImmGen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ImmGen
+# -- Compiling architecture Behavioral of ImmGen
+# End time: 01:49:41 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:41 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_EX_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_EX_Register
+# -- Compiling architecture Behavioral of ID_EX_Register
+# End time: 01:49:41 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:41 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Control_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Control_Unit
+# -- Compiling architecture Behavioral of Control_Unit
+# End time: 01:49:41 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:42 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ALU.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ALU
+# -- Compiling architecture Behavioral of ALU
+# End time: 01:49:42 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:42 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/M_Extension_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity M_Extension_Unit
+# -- Compiling architecture Behavioral of M_Extension_Unit
+# End time: 01:49:42 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:42 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Hazard_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Hazard_Unit
+# -- Compiling architecture Behavioral of Hazard_Unit
+# End time: 01:49:42 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:42 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Forwarding_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Forwarding_Unit
+# -- Compiling architecture Behavioral of Forwarding_Unit
+# End time: 01:49:42 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:42 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_MEM_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_MEM_Register
+# -- Compiling architecture Behavioral of EX_MEM_Register
+# End time: 01:49:43 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:43 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Data_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Data_Memory
+# -- Compiling architecture Behavioral of Data_Memory
+# End time: 01:49:43 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:43 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_WB_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_WB_Register
+# -- Compiling architecture Behavioral of MEM_WB_Register
+# End time: 01:49:43 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:43 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity IF_Stage
+# -- Compiling architecture Structural of IF_Stage
+# End time: 01:49:43 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:43 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_Stage
+# -- Compiling architecture Structural of ID_Stage
+# End time: 01:49:44 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:44 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_Stage
+# -- Compiling architecture Structural of EX_Stage
+# End time: 01:49:44 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:44 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_Stage
+# -- Compiling architecture Structural of MEM_Stage
+# End time: 01:49:44 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:44 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/CPU_FPGA.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity CPU_FPGA
+# -- Compiling architecture Structural of CPU_FPGA
+# End time: 01:49:44 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:44 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bram_4kb.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bram_4kb
+# -- Compiling architecture rtl of bram_4kb
+# End time: 01:49:45 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:45 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bus_interconnect.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bus_interconnect
+# -- Compiling architecture rtl of bus_interconnect
+# End time: 01:49:45 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:45 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/uart_tx.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity uart_tx
+# -- Compiling architecture Behavioral of uart_tx
+# End time: 01:49:45 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:45 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_led.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_led
+# -- Compiling architecture Behavioral of gpio_led
+# End time: 01:49:45 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:45 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_key.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_key
+# -- Compiling architecture Behavioral of gpio_key
+# End time: 01:49:45 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:46 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/timer.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity timer
+# -- Compiling architecture Behavioral of timer
+# End time: 01:49:46 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:46 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity rv32im_soc
+# -- Compiling architecture Structural of rv32im_soc
+# -- Loading entity CPU_FPGA
+# -- Loading entity bram_4kb
+# -- Loading entity bus_interconnect
+# -- Loading entity uart_tx
+# -- Loading entity gpio_led
+# -- Loading entity gpio_key
+# -- Loading entity timer
+# End time: 01:49:46 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:49:46 on Aug 13,2026
+# vcom -reportprogress 300 -2008 tb_rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_rv32im_soc
+# -- Compiling architecture Behavioral of tb_rv32im_soc
+# -- Loading entity rv32im_soc
+# End time: 01:49:46 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 01:49:47 on Aug 13,2026, Elapsed time: 0:06:07
+# Errors: 0, Warnings: 7
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -t 1ns -voptargs=""+acc"" work.tb_rv32im_soc 
+# Start time: 01:49:48 on Aug 13,2026
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Warning: (vopt-10908) Some optimizations are turned off because the +acc switch is in effect.
+# ** Note: (vopt-220) 'modelsim.ini' is used as the ini file.
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_rv32im_soc(behavioral)#1
+# Loading work.rv32im_soc(structural)#1
+# Loading work.cpu_fpga(structural)#1
+# Loading ieee.std_logic_textio(body)
+# Loading work.if_stage(structural)#1
+# Loading work.program_counter(behavioral)#1
+# Loading work.instruction_memory(behavioral)#1
+# Loading work.if_id_register(behavioral)#1
+# Loading work.id_stage(structural)#1
+# Loading work.regfile(behavioral)#1
+# Loading work.control_unit(behavioral)#1
+# Loading work.immgen(behavioral)#1
+# Loading work.id_ex_register(behavioral)#1
+# Loading work.ex_stage(structural)#1
+# Loading work.forwarding_unit(behavioral)#1
+# Loading work.alu(behavioral)#1
+# Loading work.m_extension_unit(behavioral)#1
+# Loading work.ex_mem_register(behavioral)#1
+# Loading work.mem_stage(structural)#1
+# Loading work.data_memory(behavioral)#1
+# Loading work.mem_wb_register(behavioral)#1
+# Loading work.hazard_unit(behavioral)#1
+# Loading work.bram_4kb(rtl)#1
+# Loading work.bus_interconnect(rtl)#1
+# Loading work.uart_tx(behavioral)#1
+# Loading work.gpio_led(behavioral)#1
+# Loading work.gpio_key(behavioral)#1
+# Loading work.timer(behavioral)#1
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 1  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 2  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# Break key hit
+quit -sim
+# End time: 01:52:55 on Aug 13,2026, Elapsed time: 0:03:07
+# Errors: 0, Warnings: 8
+do run_sim.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Errors: 0, Warnings: 1
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work work 
+# ** Note: (vmap-220) 'modelsim.ini' is used as the ini file.
+# Modifying modelsim.ini
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:03 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Program_Counter.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Program_Counter
+# -- Compiling architecture Behavioral of Program_Counter
+# End time: 01:53:03 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:03 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Instruction_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity Instruction_Memory
+# -- Compiling architecture Behavioral of Instruction_Memory
+# End time: 01:53:03 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:03 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_ID_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity IF_ID_Register
+# -- Compiling architecture Behavioral of IF_ID_Register
+# End time: 01:53:03 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:03 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/RegFile.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity RegFile
+# -- Compiling architecture Behavioral of RegFile
+# End time: 01:53:03 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:03 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ImmGen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ImmGen
+# -- Compiling architecture Behavioral of ImmGen
+# End time: 01:53:04 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:04 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_EX_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_EX_Register
+# -- Compiling architecture Behavioral of ID_EX_Register
+# End time: 01:53:04 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:04 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Control_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Control_Unit
+# -- Compiling architecture Behavioral of Control_Unit
+# End time: 01:53:04 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:04 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ALU.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ALU
+# -- Compiling architecture Behavioral of ALU
+# End time: 01:53:04 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:04 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/M_Extension_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity M_Extension_Unit
+# -- Compiling architecture Behavioral of M_Extension_Unit
+# End time: 01:53:04 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:05 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Hazard_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Hazard_Unit
+# -- Compiling architecture Behavioral of Hazard_Unit
+# End time: 01:53:05 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:05 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Forwarding_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Forwarding_Unit
+# -- Compiling architecture Behavioral of Forwarding_Unit
+# End time: 01:53:05 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:05 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_MEM_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_MEM_Register
+# -- Compiling architecture Behavioral of EX_MEM_Register
+# End time: 01:53:05 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:05 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Data_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Data_Memory
+# -- Compiling architecture Behavioral of Data_Memory
+# End time: 01:53:05 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:05 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_WB_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_WB_Register
+# -- Compiling architecture Behavioral of MEM_WB_Register
+# End time: 01:53:06 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:06 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity IF_Stage
+# -- Compiling architecture Structural of IF_Stage
+# End time: 01:53:06 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:06 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_Stage
+# -- Compiling architecture Structural of ID_Stage
+# End time: 01:53:06 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:06 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_Stage
+# -- Compiling architecture Structural of EX_Stage
+# End time: 01:53:06 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:06 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_Stage
+# -- Compiling architecture Structural of MEM_Stage
+# End time: 01:53:07 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:07 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/CPU_FPGA.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity CPU_FPGA
+# -- Compiling architecture Structural of CPU_FPGA
+# End time: 01:53:07 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:07 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bram_4kb.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bram_4kb
+# -- Compiling architecture rtl of bram_4kb
+# End time: 01:53:07 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:07 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bus_interconnect.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bus_interconnect
+# -- Compiling architecture rtl of bus_interconnect
+# End time: 01:53:07 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:07 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/uart_tx.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity uart_tx
+# -- Compiling architecture Behavioral of uart_tx
+# End time: 01:53:08 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:08 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_led.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_led
+# -- Compiling architecture Behavioral of gpio_led
+# End time: 01:53:08 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:08 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_key.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_key
+# -- Compiling architecture Behavioral of gpio_key
+# End time: 01:53:08 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:08 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/timer.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity timer
+# -- Compiling architecture Behavioral of timer
+# End time: 01:53:08 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:08 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity rv32im_soc
+# -- Compiling architecture Structural of rv32im_soc
+# -- Loading entity CPU_FPGA
+# -- Loading entity bram_4kb
+# -- Loading entity bus_interconnect
+# -- Loading entity uart_tx
+# -- Loading entity gpio_led
+# -- Loading entity gpio_key
+# -- Loading entity timer
+# End time: 01:53:08 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:53:09 on Aug 13,2026
+# vcom -reportprogress 300 -2008 tb_rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_rv32im_soc
+# -- Compiling architecture Behavioral of tb_rv32im_soc
+# -- Loading entity rv32im_soc
+# End time: 01:53:09 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -t 1ns -voptargs=""+acc"" work.tb_rv32im_soc 
+# Start time: 01:53:09 on Aug 13,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_rv32im_soc(behavioral)#1
+# Loading work.rv32im_soc(structural)#1
+# Loading work.cpu_fpga(structural)#1
+# Loading ieee.std_logic_textio(body)
+# Loading work.if_stage(structural)#1
+# Loading work.program_counter(behavioral)#1
+# Loading work.instruction_memory(behavioral)#1
+# Loading work.if_id_register(behavioral)#1
+# Loading work.id_stage(structural)#1
+# Loading work.regfile(behavioral)#1
+# Loading work.control_unit(behavioral)#1
+# Loading work.immgen(behavioral)#1
+# Loading work.id_ex_register(behavioral)#1
+# Loading work.ex_stage(structural)#1
+# Loading work.forwarding_unit(behavioral)#1
+# Loading work.alu(behavioral)#1
+# Loading work.m_extension_unit(behavioral)#1
+# Loading work.ex_mem_register(behavioral)#1
+# Loading work.mem_stage(structural)#1
+# Loading work.data_memory(behavioral)#1
+# Loading work.mem_wb_register(behavioral)#1
+# Loading work.hazard_unit(behavioral)#1
+# Loading work.bram_4kb(rtl)#1
+# Loading work.bus_interconnect(rtl)#1
+# Loading work.uart_tx(behavioral)#1
+# Loading work.gpio_led(behavioral)#1
+# Loading work.gpio_key(behavioral)#1
+# Loading work.timer(behavioral)#1
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 1  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 2  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+quit -sim
+# End time: 01:56:45 on Aug 13,2026, Elapsed time: 0:03:36
+# Errors: 0, Warnings: 7
+do run_sim.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Errors: 0, Warnings: 1
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work work 
+# ** Note: (vmap-220) 'modelsim.ini' is used as the ini file.
+# Modifying modelsim.ini
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:50 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Program_Counter.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Program_Counter
+# -- Compiling architecture Behavioral of Program_Counter
+# End time: 01:56:50 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:50 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Instruction_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity Instruction_Memory
+# -- Compiling architecture Behavioral of Instruction_Memory
+# End time: 01:56:50 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:50 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_ID_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity IF_ID_Register
+# -- Compiling architecture Behavioral of IF_ID_Register
+# End time: 01:56:50 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:50 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/RegFile.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity RegFile
+# -- Compiling architecture Behavioral of RegFile
+# End time: 01:56:50 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:51 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ImmGen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ImmGen
+# -- Compiling architecture Behavioral of ImmGen
+# End time: 01:56:51 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:51 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_EX_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_EX_Register
+# -- Compiling architecture Behavioral of ID_EX_Register
+# End time: 01:56:51 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:51 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Control_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Control_Unit
+# -- Compiling architecture Behavioral of Control_Unit
+# End time: 01:56:51 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:51 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ALU.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ALU
+# -- Compiling architecture Behavioral of ALU
+# End time: 01:56:51 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:52 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/M_Extension_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity M_Extension_Unit
+# -- Compiling architecture Behavioral of M_Extension_Unit
+# End time: 01:56:52 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:52 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Hazard_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Hazard_Unit
+# -- Compiling architecture Behavioral of Hazard_Unit
+# End time: 01:56:52 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:52 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Forwarding_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Forwarding_Unit
+# -- Compiling architecture Behavioral of Forwarding_Unit
+# End time: 01:56:52 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:52 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_MEM_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_MEM_Register
+# -- Compiling architecture Behavioral of EX_MEM_Register
+# End time: 01:56:52 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:52 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Data_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Data_Memory
+# -- Compiling architecture Behavioral of Data_Memory
+# End time: 01:56:53 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:53 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_WB_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_WB_Register
+# -- Compiling architecture Behavioral of MEM_WB_Register
+# End time: 01:56:53 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:53 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity IF_Stage
+# -- Compiling architecture Structural of IF_Stage
+# End time: 01:56:53 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:53 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_Stage
+# -- Compiling architecture Structural of ID_Stage
+# End time: 01:56:53 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:53 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_Stage
+# -- Compiling architecture Structural of EX_Stage
+# End time: 01:56:54 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:54 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_Stage
+# -- Compiling architecture Structural of MEM_Stage
+# End time: 01:56:54 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:54 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/CPU_FPGA.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity CPU_FPGA
+# -- Compiling architecture Structural of CPU_FPGA
+# End time: 01:56:54 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:54 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bram_4kb.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bram_4kb
+# -- Compiling architecture rtl of bram_4kb
+# End time: 01:56:54 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:54 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bus_interconnect.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bus_interconnect
+# -- Compiling architecture rtl of bus_interconnect
+# End time: 01:56:55 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:55 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/uart_tx.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity uart_tx
+# -- Compiling architecture Behavioral of uart_tx
+# End time: 01:56:55 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:55 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_led.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_led
+# -- Compiling architecture Behavioral of gpio_led
+# End time: 01:56:55 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:55 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_key.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_key
+# -- Compiling architecture Behavioral of gpio_key
+# End time: 01:56:55 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:56 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/timer.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity timer
+# -- Compiling architecture Behavioral of timer
+# End time: 01:56:56 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:56 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity rv32im_soc
+# -- Compiling architecture Structural of rv32im_soc
+# -- Loading entity CPU_FPGA
+# -- Loading entity bram_4kb
+# -- Loading entity bus_interconnect
+# -- Loading entity uart_tx
+# -- Loading entity gpio_led
+# -- Loading entity gpio_key
+# -- Loading entity timer
+# End time: 01:56:56 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:56:56 on Aug 13,2026
+# vcom -reportprogress 300 -2008 tb_rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_rv32im_soc
+# -- Compiling architecture Behavioral of tb_rv32im_soc
+# -- Loading entity rv32im_soc
+# End time: 01:56:56 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -t 1ns -voptargs=""+acc"" work.tb_rv32im_soc 
+# Start time: 01:56:56 on Aug 13,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_rv32im_soc(behavioral)#1
+# Loading work.rv32im_soc(structural)#1
+# Loading work.cpu_fpga(structural)#1
+# Loading ieee.std_logic_textio(body)
+# Loading work.if_stage(structural)#1
+# Loading work.program_counter(behavioral)#1
+# Loading work.instruction_memory(behavioral)#1
+# Loading work.if_id_register(behavioral)#1
+# Loading work.id_stage(structural)#1
+# Loading work.regfile(behavioral)#1
+# Loading work.control_unit(behavioral)#1
+# Loading work.immgen(behavioral)#1
+# Loading work.id_ex_register(behavioral)#1
+# Loading work.ex_stage(structural)#1
+# Loading work.forwarding_unit(behavioral)#1
+# Loading work.alu(behavioral)#1
+# Loading work.m_extension_unit(behavioral)#1
+# Loading work.ex_mem_register(behavioral)#1
+# Loading work.mem_stage(structural)#1
+# Loading work.data_memory(behavioral)#1
+# Loading work.mem_wb_register(behavioral)#1
+# Loading work.hazard_unit(behavioral)#1
+# Loading work.bram_4kb(rtl)#1
+# Loading work.bus_interconnect(rtl)#1
+# Loading work.uart_tx(behavioral)#1
+# Loading work.gpio_led(behavioral)#1
+# Loading work.gpio_key(behavioral)#1
+# Loading work.timer(behavioral)#1
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 1  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 2  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+quit -sim
+vlib work
+# End time: 01:57:23 on Aug 13,2026, Elapsed time: 0:00:27
+# Errors: 0, Warnings: 7
+# ** Warning: (vlib-34) Library already exists at "work".
+# Errors: 0, Warnings: 1
+vmap work work
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work work 
+# ** Note: (vmap-220) 'modelsim.ini' is used as the ini file.
+# Modifying modelsim.ini
+do run_sim.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Errors: 0, Warnings: 1
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work work 
+# ** Note: (vmap-220) 'modelsim.ini' is used as the ini file.
+# Modifying modelsim.ini
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:24 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Program_Counter.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Program_Counter
+# -- Compiling architecture Behavioral of Program_Counter
+# End time: 01:57:24 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:24 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Instruction_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity Instruction_Memory
+# -- Compiling architecture Behavioral of Instruction_Memory
+# End time: 01:57:24 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:24 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_ID_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity IF_ID_Register
+# -- Compiling architecture Behavioral of IF_ID_Register
+# End time: 01:57:24 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:24 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/RegFile.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity RegFile
+# -- Compiling architecture Behavioral of RegFile
+# End time: 01:57:24 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:24 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ImmGen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ImmGen
+# -- Compiling architecture Behavioral of ImmGen
+# End time: 01:57:25 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:25 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_EX_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_EX_Register
+# -- Compiling architecture Behavioral of ID_EX_Register
+# End time: 01:57:25 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:25 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Control_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Control_Unit
+# -- Compiling architecture Behavioral of Control_Unit
+# End time: 01:57:25 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:25 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ALU.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ALU
+# -- Compiling architecture Behavioral of ALU
+# End time: 01:57:25 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:25 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/M_Extension_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity M_Extension_Unit
+# -- Compiling architecture Behavioral of M_Extension_Unit
+# End time: 01:57:26 on Aug 13,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:26 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Hazard_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Hazard_Unit
+# -- Compiling architecture Behavioral of Hazard_Unit
+# End time: 01:57:26 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:26 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Forwarding_Unit.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Forwarding_Unit
+# -- Compiling architecture Behavioral of Forwarding_Unit
+# End time: 01:57:26 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:26 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_MEM_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_MEM_Register
+# -- Compiling architecture Behavioral of EX_MEM_Register
+# End time: 01:57:26 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:26 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/Data_Memory.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity Data_Memory
+# -- Compiling architecture Behavioral of Data_Memory
+# End time: 01:57:26 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:27 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_WB_Register.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_WB_Register
+# -- Compiling architecture Behavioral of MEM_WB_Register
+# End time: 01:57:27 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:27 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/IF_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_textio
+# -- Compiling entity IF_Stage
+# -- Compiling architecture Structural of IF_Stage
+# End time: 01:57:27 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:27 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/ID_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ID_Stage
+# -- Compiling architecture Structural of ID_Stage
+# End time: 01:57:27 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:27 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/EX_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity EX_Stage
+# -- Compiling architecture Structural of EX_Stage
+# End time: 01:57:27 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:28 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/MEM_Stage.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity MEM_Stage
+# -- Compiling architecture Structural of MEM_Stage
+# End time: 01:57:28 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:28 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/core/CPU_FPGA.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity CPU_FPGA
+# -- Compiling architecture Structural of CPU_FPGA
+# End time: 01:57:28 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:28 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bram_4kb.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bram_4kb
+# -- Compiling architecture rtl of bram_4kb
+# End time: 01:57:28 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:28 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/memory/bus_interconnect.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity bus_interconnect
+# -- Compiling architecture rtl of bus_interconnect
+# End time: 01:57:28 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:29 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/uart_tx.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity uart_tx
+# -- Compiling architecture Behavioral of uart_tx
+# End time: 01:57:29 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:29 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_led.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_led
+# -- Compiling architecture Behavioral of gpio_led
+# End time: 01:57:29 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:29 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/gpio_key.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity gpio_key
+# -- Compiling architecture Behavioral of gpio_key
+# End time: 01:57:29 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:29 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/peripherals/timer.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity timer
+# -- Compiling architecture Behavioral of timer
+# End time: 01:57:29 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:30 on Aug 13,2026
+# vcom -reportprogress 300 -2008 ../rtl/rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity rv32im_soc
+# -- Compiling architecture Structural of rv32im_soc
+# -- Loading entity CPU_FPGA
+# -- Loading entity bram_4kb
+# -- Loading entity bus_interconnect
+# -- Loading entity uart_tx
+# -- Loading entity gpio_led
+# -- Loading entity gpio_key
+# -- Loading entity timer
+# End time: 01:57:30 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 01:57:30 on Aug 13,2026
+# vcom -reportprogress 300 -2008 tb_rv32im_soc.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_rv32im_soc
+# -- Compiling architecture Behavioral of tb_rv32im_soc
+# -- Loading entity rv32im_soc
+# End time: 01:57:30 on Aug 13,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -t 1ns -voptargs=""+acc"" work.tb_rv32im_soc 
+# Start time: 01:57:30 on Aug 13,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_rv32im_soc(behavioral)#1
+# Loading work.rv32im_soc(structural)#1
+# Loading work.cpu_fpga(structural)#1
+# Loading ieee.std_logic_textio(body)
+# Loading work.if_stage(structural)#1
+# Loading work.program_counter(behavioral)#1
+# Loading work.instruction_memory(behavioral)#1
+# Loading work.if_id_register(behavioral)#1
+# Loading work.id_stage(structural)#1
+# Loading work.regfile(behavioral)#1
+# Loading work.control_unit(behavioral)#1
+# Loading work.immgen(behavioral)#1
+# Loading work.id_ex_register(behavioral)#1
+# Loading work.ex_stage(structural)#1
+# Loading work.forwarding_unit(behavioral)#1
+# Loading work.alu(behavioral)#1
+# Loading work.m_extension_unit(behavioral)#1
+# Loading work.ex_mem_register(behavioral)#1
+# Loading work.mem_stage(structural)#1
+# Loading work.data_memory(behavioral)#1
+# Loading work.mem_wb_register(behavioral)#1
+# Loading work.hazard_unit(behavioral)#1
+# Loading work.bram_4kb(rtl)#1
+# Loading work.bus_interconnect(rtl)#1
+# Loading work.uart_tx(behavioral)#1
+# Loading work.gpio_led(behavioral)#1
+# Loading work.gpio_key(behavioral)#1
+# Loading work.timer(behavioral)#1
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 0  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_ID/U_REGFILE
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 1  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 2  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 10 ns  Iteration: 3  Instance: /tb_rv32im_soc/UUT/U_CPU/U_STAGE_EX/U_ALU
+# End time: 02:38:14 on Aug 13,2026, Elapsed time: 0:40:44
+# Errors: 0, Warnings: 7

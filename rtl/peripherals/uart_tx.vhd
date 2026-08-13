@@ -9,7 +9,7 @@ entity uart_tx is
     );
     port (
         clk      : in  std_logic;
-        rst_n      : in  std_logic;
+        rst_n    : in  std_logic;
         -- MMIO Interface
         tx_data  : in  std_logic_vector(7 downto 0);
         tx_start : in  std_logic;
@@ -35,59 +35,61 @@ begin
     -- Synchronous Process: State update, Baud Prescaler, and Datapath Outputs
     process(clk)
     begin
-        if rst_n = '0' then
-            current_state <= IDLE;
-            counter       <= (others => '0');
-            baud_tick     <= '0';
-            bit_index     <= (others => '0');
-            shift_reg     <= (others => '0');
-            tx_out        <= '1';
-            tx_busy       <= '0';
-        elsif rising_edge(clk) then
-            -- Advance FSM State
-            current_state <= next_state;
-
-            -- Baud Prescaler Counter
-            if counter = 0 then
-                baud_tick <= '1';
-                counter   <= to_unsigned(433, counter'length);
+        if rising_edge(clk) then
+            if rst_n = '0' then
+                current_state <= IDLE;
+                counter       <= (others => '0');
+                baud_tick     <= '0';
+                bit_index     <= (others => '0');
+                shift_reg     <= (others => '0');
+                tx_out        <= '1';
+                tx_busy       <= '0';
             else
-                baud_tick <= '0';
-                counter   <= counter - 1;
+                -- Advance FSM State
+                current_state <= next_state;
+
+                -- Baud Prescaler Counter
+                if counter = 0 then
+                    baud_tick <= '1';
+                    counter   <= to_unsigned(433, counter'length);
+                else
+                    baud_tick <= '0';
+                    counter   <= counter - 1;
+                end if;
+
+                -- State-dependent Datapath Actions
+                case current_state is
+                    when IDLE =>
+                        if tx_start = '1' then
+                            shift_reg <= tx_data;
+                        end if;
+                        counter   <= to_unsigned(433, counter'length); -- Keep counter loaded in IDLE
+                        bit_index <= (others => '0');
+                        tx_out    <= '1';
+                        tx_busy   <= '0';
+
+                    when START =>
+                        tx_out  <= '0'; -- Start bit (space)
+                        tx_busy <= '1';
+
+                    when DATA =>
+                        if baud_tick = '1' then
+                            shift_reg <= '0' & shift_reg(7 downto 1); -- Shift right LSB first
+                            bit_index <= bit_index + 1;
+                        end if;
+                        tx_out  <= shift_reg(0);
+                        tx_busy <= '1';
+
+                    when STOP =>
+                        bit_index <= (others => '0');
+                        tx_out    <= '1'; -- Stop bit (mark)
+                        tx_busy   <= '1';
+                end case;
             end if;
-
-            -- State-dependent Datapath Actions
-            case current_state is
-                when IDLE =>
-                    if tx_start = '1' then
-                        shift_reg <= tx_data;
-                    end if;
-                    counter   <= to_unsigned(433, counter'length); -- Keep counter loaded in IDLE
-                    bit_index <= (others => '0');
-                    tx_out    <= '1';
-                    tx_busy   <= '0';
-
-                when START =>
-                    tx_out  <= '0'; -- Start bit (space)
-                    tx_busy <= '1';
-
-                when DATA =>
-                    if baud_tick = '1' then
-                        shift_reg <= '0' & shift_reg(7 downto 1); -- Shift right LSB first
-                        bit_index <= bit_index + 1;
-                    end if;
-                    tx_out  <= shift_reg(0);
-                    tx_busy <= '1';
-
-                when STOP =>
-                    bit_index <= (others => '0');
-                    tx_out    <= '1'; -- Stop bit (mark)
-                    tx_busy   <= '1';
-            end case;
         end if;
     end process;
 
-    -- Combinational Process: Next-State Logic (VHDL-2008)
+    -- Combinational Process: Next-State Logic 
     process(all)
     begin
         case current_state is

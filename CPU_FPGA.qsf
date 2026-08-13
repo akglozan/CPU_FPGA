@@ -1,48 +1,13 @@
 # -------------------------------------------------------------------------- #
-#
-# Copyright (C) 1991-2013 Altera Corporation
-# Your use of Altera Corporation's design tools, logic functions 
-# and other software and tools, and its AMPP partner logic 
-# functions, and any output files from any of the foregoing 
-# (including device programming or simulation files), and any 
-# associated documentation or information are expressly subject 
-# to the terms and conditions of the Altera Program License 
-# Subscription Agreement, Altera MegaCore Function License 
-# Agreement, or other applicable license agreement, including, 
-# without limitation, that your use is for the sole purpose of 
-# programming logic devices manufactured by Altera and sold by 
-# Altera or its authorized distributors.  Please refer to the 
-# applicable agreement for further details.
-#
+# Quartus II / Prime Project Assignments File
+# Top-Level Entity: rv32im_soc
 # -------------------------------------------------------------------------- #
-#
-# Quartus II 64-Bit
-# Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-# Date created = 23:40:56  July 25, 2026
-#
-# -------------------------------------------------------------------------- #
-#
-# Notes:
-#
-# 1) The default values for assignments are stored in the file:
-#		CPU_FPGA_assignment_defaults.qdf
-#    If this file doesn't exist, see file:
-#		assignment_defaults.qdf
-#
-# 2) Altera recommends that you do not modify this file. This
-#    file is updated automatically by the Quartus II software
-#    and any changes you make may be lost or overwritten.
-#
-# -------------------------------------------------------------------------- #
-
 
 set_global_assignment -name FAMILY "Cyclone IV E"
 set_global_assignment -name DEVICE EP4CE6E22C8
-set_global_assignment -name TOP_LEVEL_ENTITY CPU_Top_Wrapper
+set_global_assignment -name TOP_LEVEL_ENTITY rv32im_soc
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
-set_global_assignment -name PROJECT_CREATION_TIME_DATE "23:40:56  JULY 25, 2026"
-set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
-set_global_assignment -name SOURCE_FILE main
+set_global_assignment -name LAST_QUARTUS_VERSION "25.1STD.0 LITE EDITION"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
@@ -51,9 +16,17 @@ set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name DEVICE_FILTER_PACKAGE "ANY QFP"
 set_global_assignment -name DEVICE_FILTER_PIN_COUNT 144
 
+# Performance & Multi-Core Synthesis
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
+set_global_assignment -name SMART_RECOMPILE ON
+set_global_assignment -name FLOW_ENABLE_RTL_VIEWER ON
+set_global_assignment -name FLOW_ENABLE_IO_ASSIGNMENT_ANALYSIS ON
+set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
+
 # -------------------------------------------------------------------------- #
-# RTL Core Source Files (Phase 1 Pipeline)
+# Source Files
 # -------------------------------------------------------------------------- #
+# Core Pipeline Files
 set_global_assignment -name VHDL_FILE rtl/core/Program_Counter.vhd
 set_global_assignment -name VHDL_FILE rtl/core/Instruction_Memory.vhd
 set_global_assignment -name VHDL_FILE rtl/core/IF_ID_Register.vhd
@@ -75,51 +48,48 @@ set_global_assignment -name VHDL_FILE rtl/core/MEM_Stage.vhd
 set_global_assignment -name VHDL_FILE rtl/core/CPU_FPGA.vhd
 set_global_assignment -name VHDL_FILE rtl/core/CPU_Top_Wrapper.vhd
 
-# -------------------------------------------------------------------------- #
-# Simulation Testbenches
-# -------------------------------------------------------------------------- #
-set_global_assignment -name VHDL_FILE sim/tb_CPU_FPGA.vhd
-set_global_assignment -name VHDL_FILE sim/ImmGen_tb.vhd
-set_global_assignment -name VHDL_FILE sim/ALU_tb.vhd
-set_global_assignment -name VHDL_FILE sim/M_Extension_Unit_tb.vhd
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_instance_assignment -name VIRTUAL_PIN ON -to *_debug*
-set_instance_assignment -name VIRTUAL_PIN ON -to pc_debug
-set_instance_assignment -name VIRTUAL_PIN ON -to instr_debug
-set_instance_assignment -name VIRTUAL_PIN ON -to rs1_debug
-set_instance_assignment -name VIRTUAL_PIN ON -to rs2_debug
+# Memory & SoC Interconnect Files
+set_global_assignment -name VHDL_FILE rtl/memory/bram_4kb.vhd
+set_global_assignment -name VHDL_FILE rtl/memory/bus_interconnect.vhd
+set_global_assignment -name VHDL_FILE rtl/rv32im_soc.vhd
+
+# Peripheral Core Files
 set_global_assignment -name VHDL_FILE rtl/peripherals/uart_tx.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/Bus_Decoder.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/gpio_led.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/gpio_key.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/timer.vhd
 
-# System Clock & Reset
+# Simulation Testbenches
+set_global_assignment -name VHDL_FILE sim/tb_CPU_FPGA.vhd
+set_global_assignment -name VHDL_FILE sim/ImmGen_tb.vhd
+set_global_assignment -name VHDL_FILE sim/ALU_tb.vhd
+set_global_assignment -name VHDL_FILE sim/M_Extension_Unit_tb.vhd
+
+# -------------------------------------------------------------------------- #
+# FPGA Physical Pin Assignments (Cyclone IV EP4CE6E22C8)
+# -------------------------------------------------------------------------- #
+# Clock & System Reset
 set_location_assignment PIN_23 -to clk
 set_location_assignment PIN_25 -to rst_n
 
-# Push Buttons / Keys (Pins 88, 89, 90, 91)
-set_location_assignment PIN_88 -to key_in[0]
-set_location_assignment PIN_89 -to key_in[1]
-set_location_assignment PIN_90 -to key_in[2]
-set_location_assignment PIN_91 -to key_in[3]
+# Push Buttons / Keys (Active-Low Inputs)
+set_location_assignment PIN_88 -to gpio_keys[0]
+set_location_assignment PIN_89 -to gpio_keys[1]
+set_location_assignment PIN_90 -to gpio_keys[2]
+set_location_assignment PIN_91 -to gpio_keys[3]
 
-# Debug Select (Remapped to avoid Pin_88 and Pin_89 duplicate location errors)
-set_location_assignment PIN_119 -to debug_sel[0]
-set_location_assignment PIN_120 -to debug_sel[1]
+# Onboard Diagnostic LEDs (Active-Low Outputs)
+set_location_assignment PIN_87 -to gpio_leds[0]
+set_location_assignment PIN_86 -to gpio_leds[1]
+set_location_assignment PIN_85 -to gpio_leds[2]
+set_location_assignment PIN_84 -to gpio_leds[3]
 
-# Onboard Diagnostic LEDs
-set_location_assignment PIN_87 -to led_out[0]
-set_location_assignment PIN_86 -to led_out[1]
-set_location_assignment PIN_85 -to led_out[2]
-set_location_assignment PIN_84 -to led_out[3]
+# UART Lines
+set_location_assignment PIN_114 -to uart_tx
+set_location_assignment PIN_115 -to uart_rx
 
-# UART Serial Output Pin
-set_location_assignment PIN_114 -to uart_tx_pin
-
-# Default I/O Standard
+# I/O Standards & Configuration
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
 set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN OFF
@@ -128,10 +98,20 @@ set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -rise
 set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -fall
 set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -rise
 set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
-set_global_assignment -name EDA_DESIGN_ENTRY_SYNTHESIS_TOOL Custom
-set_global_assignment -name EDA_INPUT_DATA_FORMAT EDIF -section_id eda_design_synthesis
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name VHDL_FILE rtl/memory/bram_4kb.vhd
+
+# Partition Assignments
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name EDA_DESIGN_ENTRY_SYNTHESIS_TOOL "<None>"
+
+set_global_assignment -name SDC_FILE CPU_FPGA.sdc
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_timing
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_symbol
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_signal_integrity
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_boundary_scan
+set_global_assignment -name EDA_INPUT_DATA_FORMAT EDIF -section_id eda_design_synthesis
+set_global_assignment -name VHDL_FILE sim/tb_rv32im_soc.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
-set_global_assignment -name VHDL_FILE rtl/memory/bus_interconnect.vhd
