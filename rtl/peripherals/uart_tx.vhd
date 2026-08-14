@@ -4,127 +4,118 @@ use IEEE.NUMERIC_STD.all;
 
 entity uart_tx is
     generic (
-        CLK_FREQ  : integer := 50_000_000; -- 50 MHz system clock
-        BAUD_RATE : integer := 115_200     -- Target baud rate
+        CLK_FREQ  : positive := 50000000;
+        BAUD_RATE : positive := 115200
     );
     port (
         clk      : in  std_logic;
         rst_n    : in  std_logic;
-        -- MMIO Interface
         tx_data  : in  std_logic_vector(7 downto 0);
         tx_start : in  std_logic;
         tx_busy  : out std_logic;
-        -- Physical Output Pin
         tx_out   : out std_logic
     );
 end entity uart_tx;
 
-architecture Behavioral of uart_tx is
+architecture rtl of uart_tx is
 
-    type state_type is (IDLE, START, DATA, STOP);
-    signal current_state, next_state : state_type;
+    -- 50 MHz / 115200 = 434 clocks per UART bit.
+    constant CLKS_PER_BIT : positive := CLK_FREQ / BAUD_RATE;
 
-    -- Internal counters and registers
-    signal counter   : unsigned(8 downto 0) := (others => '0');
-    signal bit_index : unsigned(2 downto 0) := (others => '0');
-    signal shift_reg : std_logic_vector(7 downto 0) := (others => '0');
-    signal baud_tick : std_logic := '0';
+    type state_t is (
+        STATE_IDLE,
+        STATE_START,
+        STATE_DATA,
+        STATE_STOP
+    );
+
+    signal state     : state_t := STATE_IDLE;
+    signal clk_count : natural range 0 to CLKS_PER_BIT - 1 := 0;
+    signal bit_index : natural range 0 to 7 := 0;
+    signal tx_shift  : std_logic_vector(7 downto 0) := (others => '0');
+    signal tx_reg    : std_logic := '1';
+    signal busy_reg  : std_logic := '0';
 
 begin
 
-    -- Synchronous Process: State update, Baud Prescaler, and Datapath Outputs
-    process(clk)
+    assert CLK_FREQ >= BAUD_RATE
+        report "uart_tx: CLK_FREQ must be greater than or equal to BAUD_RATE"
+        severity failure;
+
+    tx_out  <= tx_reg;
+    tx_busy <= busy_reg;
+
+    process (clk)
     begin
         if rising_edge(clk) then
             if rst_n = '0' then
-                current_state <= IDLE;
-                counter       <= (others => '0');
-                baud_tick     <= '0';
-                bit_index     <= (others => '0');
-                shift_reg     <= (others => '0');
-                tx_out        <= '1';
-                tx_busy       <= '0';
+                state     <= STATE_IDLE;
+                clk_count <= 0;
+                bit_index <= 0;
+                tx_shift  <= (others => '0');
+                tx_reg    <= '1';
+                busy_reg  <= '0';
+
             else
-                -- Advance FSM State
-                current_state <= next_state;
+                case state is
 
-                -- Baud Prescaler Counter
-                if counter = 0 then
-                    baud_tick <= '1';
-                    counter   <= to_unsigned(433, counter'length);
-                else
-                    baud_tick <= '0';
-                    counter   <= counter - 1;
-                end if;
+                    when STATE_IDLE =>
+                        tx_reg    <= '1';
+                        clk_count <= 0;
+                        bit_index <= 0;
+                        busy_reg  <= '0';
 
-                -- State-dependent Datapath Actions
-                case current_state is
-                    when IDLE =>
                         if tx_start = '1' then
-                            shift_reg <= tx_data;
+                            tx_shift  <= tx_data;
+                            tx_reg    <= '0';
+                            busy_reg  <= '1';
+                            state     <= STATE_START;
                         end if;
-                        counter   <= to_unsigned(433, counter'length); -- Keep counter loaded in IDLE
-                        bit_index <= (others => '0');
-                        tx_out    <= '1';
-                        tx_busy   <= '0';
 
-                    when START =>
-                        tx_out  <= '0'; -- Start bit (space)
-                        tx_busy <= '1';
+                    when STATE_START =>
+                        tx_reg   <= '0';
+                        busy_reg <= '1';
 
-                    when DATA =>
-                        if baud_tick = '1' then
-                            shift_reg <= '0' & shift_reg(7 downto 1); -- Shift right LSB first
-                            bit_index <= bit_index + 1;
+                        if clk_count = CLKS_PER_BIT - 1 then
+                            clk_count <= 0;
+                            bit_index <= 0;
+                            state     <= STATE_DATA;
+                        else
+                            clk_count <= clk_count + 1;
                         end if;
-                        tx_out  <= shift_reg(0);
-                        tx_busy <= '1';
 
-                    when STOP =>
-                        bit_index <= (others => '0');
-                        tx_out    <= '1'; -- Stop bit (mark)
-                        tx_busy   <= '1';
+                    when STATE_DATA =>
+                        tx_reg   <= tx_shift(bit_index);
+                        busy_reg <= '1';
+
+                        if clk_count = CLKS_PER_BIT - 1 then
+                            clk_count <= 0;
+
+                            if bit_index = 7 then
+                                bit_index <= 0;
+                                state     <= STATE_STOP;
+                            else
+                                bit_index <= bit_index + 1;
+                            end if;
+                        else
+                            clk_count <= clk_count + 1;
+                        end if;
+
+                    when STATE_STOP =>
+                        tx_reg   <= '1';
+                        busy_reg <= '1';
+
+                        if clk_count = CLKS_PER_BIT - 1 then
+                            clk_count <= 0;
+                            busy_reg  <= '0';
+                            state     <= STATE_IDLE;
+                        else
+                            clk_count <= clk_count + 1;
+                        end if;
+
                 end case;
             end if;
         end if;
     end process;
 
-    -- Combinational Process: Next-State Logic 
-    process(all)
-    begin
-        case current_state is
-            when IDLE =>
-                if tx_start = '1' then
-                    next_state <= START;
-                else
-                    next_state <= IDLE;
-                end if;
-
-            when START =>
-                if baud_tick = '1' then
-                    next_state <= DATA;
-                else
-                    next_state <= START;
-                end if;
-
-            when DATA =>
-                if baud_tick = '1' then
-                    if bit_index = 7 then
-                        next_state <= STOP;
-                    else
-                        next_state <= DATA;
-                    end if;
-                else
-                    next_state <= DATA;
-                end if;
-
-            when STOP =>
-                if baud_tick = '1' then
-                    next_state <= IDLE;
-                else
-                    next_state <= STOP;
-                end if;
-        end case;
-    end process;
-
-end architecture Behavioral;
+end architecture rtl;

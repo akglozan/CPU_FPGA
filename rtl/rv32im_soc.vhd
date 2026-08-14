@@ -106,23 +106,22 @@ begin
             timer_rdata => timer_rdata
         );
 
-    -- 4. UART Peripheral (0x80000000)
-    uart_rdata <= (31 downto 1 => '0') & uart_tx_busy;
+	-- 4. UART Peripheral (0x80000000)
+	uart_rdata <= (31 downto 1 => '0') & uart_tx_busy;
 
-    U_UART: entity work.uart_tx
-        generic map (
-            CLK_FREQ  => 50_000_000,
-            BAUD_RATE => 115_200
-        )
-        port map (
-            clk      => clk,
-            rst_n    => rst_n,
-            tx_data  => mem_wdata(7 downto 0),
-            tx_start => uart_tx_start,
-            tx_busy  => uart_tx_busy,
-            tx_out   => uart_tx
-        );
-
+	U_UART : entity work.uart_tx
+		 generic map (
+			  CLK_FREQ  => 50000000,
+			  BAUD_RATE => 115200
+		 )
+		 port map (
+			  clk      => clk,
+			  rst_n    => rst_n,
+			  tx_data  => mem_wdata(7 downto 0),
+			  tx_start => uart_tx_start,
+			  tx_busy  => uart_tx_busy,
+			  tx_out   => uart_tx
+    );
     -- 5. GPIO Peripheral System (0x80000100)
     U_GPIO_LED : entity work.gpio_led(Behavioral)
         port map (

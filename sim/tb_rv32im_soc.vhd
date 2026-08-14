@@ -50,7 +50,7 @@ begin
         rst_n <= '0'; -- Ensure reset is asserted low at start
         wait for 100 ns;
         rst_n <= '1'; -- De-assert reset
-        wait for 2 ms;
+        wait for 15 ms;
         report "Simulation run completed." severity note;
         wait;
     end process;

@@ -82,9 +82,11 @@ begin
                         bram_we_b <= "0000";
                 end case;
 
-            -- UART Peripheral Range (0x80000000 - 0x8000000F)
-            elsif addr(31 downto 4) = x"8000000" then
-                uart_we <= '1';
+            -- In bus_interconnect.vhd (Combinatorial Store Process):
+				elsif addr(31 downto 4) = x"8000000" then
+					 if addr(3 downto 0) = x"0" then
+						  uart_we <= '1';
+					 end if;
 
             -- GPIO Peripheral Range (0x80000100 - 0x8000010F)
             elsif addr(31 downto 4) = x"8000010" then
