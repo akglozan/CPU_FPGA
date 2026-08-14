@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.all;
 entity bram_4kb is
 
 	generic (
-    HEX_FILE : string := "../rv32_firmware/build/firmware.hex"
+    HEX_FILE : string := "../boot_bram.hex"
 	);
 
 	port(

@@ -14,6 +14,9 @@ SRC_DIR   = src
 SRCS      = $(BSP_DIR)/crt0.s $(SRC_DIR)/main.c
 TARGET    = $(BUILD_DIR)/firmware
 
+# Consolidated single hex file output at the repository root
+HEX_OUTPUT = ../boot_bram.hex
+
 .PHONY: all clean
 
 all: $(BUILD_DIR) $(TARGET).hex $(TARGET).bin $(TARGET).dis
@@ -30,8 +33,10 @@ $(TARGET).dis: $(TARGET).elf
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 
+# Generate both local build copy and update the repository root single source of truth
 $(TARGET).hex: $(TARGET).elf
 	$(OBJCOPY) -O ihex $< $@
+	$(OBJCOPY) -O ihex $< $(HEX_OUTPUT)
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) $(HEX_OUTPUT)

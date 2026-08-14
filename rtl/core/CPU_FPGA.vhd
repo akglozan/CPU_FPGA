@@ -7,24 +7,23 @@ entity CPU_FPGA is
         DATA_WIDTH : integer := 32
     );
     port (
-        clk         : in  std_logic;
-        rst_n         : in  std_logic;
+        clk          : in  std_logic;
+        rst_n        : in  std_logic;
         
         -- External debug outputs
-        pc_debug    : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        instr_debug : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        rs1_debug   : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        rs2_debug   : out std_logic_vector(DATA_WIDTH-1 downto 0);
-		  
-		  --Memory Bus Interface Ports
-		  mem_addr_out	: out std_logic_vector(DATA_WIDTH-1 downto 0);
-		  mem_wdata_out: out std_logic_vector(DATA_WIDTH-1 downto 0);
-		  mem_we_out	: out std_logic;
-		  mem_re_out	: out std_logic;
-		  mem_rdata_in	: in std_logic_vector(DATA_WIDTH-1 downto 0);
-		  
-		  funct3_out : out std_logic_vector(2 downto 0)
-		  
+        pc_debug     : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        instr_debug  : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        rs1_debug    : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        rs2_debug    : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        
+        -- Memory Bus Interface Ports
+        mem_addr_out : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        mem_wdata_out: out std_logic_vector(DATA_WIDTH-1 downto 0);
+        mem_we_out   : out std_logic;
+        mem_re_out   : out std_logic;
+        mem_rdata_in : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        
+        funct3_out   : out std_logic_vector(2 downto 0)
     );
 end entity CPU_FPGA;
 
@@ -50,7 +49,7 @@ architecture Structural of CPU_FPGA is
     component ID_Stage is
         port (
             clk             : in  std_logic;
-            rst_n             : in  std_logic;
+            rst_n           : in  std_logic;
             id_ex_stall     : in  std_logic;
             id_ex_flush     : in  std_logic;
             id_pc_in        : in  std_logic_vector(31 downto 0);
@@ -61,8 +60,8 @@ architecture Structural of CPU_FPGA is
             wb_rd_data      : in  std_logic_vector(31 downto 0);
             id_rs1_addr_out : out std_logic_vector(4 downto 0);
             id_rs2_addr_out : out std_logic_vector(4 downto 0);
-				id_rs1_data_out : out std_logic_vector(31 downto 0); -- NEW
-            id_rs2_data_out : out std_logic_vector(31 downto 0); -- NEW
+            id_rs1_data_out : out std_logic_vector(31 downto 0);
+            id_rs2_data_out : out std_logic_vector(31 downto 0);
             ex_pc_out       : out std_logic_vector(31 downto 0);
             ex_pc_plus4_out : out std_logic_vector(31 downto 0);
             ex_imm_ext_out  : out std_logic_vector(31 downto 0);
@@ -87,7 +86,7 @@ architecture Structural of CPU_FPGA is
     component EX_Stage is
         port (
             clk                     : in  std_logic;
-            rst_n                     : in  std_logic;
+            rst_n                   : in  std_logic;
             ex_pc_in                : in  std_logic_vector(31 downto 0);
             ex_imm_ext_in           : in  std_logic_vector(31 downto 0);
             ex_reg_data1_in         : in  std_logic_vector(31 downto 0);
@@ -125,10 +124,11 @@ architecture Structural of CPU_FPGA is
         );
     end component;
 
+    -- UPDATED component declaration for MEM_Stage with mem_rdata_ext_in
     component MEM_Stage is
         port (
             clk                 : in  std_logic;
-            rst_n                 : in  std_logic;
+            rst_n               : in  std_logic;
             mem_result_in       : in  std_logic_vector(31 downto 0);
             mem_write_data_in   : in  std_logic_vector(31 downto 0);
             mem_rd_addr_in      : in  std_logic_vector(4 downto 0);
@@ -137,13 +137,14 @@ architecture Structural of CPU_FPGA is
             mem_mem_write_in    : in  std_logic;
             mem_wb_sel_in       : in  std_logic_vector(1 downto 0);
             mem_funct3_in       : in  std_logic_vector(2 downto 0);
+            mem_rdata_ext_in    : in  std_logic_vector(31 downto 0);
             mem_result_fwd_out  : out std_logic_vector(31 downto 0);
             wb_result_out       : out std_logic_vector(31 downto 0);
             wb_read_data_out    : out std_logic_vector(31 downto 0);
             wb_rd_addr_out      : out std_logic_vector(4 downto 0);
             wb_reg_write_out    : out std_logic;
             wb_sel_out          : out std_logic_vector(1 downto 0);
-				wb_pc_plus4_out     : out std_logic_vector(31 downto 0)
+            wb_pc_plus4_out     : out std_logic_vector(31 downto 0)
         );
     end component;
 
@@ -178,7 +179,7 @@ architecture Structural of CPU_FPGA is
     signal id_instr          : std_logic_vector(31 downto 0);
     signal id_rs1_addr       : std_logic_vector(4 downto 0);
     signal id_rs2_addr       : std_logic_vector(4 downto 0);
-	 signal id_rs1_data       : std_logic_vector(31 downto 0);
+    signal id_rs1_data       : std_logic_vector(31 downto 0);
     signal id_rs2_data       : std_logic_vector(31 downto 0);
 
     signal ex_pc             : std_logic_vector(31 downto 0);
@@ -216,25 +217,22 @@ architecture Structural of CPU_FPGA is
     signal wb_reg_write      : std_logic;
     signal wb_sel            : std_logic_vector(1 downto 0);
     signal wb_rd_data        : std_logic_vector(31 downto 0);
-	 signal wb_pc_plus4 : std_logic_vector(31 downto 0);
-	 
-	 
+    signal wb_pc_plus4       : std_logic_vector(31 downto 0);
 
 begin
 
-	--Concurrent Output Assignments
-	 mem_addr_out <= mem_result;
-	 mem_wdata_out <= mem_write_data;
-	 mem_we_out <= mem_mem_write;
-	 mem_re_out <= mem_mem_read;
-	 funct3_out <= mem_funct3;
-	 
+    -- Concurrent Output Assignments to SoC Bus Interface
+    mem_addr_out  <= mem_result;
+    mem_wdata_out <= mem_write_data;
+    mem_we_out    <= mem_mem_write;
+    mem_re_out    <= mem_mem_read;
+    funct3_out    <= mem_funct3;
 
     -- 1. IF Stage
     U_STAGE_IF : IF_Stage
         port map (
             clk             => clk,
-            rst_n             => rst_n,
+            rst_n           => rst_n,
             pc_write        => pc_write_wire,
             if_id_stall     => if_id_stall_wire,
             if_id_flush     => if_id_flush_wire,
@@ -249,7 +247,7 @@ begin
     U_STAGE_ID : ID_Stage
         port map (
             clk             => clk,
-            rst_n             => rst_n,
+            rst_n           => rst_n,
             id_ex_stall     => id_ex_stall_wire,
             id_ex_flush     => id_ex_flush_wire,
             id_pc_in        => id_pc,
@@ -260,8 +258,8 @@ begin
             wb_rd_data      => wb_rd_data,
             id_rs1_addr_out => id_rs1_addr,
             id_rs2_addr_out => id_rs2_addr,
-				id_rs1_data_out => id_rs1_data, -- NEW CONNECTION
-            id_rs2_data_out => id_rs2_data, -- NEW CONNECTION
+            id_rs1_data_out => id_rs1_data,
+            id_rs2_data_out => id_rs2_data,
             ex_pc_out       => ex_pc,
             ex_pc_plus4_out => ex_pc_plus4,
             ex_imm_ext_out  => ex_imm_ext,
@@ -286,7 +284,7 @@ begin
     U_STAGE_EX : EX_Stage
         port map (
             clk                     => clk,
-            rst_n                     => rst_n,
+            rst_n                   => rst_n,
             ex_pc_in                => ex_pc,
             ex_imm_ext_in           => ex_imm_ext,
             ex_reg_data1_in         => ex_reg_data1,
@@ -327,22 +325,25 @@ begin
     U_STAGE_MEM : MEM_Stage
         port map (
             clk                 => clk,
-            rst_n                 => rst_n,
+            rst_n               => rst_n,
             mem_result_in       => mem_result,
-            mem_write_data_in   => mem_rdata_in,
+            -- FIXED: Correctly pass EX stage write data instead of external read bus
+            mem_write_data_in   => mem_write_data, 
             mem_rd_addr_in      => mem_rd_addr,
             mem_reg_write_in    => mem_reg_write,
             mem_mem_read_in     => mem_mem_read,
             mem_mem_write_in    => mem_mem_write,
             mem_wb_sel_in       => mem_wb_sel,
             mem_funct3_in       => mem_funct3,
+            -- FIXED: Connect external SoC memory read data port
+            mem_rdata_ext_in    => mem_rdata_in,   
             mem_result_fwd_out  => mem_result_fwd,
             wb_result_out       => wb_result,
             wb_read_data_out    => wb_read_data,
             wb_rd_addr_out      => wb_rd_addr,
             wb_reg_write_out    => wb_reg_write,
             wb_sel_out          => wb_sel,
-				wb_pc_plus4_out 	  => wb_pc_plus4
+            wb_pc_plus4_out     => wb_pc_plus4
         );
 
     -- 5. Hazard Unit
@@ -371,7 +372,7 @@ begin
     -- Debug Signals
     pc_debug    <= pc_current;
     instr_debug <= id_instr;
-	 rs1_debug   <= id_rs1_data; -- CONNECTED HERE
-    rs2_debug   <= id_rs2_data; -- CONNECTED HERE
+    rs1_debug   <= id_rs1_data;
+    rs2_debug   <= id_rs2_data;
 
 end architecture Structural;

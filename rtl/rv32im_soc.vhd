@@ -81,7 +81,7 @@ begin
         );
 
     -- 3. Bus Interconnect & MMIO Decoder
-    U_BUS : entity work.bus_interconnect(rtl)
+    U_BUS: entity work.bus_interconnect
         port map (
             clk         => clk,
             addr        => mem_addr,
@@ -90,20 +90,25 @@ begin
             mem_write   => mem_write,
             funct3      => mem_funct3,
             read_data   => mem_rdata,
+            
             bram_addr   => bram_addr,
             bram_wdata  => bram_wdata,
             bram_we_b   => bram_we_b,
             bram_rdata  => bram_rdata,
+            
+            uart_we     => uart_tx_start,
+            gpio_we     => gpio_we,
+            timer_we    => open,
+            
             uart_rdata  => uart_rdata,
             gpio_rdata  => gpio_rdata,
             timer_rdata => timer_rdata
         );
 
     -- 4. UART Peripheral (0x80000000)
-    uart_tx_start <= '1' when (mem_write = '1' and mem_addr = x"80000000") else '0';
-    uart_rdata    <= (31 downto 1 => '0') & uart_tx_busy;
+    uart_rdata <= (31 downto 1 => '0') & uart_tx_busy;
 
-    U_UART : entity work.uart_tx(Behavioral)
+    U_UART: entity work.uart_tx
         generic map (
             CLK_FREQ  => 50_000_000,
             BAUD_RATE => 115_200
@@ -118,8 +123,6 @@ begin
         );
 
     -- 5. GPIO Peripheral System (0x80000100)
-    gpio_we <= '1' when (mem_write = '1' and mem_addr = x"80000100") else '0';
-
     U_GPIO_LED : entity work.gpio_led(Behavioral)
         port map (
             clk     => clk,

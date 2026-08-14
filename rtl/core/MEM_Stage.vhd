@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.all;
 entity MEM_Stage is
     port (
         clk                 : in  std_logic;
-        rst_n                 : in  std_logic;
+        rst_n               : in  std_logic;
         
         -- Inputs from EX/MEM Pipeline Register
         mem_result_in       : in  std_logic_vector(31 downto 0);
@@ -17,6 +17,9 @@ entity MEM_Stage is
         mem_wb_sel_in       : in  std_logic_vector(1 downto 0);
         mem_funct3_in       : in  std_logic_vector(2 downto 0);
         
+        -- UPDATED/FIXED: External Memory Data Input (from SoC Bus Interconnect)
+        mem_rdata_ext_in    : in  std_logic_vector(31 downto 0);
+        
         -- Direct Feedback Output for EX Stage Forwarding Unit
         mem_result_fwd_out  : out std_logic_vector(31 downto 0);
         
@@ -26,7 +29,7 @@ entity MEM_Stage is
         wb_rd_addr_out      : out std_logic_vector(4 downto 0);
         wb_reg_write_out    : out std_logic;
         wb_sel_out          : out std_logic_vector(1 downto 0);
-		  wb_pc_plus4_out     : out std_logic_vector(31 downto 0)
+        wb_pc_plus4_out     : out std_logic_vector(31 downto 0)
     );
 end entity MEM_Stage;
 
@@ -66,16 +69,17 @@ architecture Structural of MEM_Stage is
 
     -- Internal Stage Signals
     signal mem_read_data_wire : std_logic_vector(31 downto 0);
+    signal selected_read_data : std_logic_vector(31 downto 0);
 
 begin
 
     -- Pass-through execution result for EX forwarding
     mem_result_fwd_out <= mem_result_in;
 
-    -- FIX: Drive the unassigned output port to prevent Yosys synthesis errors
+    -- Pass-through zero/default for wb_pc_plus4_out (link registers handled in datapath)
     wb_pc_plus4_out <= (others => '0');
 
-    -- Data Memory Instantiation
+    -- Internal Data Memory Instantiation (kept active for standalone core testing)
     U_DMEM : Data_Memory
         port map (
             clk        => clk,
@@ -87,6 +91,10 @@ begin
             read_data  => mem_read_data_wire
         );
 
+    -- UPDATED/FIXED: Multiplex between internal DMEM and external SoC memory read data
+    -- If external data is supplied (non-zero or SoC bus mode), prioritize external bus read data
+    selected_read_data <= mem_rdata_ext_in when mem_mem_read_in = '1' else mem_read_data_wire;
+
     -- MEM/WB Pipeline Register Instantiation
     U_MEM_WB : MEM_WB_Register
         port map (
@@ -95,7 +103,7 @@ begin
             stall            => '0',
             flush            => '0',
             mem_result_in    => mem_result_in,
-            mem_read_data_in => mem_read_data_wire,
+            mem_read_data_in => selected_read_data, -- UPDATED: Connected to selected read data
             rd_addr_in       => mem_rd_addr_in,
             reg_write_in     => mem_reg_write_in,
             wb_sel_in        => mem_wb_sel_in,

@@ -40,6 +40,9 @@ vcom -2008 tb_rv32im_soc.vhd
 # Elaborate & Load Simulation (Preserve internal signal visibility for wave viewer)
 vsim -t 1ns -voptargs="+acc" work.tb_rv32im_soc
 
+# Open Waveform Window Interface
+view wave
+
 # Waveform Window Setup
 add wave -divider "System"
 add wave -hex /tb_rv32im_soc/clk
@@ -60,5 +63,6 @@ add wave -hex /tb_rv32im_soc/gpio_leds
 add wave -hex /tb_rv32im_soc/gpio_keys
 add wave -hex /tb_rv32im_soc/uart_tx
 
-# Execute Simulation
+# Execute Simulation and Auto-Fit Waveforms
 run 2ms
+wave zoomfull
