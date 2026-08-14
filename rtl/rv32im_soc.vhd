@@ -45,6 +45,7 @@ architecture Structural of rv32im_soc is
     signal uart_tx_start : std_logic;
     signal uart_tx_busy  : std_logic;
     signal gpio_we       : std_logic;
+	 signal timer_we      : std_logic;
 
 begin
 
@@ -98,7 +99,7 @@ begin
             
             uart_we     => uart_tx_start,
             gpio_we     => gpio_we,
-            timer_we    => open,
+            timer_we    => timer_we,
             
             uart_rdata  => uart_rdata,
             gpio_rdata  => gpio_rdata,

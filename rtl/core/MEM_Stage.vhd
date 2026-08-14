@@ -17,7 +17,7 @@ entity MEM_Stage is
         mem_wb_sel_in       : in  std_logic_vector(1 downto 0);
         mem_funct3_in       : in  std_logic_vector(2 downto 0);
         
-        -- UPDATED/FIXED: External Memory Data Input (from SoC Bus Interconnect)
+        -- External Memory Data Input (from SoC Bus Interconnect)
         mem_rdata_ext_in    : in  std_logic_vector(31 downto 0);
         
         -- Direct Feedback Output for EX Stage Forwarding Unit
@@ -35,7 +35,6 @@ end entity MEM_Stage;
 
 architecture Structural of MEM_Stage is
 
-    -- Components
     component Data_Memory is
         port (
             clk        : in  std_logic;
@@ -67,19 +66,14 @@ architecture Structural of MEM_Stage is
         );
     end component;
 
-    -- Internal Stage Signals
     signal mem_read_data_wire : std_logic_vector(31 downto 0);
     signal selected_read_data : std_logic_vector(31 downto 0);
 
 begin
 
-    -- Pass-through execution result for EX forwarding
     mem_result_fwd_out <= mem_result_in;
+    wb_pc_plus4_out    <= (others => '0');
 
-    -- Pass-through zero/default for wb_pc_plus4_out (link registers handled in datapath)
-    wb_pc_plus4_out <= (others => '0');
-
-    -- Internal Data Memory Instantiation (kept active for standalone core testing)
     U_DMEM : Data_Memory
         port map (
             clk        => clk,
@@ -91,11 +85,9 @@ begin
             read_data  => mem_read_data_wire
         );
 
-    -- UPDATED/FIXED: Multiplex between internal DMEM and external SoC memory read data
-    -- If external data is supplied (non-zero or SoC bus mode), prioritize external bus read data
+    -- Multiplex between internal DMEM and external SoC memory read data
     selected_read_data <= mem_rdata_ext_in when mem_mem_read_in = '1' else mem_read_data_wire;
 
-    -- MEM/WB Pipeline Register Instantiation
     U_MEM_WB : MEM_WB_Register
         port map (
             clk              => clk,
@@ -103,7 +95,7 @@ begin
             stall            => '0',
             flush            => '0',
             mem_result_in    => mem_result_in,
-            mem_read_data_in => selected_read_data, -- UPDATED: Connected to selected read data
+            mem_read_data_in => selected_read_data,
             rd_addr_in       => mem_rd_addr_in,
             reg_write_in     => mem_reg_write_in,
             wb_sel_in        => mem_wb_sel_in,

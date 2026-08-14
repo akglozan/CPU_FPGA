@@ -6,7 +6,7 @@ use STD.textio.all;
 
 entity Instruction_Memory is
     generic (
-        HEX_FILE : string := "../boot_bram.hex"
+        HEX_FILE : string := "boot_bram.hex"
     );
     port (
         clk         : in  std_logic;

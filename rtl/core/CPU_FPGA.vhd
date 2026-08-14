@@ -29,7 +29,6 @@ end entity CPU_FPGA;
 
 architecture Structural of CPU_FPGA is
 
-    -- Stage Components
     component IF_Stage is
         generic ( DATA_WIDTH : integer := 32 );
         port (
@@ -124,7 +123,6 @@ architecture Structural of CPU_FPGA is
         );
     end component;
 
-    -- UPDATED component declaration for MEM_Stage with mem_rdata_ext_in
     component MEM_Stage is
         port (
             clk                 : in  std_logic;
@@ -164,7 +162,6 @@ architecture Structural of CPU_FPGA is
         );
     end component;
 
-    -- Interconnect Signals
     signal pc_write_wire     : std_logic;
     signal if_id_stall_wire  : std_logic;
     signal if_id_flush_wire  : std_logic;
@@ -221,14 +218,12 @@ architecture Structural of CPU_FPGA is
 
 begin
 
-    -- Concurrent Output Assignments to SoC Bus Interface
     mem_addr_out  <= mem_result;
     mem_wdata_out <= mem_write_data;
     mem_we_out    <= mem_mem_write;
     mem_re_out    <= mem_mem_read;
     funct3_out    <= mem_funct3;
 
-    -- 1. IF Stage
     U_STAGE_IF : IF_Stage
         port map (
             clk             => clk,
@@ -243,7 +238,6 @@ begin
             id_instr_out    => id_instr
         );
 
-    -- 2. ID Stage
     U_STAGE_ID : ID_Stage
         port map (
             clk             => clk,
@@ -280,7 +274,6 @@ begin
             ex_wb_sel_out   => ex_wb_sel
         );
 
-    -- 3. EX Stage
     U_STAGE_EX : EX_Stage
         port map (
             clk                     => clk,
@@ -321,13 +314,11 @@ begin
             mem_funct3_out          => mem_funct3
         );
 
-    -- 4. MEM Stage
     U_STAGE_MEM : MEM_Stage
         port map (
             clk                 => clk,
             rst_n               => rst_n,
             mem_result_in       => mem_result,
-            -- FIXED: Correctly pass EX stage write data instead of external read bus
             mem_write_data_in   => mem_write_data, 
             mem_rd_addr_in      => mem_rd_addr,
             mem_reg_write_in    => mem_reg_write,
@@ -335,7 +326,6 @@ begin
             mem_mem_write_in    => mem_mem_write,
             mem_wb_sel_in       => mem_wb_sel,
             mem_funct3_in       => mem_funct3,
-            -- FIXED: Connect external SoC memory read data port
             mem_rdata_ext_in    => mem_rdata_in,   
             mem_result_fwd_out  => mem_result_fwd,
             wb_result_out       => wb_result,
@@ -346,7 +336,6 @@ begin
             wb_pc_plus4_out     => wb_pc_plus4
         );
 
-    -- 5. Hazard Unit
     U_HAZARD : Hazard_Unit
         port map (
             stall_m     => stall_m_wire,
@@ -362,14 +351,12 @@ begin
             id_ex_flush => id_ex_flush_wire
         );
 
-    -- 6. WB Stage Multiplexer
     with wb_sel select
         wb_rd_data <= wb_result       when "00",
                       wb_read_data    when "01",
                       wb_pc_plus4     when "10",
                       (others => '0') when others;
 
-    -- Debug Signals
     pc_debug    <= pc_current;
     instr_debug <= id_instr;
     rs1_debug   <= id_rs1_data;

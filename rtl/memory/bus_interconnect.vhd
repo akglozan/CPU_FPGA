@@ -83,15 +83,15 @@ begin
                 end case;
 
             -- UART Peripheral Range (0x80000000 - 0x8000000F)
-            elsif addr(31 downto 12) = x"80000" and addr(11 downto 4) = x"00" then
+            elsif addr(31 downto 4) = x"8000000" then
                 uart_we <= '1';
 
             -- GPIO Peripheral Range (0x80000100 - 0x8000010F)
-            elsif addr(31 downto 12) = x"80000" and addr(11 downto 4) = x"10" then
+            elsif addr(31 downto 4) = x"8000010" then
                 gpio_we <= '1';
 
             -- Timer Peripheral Range (0x80000200 - 0x8000020F)
-            elsif addr(31 downto 12) = x"80000" and addr(11 downto 4) = x"20" then
+            elsif addr(31 downto 4) = x"8000020" then
                 timer_we <= '1';
             end if;
         end if;
@@ -102,11 +102,11 @@ begin
     begin
         if addr(31 downto 12) = x"00000" then
             raw_read_mux <= bram_rdata;
-        elsif addr(31 downto 12) = x"80000" and addr(11 downto 4) = x"00" then
+        elsif addr(31 downto 4) = x"8000000" then
             raw_read_mux <= uart_rdata;
-        elsif addr(31 downto 12) = x"80000" and addr(11 downto 4) = x"10" then
+        elsif addr(31 downto 4) = x"8000010" then
             raw_read_mux <= gpio_rdata;
-        elsif addr(31 downto 12) = x"80000" and addr(11 downto 4) = x"20" then
+        elsif addr(31 downto 4) = x"8000020" then
             raw_read_mux <= timer_rdata;
         else
             raw_read_mux <= (others => '0');

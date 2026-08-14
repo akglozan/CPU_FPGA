@@ -40,6 +40,10 @@ vcom -2008 tb_rv32im_soc.vhd
 # Elaborate & Load Simulation (Preserve internal signal visibility for wave viewer)
 vsim -t 1ns -voptargs="+acc" work.tb_rv32im_soc
 
+# Setup VCD Logging File
+vcd file sim_trace.vcd
+vcd add -r /tb_rv32im_soc/*
+
 # Open Waveform Window Interface
 view wave
 
@@ -63,6 +67,8 @@ add wave -hex /tb_rv32im_soc/gpio_leds
 add wave -hex /tb_rv32im_soc/gpio_keys
 add wave -hex /tb_rv32im_soc/uart_tx
 
-# Execute Simulation and Auto-Fit Waveforms
+# Execute Simulation, Flush VCD Dump, and Auto-Fit Waveforms
 run 2ms
+vcd flush
+vcd off
 wave zoomfull
