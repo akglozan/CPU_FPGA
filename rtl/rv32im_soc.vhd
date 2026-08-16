@@ -31,21 +31,22 @@ architecture Structural of rv32im_soc is
     signal mem_funct3  : std_logic_vector(2 downto 0);
     
     -- BRAM Port B Bus (Bus Interconnect <-> BRAM Port B)
-    signal bram_addr   : std_logic_vector(9 downto 0); -- Word-aligned: addr(11 downto 2)
+    signal bram_addr   : std_logic_vector(9 downto 0);
     signal bram_wdata  : std_logic_vector(31 downto 0);
     signal bram_rdata  : std_logic_vector(31 downto 0);
     signal bram_we_b   : std_logic_vector(3 downto 0);
     
-    -- Peripheral Read Buses (Peripherals -> Bus Interconnect)
+    -- Peripheral Read Buses
     signal uart_rdata  : std_logic_vector(31 downto 0);
     signal gpio_rdata  : std_logic_vector(31 downto 0);
     signal timer_rdata : std_logic_vector(31 downto 0);
 
     -- Internal MMIO Control Strobes
+    signal uart_tx_data  : std_logic_vector(7 downto 0);
     signal uart_tx_start : std_logic;
     signal uart_tx_busy  : std_logic;
     signal gpio_we       : std_logic;
-	 signal timer_we      : std_logic;
+    signal timer_we      : std_logic;
 
 begin
 
@@ -97,31 +98,33 @@ begin
             bram_we_b   => bram_we_b,
             bram_rdata  => bram_rdata,
             
+            uart_data   => uart_tx_data,
             uart_we     => uart_tx_start,
+            uart_rdata  => uart_rdata,
+            
             gpio_we     => gpio_we,
             timer_we    => timer_we,
-            
-            uart_rdata  => uart_rdata,
             gpio_rdata  => gpio_rdata,
             timer_rdata => timer_rdata
         );
 
-	-- 4. UART Peripheral (0x80000000)
-	uart_rdata <= (31 downto 1 => '0') & uart_tx_busy;
+    -- 4. UART Peripheral (0x80000000, 0x80000004)
+    uart_rdata <= (31 downto 1 => '0') & uart_tx_busy;
 
-	U_UART : entity work.uart_tx
-		 generic map (
-			  CLK_FREQ  => 50000000,
-			  BAUD_RATE => 115200
-		 )
-		 port map (
-			  clk      => clk,
-			  rst_n    => rst_n,
-			  tx_data  => mem_wdata(7 downto 0),
-			  tx_start => uart_tx_start,
-			  tx_busy  => uart_tx_busy,
-			  tx_out   => uart_tx
-    );
+    U_UART : entity work.uart_tx
+        generic map (
+            CLK_FREQ  => 50000000,
+            BAUD_RATE => 115200
+        )
+        port map (
+            clk      => clk,
+            rst_n    => rst_n,
+            tx_data  => uart_tx_data,
+            tx_start => uart_tx_start,
+            tx_busy  => uart_tx_busy,
+            tx_out   => uart_tx
+        );
+
     -- 5. GPIO Peripheral System (0x80000100)
     U_GPIO_LED : entity work.gpio_led(Behavioral)
         port map (

@@ -35,18 +35,6 @@ end entity MEM_Stage;
 
 architecture Structural of MEM_Stage is
 
-    component Data_Memory is
-        port (
-            clk        : in  std_logic;
-            mem_write  : in  std_logic;
-            mem_read   : in  std_logic;
-            funct3     : in  std_logic_vector(2 downto 0);
-            addr       : in  std_logic_vector(31 downto 0);
-            write_data : in  std_logic_vector(31 downto 0);
-            read_data  : out std_logic_vector(31 downto 0)
-        );
-    end component;
-
     component MEM_WB_Register is
         port (
             clk              : in  std_logic;
@@ -66,27 +54,44 @@ architecture Structural of MEM_Stage is
         );
     end component;
 
-    signal mem_read_data_wire : std_logic_vector(31 downto 0);
-    signal selected_read_data : std_logic_vector(31 downto 0);
+    signal selected_byte   : std_logic_vector(7 downto 0);
+    signal selected_half   : std_logic_vector(15 downto 0);
+    signal formatted_rdata : std_logic_vector(31 downto 0);
 
 begin
 
     mem_result_fwd_out <= mem_result_in;
     wb_pc_plus4_out    <= (others => '0');
 
-    U_DMEM : Data_Memory
-        port map (
-            clk        => clk,
-            mem_write  => mem_mem_write_in,
-            mem_read   => mem_mem_read_in,
-            funct3     => mem_funct3_in,
-            addr       => mem_result_in,
-            write_data => mem_write_data_in,
-            read_data  => mem_read_data_wire
-        );
+    -- Byte lane extraction
+    with mem_result_in(1 downto 0) select
+        selected_byte <= mem_rdata_ext_in(7 downto 0)   when "00",
+                         mem_rdata_ext_in(15 downto 8)  when "01",
+                         mem_rdata_ext_in(23 downto 16) when "10",
+                         mem_rdata_ext_in(31 downto 24) when others;
 
-    -- Multiplex between internal DMEM and external SoC memory read data
-    selected_read_data <= mem_rdata_ext_in when mem_mem_read_in = '1' else mem_read_data_wire;
+    -- Halfword lane extraction
+    selected_half <= mem_rdata_ext_in(15 downto 0) when mem_result_in(1) = '0' 
+                     else mem_rdata_ext_in(31 downto 16);
+
+    -- Load format & sign/zero extension
+    process(mem_funct3_in, selected_byte, selected_half, mem_rdata_ext_in)
+    begin
+        case mem_funct3_in is
+            when "000" => -- LB (Signed byte)
+                formatted_rdata <= std_logic_vector(resize(signed(selected_byte), 32));
+            when "001" => -- LH (Signed halfword)
+                formatted_rdata <= std_logic_vector(resize(signed(selected_half), 32));
+            when "010" => -- LW (Word)
+                formatted_rdata <= mem_rdata_ext_in;
+            when "100" => -- LBU (Unsigned byte)
+                formatted_rdata <= std_logic_vector(resize(unsigned(selected_byte), 32));
+            when "101" => -- LHU (Unsigned halfword)
+                formatted_rdata <= std_logic_vector(resize(unsigned(selected_half), 32));
+            when others =>
+                formatted_rdata <= mem_rdata_ext_in;
+        end case;
+    end process;
 
     U_MEM_WB : MEM_WB_Register
         port map (
@@ -95,7 +100,7 @@ begin
             stall            => '0',
             flush            => '0',
             mem_result_in    => mem_result_in,
-            mem_read_data_in => selected_read_data,
+            mem_read_data_in => formatted_rdata,
             rd_addr_in       => mem_rd_addr_in,
             reg_write_in     => mem_reg_write_in,
             wb_sel_in        => mem_wb_sel_in,

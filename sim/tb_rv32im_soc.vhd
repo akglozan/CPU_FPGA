@@ -1,6 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
+use IEEE.STD_LOGIC_TEXTIO.all;
 use STD.TEXTIO.all;
 
 entity tb_rv32im_soc is
@@ -55,28 +56,60 @@ begin
         wait;
     end process;
 
-    -- 4. Behavioral UART Terminal Console Output
+       -- 4. UART 8-N-1 Decoder / Checker
     uart_monitor_process : process
-        variable rx_byte : std_logic_vector(7 downto 0);
-        variable l       : line;
+        variable rx_byte    : std_logic_vector(7 downto 0);
+        variable char_line  : line;
+        variable hex_line   : line;
+        variable stop_bit   : std_logic;
     begin
         loop
-            -- Wait for UART Start Bit (Falling Edge)
+            -- Wait for an idle-to-low transition: UART start bit.
             wait until falling_edge(uart_tx);
-            wait for BIT_PERIOD / 2; -- Align sample point to center of start bit
-            
-            -- Sample 8 Data Bits (LSB First)
+
+            -- Verify that the line remains low at the start-bit centre.
+            wait for BIT_PERIOD / 2;
+            assert uart_tx = '0'
+                report "UART decode error: start bit is not low at its centre."
+                severity error;
+
+            -- Sample D0 through D7 in the centre of every data-bit period.
             for i in 0 to 7 loop
                 wait for BIT_PERIOD;
                 rx_byte(i) := uart_tx;
             end loop;
-            
-            -- Wait for Stop Bit
+
+            -- Sample the stop bit.
             wait for BIT_PERIOD;
-            
-            -- Print decoded ASCII character to ModelSim transcript window
-            write(l, character'val(to_integer(unsigned(rx_byte))));
-            writeline(output, l);
+            stop_bit := uart_tx;
+
+            assert stop_bit = '1'
+                report "UART decode error: stop bit is not high."
+                severity error;
+
+            -- Human-readable transcript output.
+            write(char_line, string'("UART RX: '"));
+
+            if to_integer(unsigned(rx_byte)) >= 32 and
+               to_integer(unsigned(rx_byte)) <= 126 then
+                write(char_line, character'val(to_integer(unsigned(rx_byte))));
+            elsif rx_byte = x"0A" then
+                write(char_line, string'("\n"));
+            elsif rx_byte = x"0D" then
+                write(char_line, string'("\r"));
+            else
+                write(char_line, string'("."));
+            end if;
+
+            write(char_line, string'("'  hex=0x"));
+            hwrite(char_line, rx_byte);
+            writeline(output, char_line);
+
+            -- Assert that no unknown state was sampled.
+            assert not is_x(rx_byte)
+                report "UART decode error: received byte contains X, U, W, or Z."
+                severity error;
+
         end loop;
     end process;
 
