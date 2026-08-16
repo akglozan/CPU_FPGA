@@ -102,18 +102,20 @@ architecture rtl of bram_4kb is
 
 begin
     
-    -- Port A: Instruction Fetch Channel (Synchronous)
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            rdata_a <= ram(to_integer(unsigned(addr_a)));
-        end if;
-    end process;
+   -- ==========================================
+    -- Port A: Instruction Fetch Channel 
+    -- Combinatorial (0-cycle) Read
+    -- ==========================================
+    rdata_a <= ram(to_integer(unsigned(addr_a)));
     
-    -- Port B: Synchronous Byte-Wise Writes
+    -- ==========================================
+    -- Port B: Data Channel
+    -- Synchronous Write, Combinatorial Read
+    -- ==========================================
     process(clk)
     begin
         if rising_edge(clk) then 
+            -- Synchronous Byte-Wise Writes
             if we_b(0) = '1' then ram(to_integer(unsigned(addr_b)))(7 downto 0)   <= wdata_b(7 downto 0);   end if;
             if we_b(1) = '1' then ram(to_integer(unsigned(addr_b)))(15 downto 8)  <= wdata_b(15 downto 8);  end if;
             if we_b(2) = '1' then ram(to_integer(unsigned(addr_b)))(23 downto 16) <= wdata_b(23 downto 16); end if;
@@ -121,7 +123,7 @@ begin
         end if;
     end process;
 
-    -- Port B: Asynchronous Read for MEM-stage load path
+    -- Combinatorial (0-cycle) Read
     rdata_b <= ram(to_integer(unsigned(addr_b)));
-    
+
 end architecture rtl;

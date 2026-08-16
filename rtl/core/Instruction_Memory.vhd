@@ -25,7 +25,6 @@ architecture Behavioral of Instruction_Memory is
         variable temp_ram  : memory_type := (others => (others => '0'));
         variable temp_data : std_logic_vector(31 downto 0);
     begin
-        -- Fixed bounded loop ensures Quartus never exceeds loop iteration limits
         for i in 0 to 1023 loop
             if not endfile(hex_file) then
                 readline(hex_file, hex_line);
@@ -42,12 +41,15 @@ architecture Behavioral of Instruction_Memory is
 
 begin
 
-    process(clk)
+    -- Combinatorial read for immediate 0-cycle fetch to align with IF_ID_Register
+    process(addr, ram)
         variable word_index : integer;
     begin
-        if rising_edge(clk) then
-            word_index := to_integer(unsigned(addr(11 downto 2)));
+        word_index := to_integer(unsigned(addr(11 downto 2)));
+        if word_index >= 0 and word_index <= 1023 then
             instruction <= ram(word_index);
+        else
+            instruction <= (others => '0');
         end if;
     end process;
 

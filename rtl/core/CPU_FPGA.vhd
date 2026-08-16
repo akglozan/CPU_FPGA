@@ -85,6 +85,7 @@ architecture Structural of CPU_FPGA is
             clk                     : in  std_logic;
             rst_n                   : in  std_logic;
             ex_pc_in                : in  std_logic_vector(31 downto 0);
+            ex_pc_plus4_in          : in  std_logic_vector(31 downto 0);
             ex_imm_ext_in           : in  std_logic_vector(31 downto 0);
             ex_reg_data1_in         : in  std_logic_vector(31 downto 0);
             ex_reg_data2_in         : in  std_logic_vector(31 downto 0);
@@ -115,6 +116,7 @@ architecture Structural of CPU_FPGA is
             mem_result_out          : out std_logic_vector(31 downto 0);
             mem_write_data_out      : out std_logic_vector(31 downto 0);
             mem_rd_addr_out         : out std_logic_vector(4 downto 0);
+            mem_pc_plus4_out        : out std_logic_vector(31 downto 0);
             mem_reg_write_out       : out std_logic;
             mem_mem_read_out        : out std_logic;
             mem_mem_write_out       : out std_logic;
@@ -130,6 +132,7 @@ architecture Structural of CPU_FPGA is
             mem_result_in       : in  std_logic_vector(31 downto 0);
             mem_write_data_in   : in  std_logic_vector(31 downto 0);
             mem_rd_addr_in      : in  std_logic_vector(4 downto 0);
+            mem_pc_plus4_in     : in  std_logic_vector(31 downto 0);
             mem_reg_write_in    : in  std_logic;
             mem_mem_read_in     : in  std_logic;
             mem_mem_write_in    : in  std_logic;
@@ -202,6 +205,7 @@ architecture Structural of CPU_FPGA is
     signal mem_result        : std_logic_vector(31 downto 0);
     signal mem_write_data    : std_logic_vector(31 downto 0);
     signal mem_rd_addr       : std_logic_vector(4 downto 0);
+    signal mem_pc_plus4      : std_logic_vector(31 downto 0);
     signal mem_reg_write     : std_logic;
     signal mem_mem_read      : std_logic;
     signal mem_mem_write     : std_logic;
@@ -281,6 +285,7 @@ begin
             clk                     => clk,
             rst_n                   => rst_n,
             ex_pc_in                => ex_pc,
+            ex_pc_plus4_in          => ex_pc_plus4,
             ex_imm_ext_in           => ex_imm_ext,
             ex_reg_data1_in         => ex_reg_data1,
             ex_reg_data2_in         => ex_reg_data2,
@@ -311,6 +316,7 @@ begin
             mem_result_out          => mem_result,
             mem_write_data_out      => mem_write_data,
             mem_rd_addr_out         => mem_rd_addr,
+            mem_pc_plus4_out        => mem_pc_plus4,
             mem_reg_write_out       => mem_reg_write,
             mem_mem_read_out        => mem_mem_read,
             mem_mem_write_out       => mem_mem_write,
@@ -325,6 +331,7 @@ begin
             mem_result_in       => mem_result,
             mem_write_data_in   => mem_write_data, 
             mem_rd_addr_in      => mem_rd_addr,
+            mem_pc_plus4_in     => mem_pc_plus4,
             mem_reg_write_in    => mem_reg_write,
             mem_mem_read_in     => mem_mem_read,
             mem_mem_write_in    => mem_mem_write,

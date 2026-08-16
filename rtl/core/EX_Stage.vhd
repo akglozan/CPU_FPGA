@@ -9,6 +9,7 @@ entity EX_Stage is
         
         -- Inputs from ID/EX Register
         ex_pc_in                : in  std_logic_vector(31 downto 0);
+        ex_pc_plus4_in          : in  std_logic_vector(31 downto 0);
         ex_imm_ext_in           : in  std_logic_vector(31 downto 0);
         ex_reg_data1_in         : in  std_logic_vector(31 downto 0);
         ex_reg_data2_in         : in  std_logic_vector(31 downto 0);
@@ -19,7 +20,7 @@ entity EX_Stage is
         
         -- Control Inputs from ID/EX Register
         ex_alu_src_in           : in  std_logic;
-        ex_alu_src_a_in         : in  std_logic; -- Selects PC when '1' (AUIPC)
+        ex_alu_src_a_in         : in  std_logic;
         ex_alu_ctrl_in          : in  std_logic_vector(3 downto 0);
         ex_is_m_ext_in          : in  std_logic;
         ex_mem_read_in          : in  std_logic;
@@ -47,6 +48,7 @@ entity EX_Stage is
         mem_result_out          : out std_logic_vector(31 downto 0);
         mem_write_data_out      : out std_logic_vector(31 downto 0);
         mem_rd_addr_out         : out std_logic_vector(4 downto 0);
+        mem_pc_plus4_out        : out std_logic_vector(31 downto 0);
         mem_reg_write_out       : out std_logic;
         mem_mem_read_out        : out std_logic;
         mem_mem_write_out       : out std_logic;
@@ -96,26 +98,28 @@ architecture Structural of EX_Stage is
 
     component EX_MEM_Register is
         port (
-            clk                     : in  std_logic;
-            rst_n                   : in  std_logic;
-            flush                   : in  std_logic;
-            stall                   : in  std_logic;
-            ex_final_result         : in  std_logic_vector(31 downto 0);
+            clk                    : in  std_logic;
+            rst_n                  : in  std_logic;
+            flush                  : in  std_logic;
+            stall                  : in  std_logic;
+            ex_final_result        : in  std_logic_vector(31 downto 0);
             ex_operand_b_forwarded : in  std_logic_vector(31 downto 0);
-            ex_rd_addr              : in  std_logic_vector(4 downto 0);
-            ex_reg_write            : in  std_logic;
-            ex_mem_read             : in  std_logic;
-            ex_mem_write            : in  std_logic;
-            ex_wb_sel               : in  std_logic;
-            ex_funct3               : in  std_logic_vector(2 downto 0);
-            mem_result              : out std_logic_vector(31 downto 0);
-            mem_write_data          : out std_logic_vector(31 downto 0);
-            mem_rd_addr             : out std_logic_vector(4 downto 0);
-            mem_reg_write           : out std_logic;
-            mem_mem_read            : out std_logic;
-            mem_mem_write           : out std_logic;
-            mem_wb_sel              : out std_logic;
-            mem_funct3              : out std_logic_vector(2 downto 0)
+            ex_rd_addr             : in  std_logic_vector(4 downto 0);
+            ex_pc_plus4            : in  std_logic_vector(31 downto 0);
+            ex_reg_write           : in  std_logic;
+            ex_mem_read            : in  std_logic;
+            ex_mem_write           : in  std_logic;
+            ex_wb_sel              : in  std_logic_vector(1 downto 0);
+            ex_funct3              : in  std_logic_vector(2 downto 0);
+            mem_result             : out std_logic_vector(31 downto 0);
+            mem_write_data         : out std_logic_vector(31 downto 0);
+            mem_rd_addr            : out std_logic_vector(4 downto 0);
+            mem_pc_plus4           : out std_logic_vector(31 downto 0);
+            mem_reg_write          : out std_logic;
+            mem_mem_read           : out std_logic;
+            mem_mem_write          : out std_logic;
+            mem_wb_sel             : out std_logic_vector(1 downto 0);
+            mem_funct3             : out std_logic_vector(2 downto 0)
         );
     end component;
 
@@ -131,13 +135,11 @@ architecture Structural of EX_Stage is
     signal ex_final_result        : std_logic_vector(31 downto 0);
     signal stall_m_wire           : std_logic;
     signal branch_cond_met        : std_logic;
-    signal mem_wb_sel_1bit        : std_logic;
 
 begin
 
     stall_m_out <= stall_m_wire;
 
-    -- Forwarding Multiplexers
     with forward_a select
         ex_operand_a_forwarded <= ex_reg_data1_in when "00",
                                   mem_result_in   when "10",
@@ -150,10 +152,7 @@ begin
                                   wb_rd_data_in   when "01",
                                   (others => '0') when others;
 
-    -- ALU Operand A MUX (PC for AUIPC, RS1 for normal ALU operations)
     ex_alu_operand_a <= ex_pc_in when ex_alu_src_a_in = '1' else ex_operand_a_forwarded;
-
-    -- ALU Operand B MUX (Immediate when alu_src = '1')
     ex_alu_operand_b <= ex_imm_ext_in when ex_alu_src_in = '1' else ex_operand_b_forwarded;
 
     U_FWD : Forwarding_Unit
@@ -195,29 +194,27 @@ begin
     process(ex_funct3_in, ex_operand_a_forwarded, ex_operand_b_forwarded, ex_zero_flag)
     begin
         case ex_funct3_in is
-            when "000" => -- BEQ
-                branch_cond_met <= ex_zero_flag;
-            when "001" => -- BNE
-                branch_cond_met <= not ex_zero_flag;
-            when "100" => -- BLT
+            when "000" => branch_cond_met <= ex_zero_flag;
+            when "001" => branch_cond_met <= not ex_zero_flag;
+            when "100" =>
                 if signed(ex_operand_a_forwarded) < signed(ex_operand_b_forwarded) then
                     branch_cond_met <= '1';
                 else
                     branch_cond_met <= '0';
                 end if;
-            when "101" => -- BGE
+            when "101" =>
                 if signed(ex_operand_a_forwarded) >= signed(ex_operand_b_forwarded) then
                     branch_cond_met <= '1';
                 else
                     branch_cond_met <= '0';
                 end if;
-            when "110" => -- BLTU
+            when "110" =>
                 if unsigned(ex_operand_a_forwarded) < unsigned(ex_operand_b_forwarded) then
                     branch_cond_met <= '1';
                 else
                     branch_cond_met <= '0';
                 end if;
-            when "111" => -- BGEU
+            when "111" =>
                 if unsigned(ex_operand_a_forwarded) >= unsigned(ex_operand_b_forwarded) then
                     branch_cond_met <= '1';
                 else
@@ -242,21 +239,21 @@ begin
             ex_final_result        => ex_final_result,
             ex_operand_b_forwarded => ex_operand_b_forwarded,
             ex_rd_addr             => ex_rd_addr_in,
+            ex_pc_plus4            => ex_pc_plus4_in,
             ex_reg_write           => ex_reg_write_in,
             ex_mem_read            => ex_mem_read_in,
             ex_mem_write           => ex_mem_write_in,
-            ex_wb_sel              => ex_wb_sel_in(0),
+            ex_wb_sel              => ex_wb_sel_in,
             ex_funct3              => ex_funct3_in,
             mem_result             => mem_result_out,
             mem_write_data         => mem_write_data_out,
             mem_rd_addr            => mem_rd_addr_out,
+            mem_pc_plus4           => mem_pc_plus4_out,
             mem_reg_write          => mem_reg_write_out,
             mem_mem_read           => mem_mem_read_out,
             mem_mem_write          => mem_mem_write_out,
-            mem_wb_sel             => mem_wb_sel_1bit,
+            mem_wb_sel             => mem_wb_sel_out,
             mem_funct3             => mem_funct3_out
         );
-
-    mem_wb_sel_out <= "0" & mem_wb_sel_1bit;
 
 end architecture Structural;
