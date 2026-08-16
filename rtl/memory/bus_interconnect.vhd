@@ -1,128 +1,115 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.NUMERIC_STD.all;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity bus_interconnect is
     port (
-        clk         : in  std_logic;
+        -- Wishbone Master Interface (CPU MEM Stage)
+        m_adr_i  : in  std_logic_vector(31 downto 0);
+        m_dat_i  : in  std_logic_vector(31 downto 0);
+        m_dat_o  : out std_logic_vector(31 downto 0);
+        m_we_i   : in  std_logic;
+        m_sel_i  : in  std_logic_vector(3 downto 0);
+        m_stb_i  : in  std_logic;
+        m_cyc_i  : in  std_logic;
+        m_ack_o  : out std_logic;
 
-        -- CPU Memory Interface
-        addr        : in  std_logic_vector(31 downto 0);
-        write_data  : in  std_logic_vector(31 downto 0);
-        mem_write   : in  std_logic;
-        mem_read    : in  std_logic;
-        funct3      : in  std_logic_vector(2 downto 0);
-        read_data   : out std_logic_vector(31 downto 0);
+        -- Slave 0: Internal BRAM (0x0000_0000 - 0x0000_FFFF)
+        s0_adr_o : out std_logic_vector(31 downto 0);
+        s0_dat_o : out std_logic_vector(31 downto 0);
+        s0_dat_i : in  std_logic_vector(31 downto 0);
+        s0_sel_o : out std_logic_vector(3 downto 0);
+        s0_we_o  : out std_logic;
+        s0_stb_o : out std_logic;
+        s0_cyc_o : out std_logic;
+        s0_ack_i : in  std_logic;
 
-        -- BRAM Interface (Port B / Data Side: 1024 x 32-bit words)
-        bram_addr   : out std_logic_vector(9 downto 0);
-        bram_wdata  : out std_logic_vector(31 downto 0);
-        bram_we_b   : out std_logic_vector(3 downto 0);
-        bram_rdata  : in  std_logic_vector(31 downto 0);
+        -- Slave 1: Main SDRAM (0x8000_0000 - 0x87FF_FFFF)
+        s1_adr_o : out std_logic_vector(31 downto 0);
+        s1_dat_o : out std_logic_vector(31 downto 0);
+        s1_dat_i : in  std_logic_vector(31 downto 0);
+        s1_sel_o : out std_logic_vector(3 downto 0);
+        s1_we_o  : out std_logic;
+        s1_stb_o : out std_logic;
+        s1_cyc_o : out std_logic;
+        s1_ack_i : in  std_logic;
 
-        -- UART Interface
-        uart_data   : out std_logic_vector(7 downto 0);
-        uart_we     : out std_logic;
-        uart_rdata  : in  std_logic_vector(31 downto 0);
+        -- Slave 2: VGA Framebuffer (0xC000_0000 - 0xC007_FFFF)
+        s2_adr_o : out std_logic_vector(31 downto 0);
+        s2_dat_o : out std_logic_vector(31 downto 0);
+        s2_dat_i : in  std_logic_vector(31 downto 0);
+        s2_sel_o : out std_logic_vector(3 downto 0);
+        s2_we_o  : out std_logic;
+        s2_stb_o : out std_logic;
+        s2_cyc_o : out std_logic;
+        s2_ack_i : in  std_logic;
 
-        -- Peripheral Controls
-        gpio_we     : out std_logic;
-        timer_we    : out std_logic;
-        gpio_rdata  : in  std_logic_vector(31 downto 0);
-        timer_rdata : in  std_logic_vector(31 downto 0)
+        -- Slave 3: Peripheral Sub-bus Bridge (0xE000_0000 - 0xE000_FFFF)
+        s3_adr_o : out std_logic_vector(31 downto 0);
+        s3_dat_o : out std_logic_vector(31 downto 0);
+        s3_dat_i : in  std_logic_vector(31 downto 0);
+        s3_sel_o : out std_logic_vector(3 downto 0);
+        s3_we_o  : out std_logic;
+        s3_stb_o : out std_logic;
+        s3_cyc_o : out std_logic;
+        s3_ack_i : in  std_logic
     );
 end entity bus_interconnect;
 
 architecture rtl of bus_interconnect is
-    signal byte_enable : std_logic_vector(3 downto 0);
+    type slave_sel_t is (SEL_BRAM, SEL_SDRAM, SEL_VGA, SEL_PERIPH, SEL_NONE);
+    signal active_slave : slave_sel_t;
 begin
 
-    -- Word-aligned address indexing for 1024-word (4 KB) BRAM
-    bram_addr  <= addr(11 downto 2);
-    bram_wdata <= write_data;
-    uart_data  <= write_data(7 downto 0);
+    -- Common shared bus lines to all slaves
+    s0_adr_o <= m_adr_i; s0_dat_o <= m_dat_i; s0_sel_o <= m_sel_i; s0_we_o <= m_we_i; s0_cyc_o <= m_cyc_i;
+    s1_adr_o <= m_adr_i; s1_dat_o <= m_dat_i; s1_sel_o <= m_sel_i; s1_we_o <= m_we_i; s1_cyc_o <= m_cyc_i;
+    s2_adr_o <= m_adr_i; s2_dat_o <= m_dat_i; s2_sel_o <= m_sel_i; s2_we_o <= m_we_i; s2_cyc_o <= m_cyc_i;
+    s3_adr_o <= m_adr_i; s3_dat_o <= m_dat_i; s3_sel_o <= m_sel_i; s3_we_o <= m_we_i; s3_cyc_o <= m_cyc_i;
 
-    -- Generate byte-enables for store instructions (SB, SH, SW)
-    process(funct3, addr, mem_write)
+    -- Target Address Decoding
+    process(m_adr_i)
     begin
-        if mem_write = '1' then
-            case funct3 is
-                when "000" => -- SB
-                    case addr(1 downto 0) is
-                        when "00"   => byte_enable <= "0001";
-                        when "01"   => byte_enable <= "0010";
-                        when "10"   => byte_enable <= "0100";
-                        when others => byte_enable <= "1000";
-                    end case;
-                when "001" => -- SH
-                    if addr(1) = '0' then
-                        byte_enable <= "0011";
-                    else
-                        byte_enable <= "1100";
-                    end if;
-                when "010" => -- SW
-                    byte_enable <= "1111";
-                when others =>
-                    byte_enable <= "1111";
-            end case;
+        if m_adr_i(31 downto 16) = x"0000" then
+            active_slave <= SEL_BRAM;
+        elsif m_adr_i(31 downto 27) = "10000" then         -- 0x8000_0000 - 0x87FF_FFFF (128 MB space)
+            active_slave <= SEL_SDRAM;
+        elsif m_adr_i(31 downto 19) = "1100000000000" then -- 0xC000_0000 - 0xC007_FFFF (512 KB space)
+            active_slave <= SEL_VGA;
+        elsif m_adr_i(31 downto 16) = x"E000" then         -- 0xE000_0000 - 0xE000_FFFF (64 KB space)
+            active_slave <= SEL_PERIPH;
         else
-            byte_enable <= "0000";
+            active_slave <= SEL_NONE;
         end if;
     end process;
 
-    -- Combinational bus decoding and read multiplexer
-    process(addr, mem_write, mem_read, byte_enable, bram_rdata, uart_rdata, gpio_rdata, timer_rdata)
+    -- Strobe Routing
+    s0_stb_o <= m_stb_i when (active_slave = SEL_BRAM   and m_cyc_i = '1') else '0';
+    s1_stb_o <= m_stb_i when (active_slave = SEL_SDRAM  and m_cyc_i = '1') else '0';
+    s2_stb_o <= m_stb_i when (active_slave = SEL_VGA    and m_cyc_i = '1') else '0';
+    s3_stb_o <= m_stb_i when (active_slave = SEL_PERIPH and m_cyc_i = '1') else '0';
+
+    -- Return Channel Multiplexer
+    process(active_slave, s0_dat_i, s0_ack_i, s1_dat_i, s1_ack_i, 
+            s2_dat_i, s2_ack_i, s3_dat_i, s3_ack_i)
     begin
-        bram_we_b <= (others => '0');
-        uart_we   <= '0';
-        gpio_we   <= '0';
-        timer_we  <= '0';
-        read_data <= (others => '0');
-
-        if addr(31) = '0' then
-            --------------------------------------------------------
-            -- 0x00000000 - 0x00000FFF : 4 KB BRAM space
-            --------------------------------------------------------
-            bram_we_b <= byte_enable;
-            read_data <= bram_rdata;
-
-        elsif addr(31 downto 8) = x"800000" then
-            --------------------------------------------------------
-            -- 0x80000000 - 0x800000FF : UART Peripheral Range
-            --------------------------------------------------------
-            case addr(7 downto 0) is
-                when x"00" =>
-                    -- 0x80000000 : UART TX Data Register
-                    if mem_write = '1' then
-                        uart_we <= '1';
-                    end if;
-                    read_data <= (others => '0');
-
-                when x"04" =>
-                    -- 0x80000004 : UART Status Register
-                    read_data <= uart_rdata;
-
-                when others =>
-                    read_data <= (others => '0');
-            end case;
-
-        elsif addr = x"80000100" then
-            --------------------------------------------------------
-            -- 0x80000100 : GPIO
-            --------------------------------------------------------
-            gpio_we   <= mem_write;
-            read_data <= gpio_rdata;
-
-        elsif addr = x"80000200" then
-            --------------------------------------------------------
-            -- 0x80000200 : Cycle Timer
-            --------------------------------------------------------
-            timer_we  <= mem_write;
-            read_data <= timer_rdata;
-
-        else
-            read_data <= (others => '0');
-        end if;
+        case active_slave is
+            when SEL_BRAM =>
+                m_dat_o <= s0_dat_i;
+                m_ack_o <= s0_ack_i;
+            when SEL_SDRAM =>
+                m_dat_o <= s1_dat_i;
+                m_ack_o <= s1_ack_i;
+            when SEL_VGA =>
+                m_dat_o <= s2_dat_i;
+                m_ack_o <= s2_ack_i;
+            when SEL_PERIPH =>
+                m_dat_o <= s3_dat_i;
+                m_ack_o <= s3_ack_i;
+            when others =>
+                m_dat_o <= (others => '0');
+                m_ack_o <= '0';
+        end case;
     end process;
 
 end architecture rtl;

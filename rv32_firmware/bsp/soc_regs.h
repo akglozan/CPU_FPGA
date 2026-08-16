@@ -1,13 +1,22 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Ozan Akgül
+
 #ifndef SOC_REGS_H
 #define SOC_REGS_H
 
 #include <stdint.h>
 
-// Base Addresses & Register Definitions
-#define UART_BASE       0x80000000
-#define GPIO_BASE       0x80000100
-#define TIMER_BASE      0x80000200
+// Base Addresses & Memory Map
+#define BRAM_BASE       0x00000000
+#define SDRAM_BASE      0x80000000
+#define VGA_BASE        0xC0000000
+#define PERIPH_BASE     0xE0000000
 
+#define UART_BASE       (PERIPH_BASE + 0x00)
+#define GPIO_BASE       (PERIPH_BASE + 0x10)
+#define TIMER_BASE      (PERIPH_BASE + 0x20)
+
+// Register Access Macros
 #define UART_DATA_REG   (*(volatile uint32_t *)(UART_BASE + 0x00))
 #define UART_STATUS_REG (*(volatile uint32_t *)(UART_BASE + 0x04))
 

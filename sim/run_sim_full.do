@@ -1,100 +1,54 @@
-# Recreate the ModelSim/Questa work library
-if {[file exists work]} {
-    vdel -lib work -all
-}
-vlib work
-vmap work work
+# 2. Add Wave Window Signals
+# Clocks & Reset
+add wave -noupdate -divider "Clocks & Reset"
+add wave -noupdate /tb_rv32im_soc/clk
+add wave -noupdate /tb_rv32im_soc/rst_n
 
-# Compile core RTL (VHDL-2008)
-vcom -2008 ../rtl/core/Program_Counter.vhd
-vcom -2008 ../rtl/core/Instruction_Memory.vhd
-vcom -2008 ../rtl/core/IF_ID_Register.vhd
-vcom -2008 ../rtl/core/RegFile.vhd
-vcom -2008 ../rtl/core/ImmGen.vhd
-vcom -2008 ../rtl/core/ID_EX_Register.vhd
-vcom -2008 ../rtl/core/Control_Unit.vhd
-vcom -2008 ../rtl/core/ALU.vhd
-vcom -2008 ../rtl/core/M_Extension_Unit.vhd
-vcom -2008 ../rtl/core/Hazard_Unit.vhd
-vcom -2008 ../rtl/core/Forwarding_Unit.vhd
-vcom -2008 ../rtl/core/EX_MEM_Register.vhd
-vcom -2008 ../rtl/core/Data_Memory.vhd
-vcom -2008 ../rtl/core/MEM_WB_Register.vhd
-vcom -2008 ../rtl/core/IF_Stage.vhd
-vcom -2008 ../rtl/core/ID_Stage.vhd
-vcom -2008 ../rtl/core/EX_Stage.vhd
-vcom -2008 ../rtl/core/MEM_Stage.vhd
-vcom -2008 ../rtl/core/CPU_FPGA.vhd
+# CPU Core Execution & Pipeline Signals
+add wave -noupdate -divider "CPU Execution"
+add wave -noupdate -radix hex /tb_rv32im_soc/DUT/U_CPU/pc_debug
+add wave -noupdate -radix hex /tb_rv32im_soc/DUT/instr
+add wave -noupdate            /tb_rv32im_soc/DUT/U_CPU/bus_stall_wire
 
-# Compile memory and bus interconnect
-vcom -2008 ../rtl/memory/bram_4kb.vhd
-vcom -2008 ../rtl/memory/bus_interconnect.vhd
+# Wishbone Master Bus (CPU MEM Stage)
+add wave -noupdate -divider "Wishbone Master Bus"
+add wave -noupdate -radix hex /tb_rv32im_soc/DUT/wb_cpu_adr
+add wave -noupdate -radix hex /tb_rv32im_soc/DUT/wb_cpu_wdat
+add wave -noupdate -radix hex /tb_rv32im_soc/DUT/wb_cpu_rdat
+add wave -noupdate -radix bin /tb_rv32im_soc/DUT/wb_cpu_sel
+add wave -noupdate            /tb_rv32im_soc/DUT/wb_cpu_we
+add wave -noupdate            /tb_rv32im_soc/DUT/wb_cpu_cyc
+add wave -noupdate            /tb_rv32im_soc/DUT/wb_cpu_stb
+add wave -noupdate            /tb_rv32im_soc/DUT/wb_cpu_ack
 
-# Compile peripherals and SoC top level
-vcom -2008 ../rtl/peripherals/uart_tx.vhd
-vcom -2008 ../rtl/peripherals/gpio_led.vhd
-vcom -2008 ../rtl/peripherals/gpio_key.vhd
-vcom -2008 ../rtl/peripherals/timer.vhd
-vcom -2008 ../rtl/rv32im_soc.vhd
+# Bus Interconnect Slave Strobes
+add wave -noupdate -divider "Interconnect Slaves"
+add wave -noupdate            /tb_rv32im_soc/DUT/s0_stb
+add wave -noupdate            /tb_rv32im_soc/DUT/s0_ack
+add wave -noupdate            /tb_rv32im_soc/DUT/s1_stb
+add wave -noupdate            /tb_rv32im_soc/DUT/s1_ack
+add wave -noupdate            /tb_rv32im_soc/DUT/s3_stb
+add wave -noupdate            /tb_rv32im_soc/DUT/s3_ack
 
-# Compile testbench
-vcom -2008 tb_rv32im_soc.vhd
+# SDRAM Controller Internal State
+add wave -noupdate -divider "SDRAM Controller Internal"
+add wave -noupdate            /tb_rv32im_soc/DUT/U_SDRAM/state
+add wave -noupdate -radix dec /tb_rv32im_soc/DUT/U_SDRAM/wait_cnt
+add wave -noupdate            /tb_rv32im_soc/DUT/U_SDRAM/refresh_req
 
-# Elaborate with internal signal visibility
-vsim -t 1ns -voptargs="+acc" work.tb_rv32im_soc
+# External SDRAM Interface Pins
+add wave -noupdate -divider "Physical SDRAM Pins"
+add wave -noupdate            /tb_rv32im_soc/sdram_cke
+add wave -noupdate            /tb_rv32im_soc/sdram_cs_n
+add wave -noupdate            /tb_rv32im_soc/sdram_ras_n
+add wave -noupdate            /tb_rv32im_soc/sdram_cas_n
+add wave -noupdate            /tb_rv32im_soc/sdram_we_n
+add wave -noupdate -radix hex /tb_rv32im_soc/sdram_ba
+add wave -noupdate -radix hex /tb_rv32im_soc/sdram_addr
+add wave -noupdate -radix bin /tb_rv32im_soc/sdram_dqm
+add wave -noupdate -radix hex /tb_rv32im_soc/sdram_dq
 
-# Log all signals for text dump
-log -r /tb_rv32im_soc
-
-# VCD logging (binary waveform file)
-vcd file sim_trace.vcd
-vcd add -r /tb_rv32im_soc/*
-vcd add -r /tb_rv32im_soc/UUT/*
-vcd add -r /tb_rv32im_soc/UUT/U_UART/*
-
-# Waveform setup
-view wave
-
-add wave -divider "System"
-add wave -hex /tb_rv32im_soc/clk
-add wave -hex /tb_rv32im_soc/rst_n
-
-add wave -divider "CPU Core Pipeline"
-add wave -hex /tb_rv32im_soc/UUT/U_CPU/pc_debug
-add wave -hex /tb_rv32im_soc/UUT/U_CPU/instr_debug
-
-add wave -divider "Bus Interconnect"
-add wave -hex /tb_rv32im_soc/UUT/mem_addr
-add wave -hex /tb_rv32im_soc/UUT/mem_wdata
-add wave -hex /tb_rv32im_soc/UUT/mem_rdata
-add wave -hex /tb_rv32im_soc/UUT/mem_write
-
-add wave -divider "UART Interface"
-add wave -hex /tb_rv32im_soc/uart_tx
-add wave -hex /tb_rv32im_soc/UUT/uart_tx_start
-add wave -hex /tb_rv32im_soc/UUT/uart_tx_busy
-add wave -hex /tb_rv32im_soc/UUT/uart_rdata
-add wave -hex /tb_rv32im_soc/UUT/U_UART/tx_data
-add wave -hex /tb_rv32im_soc/UUT/U_UART/tx_start
-add wave -hex /tb_rv32im_soc/UUT/U_UART/tx_busy
-add wave -hex /tb_rv32im_soc/UUT/U_UART/tx_out
-add wave -hex /tb_rv32im_soc/UUT/U_UART/tx_shift
-add wave -unsigned /tb_rv32im_soc/UUT/U_UART/clk_count
-add wave -hex /tb_rv32im_soc/UUT/U_UART/state
-
-add wave -divider "GPIO"
-add wave -hex /tb_rv32im_soc/gpio_leds
-add wave -hex /tb_rv32im_soc/gpio_keys
-
-# Run long enough for the complete firmware banner and diagnostics
-run 15ms
-
-# Flush and close VCD
-vcd flush
-vcd off
-
-# Export full time-history waveform log to text file
-dump -o sim_trace.txt
-
-# Auto-fit waveform window
-wave zoomfull
+# Peripherals & I/O
+add wave -noupdate -divider "Peripherals & I/O"
+add wave -noupdate            /tb_rv32im_soc/uart_tx
+add wave -noupdate -radix hex /tb_rv32im_soc/gpio_leds

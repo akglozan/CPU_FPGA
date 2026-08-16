@@ -27,40 +27,40 @@ Disassembly of section .text:
 00000028 <uart_puts>:
   28:	00054683          	lbu	a3,0(a0)
   2c:	02068663          	beqz	a3,58 <uart_puts+0x30>
-  30:	80000737          	lui	a4,0x80000
-  34:	00470713          	addi	a4,a4,4 # 80000004 <_estack+0x7ffff004>
-  38:	80000637          	lui	a2,0x80000
+  30:	e0000737          	lui	a4,0xe0000
+  34:	00470713          	addi	a4,a4,4 # e0000004 <_estack+0xdffff004>
+  38:	e0000637          	lui	a2,0xe0000
   3c:	00150513          	addi	a0,a0,1
   40:	00072783          	lw	a5,0(a4)
   44:	0017f793          	andi	a5,a5,1
   48:	fe079ce3          	bnez	a5,40 <uart_puts+0x18>
-  4c:	00d62023          	sw	a3,0(a2) # 80000000 <_estack+0x7ffff000>
+  4c:	00d62023          	sw	a3,0(a2) # e0000000 <_estack+0xdffff000>
   50:	00054683          	lbu	a3,0(a0)
   54:	fe0694e3          	bnez	a3,3c <uart_puts+0x14>
   58:	00008067          	ret
 
 0000005c <print_hex32>:
-  5c:	80000737          	lui	a4,0x80000
-  60:	00470713          	addi	a4,a4,4 # 80000004 <_estack+0x7ffff004>
-  64:	800006b7          	lui	a3,0x80000
+  5c:	e0000737          	lui	a4,0xe0000
+  60:	00470713          	addi	a4,a4,4 # e0000004 <_estack+0xdffff004>
+  64:	e00006b7          	lui	a3,0xe0000
   68:	00072783          	lw	a5,0(a4)
   6c:	0017f793          	andi	a5,a5,1
   70:	fe079ce3          	bnez	a5,68 <print_hex32+0xc>
   74:	03000793          	li	a5,48
-  78:	80000737          	lui	a4,0x80000
-  7c:	00f6a023          	sw	a5,0(a3) # 80000000 <_estack+0x7ffff000>
-  80:	00470713          	addi	a4,a4,4 # 80000004 <_estack+0x7ffff004>
-  84:	800006b7          	lui	a3,0x80000
+  78:	e0000737          	lui	a4,0xe0000
+  7c:	00f6a023          	sw	a5,0(a3) # e0000000 <_estack+0xdffff000>
+  80:	00470713          	addi	a4,a4,4 # e0000004 <_estack+0xdffff004>
+  84:	e00006b7          	lui	a3,0xe0000
   88:	00072783          	lw	a5,0(a4)
   8c:	0017f793          	andi	a5,a5,1
   90:	fe079ce3          	bnez	a5,88 <print_hex32+0x2c>
   94:	07800793          	li	a5,120
-  98:	80000737          	lui	a4,0x80000
-  9c:	00f6a023          	sw	a5,0(a3) # 80000000 <_estack+0x7ffff000>
+  98:	e0000737          	lui	a4,0xe0000
+  9c:	00f6a023          	sw	a5,0(a3) # e0000000 <_estack+0xdffff000>
   a0:	2f800593          	li	a1,760
-  a4:	00470713          	addi	a4,a4,4 # 80000004 <_estack+0x7ffff004>
+  a4:	00470713          	addi	a4,a4,4 # e0000004 <_estack+0xdffff004>
   a8:	01c00693          	li	a3,28
-  ac:	800008b7          	lui	a7,0x80000
+  ac:	e00008b7          	lui	a7,0xe0000
   b0:	ffc00813          	li	a6,-4
   b4:	00d557b3          	srl	a5,a0,a3
   b8:	00f7f793          	andi	a5,a5,15
@@ -69,7 +69,7 @@ Disassembly of section .text:
   c4:	00072783          	lw	a5,0(a4)
   c8:	0017f793          	andi	a5,a5,1
   cc:	fe079ce3          	bnez	a5,c4 <print_hex32+0x68>
-  d0:	00c8a023          	sw	a2,0(a7) # 80000000 <_estack+0x7ffff000>
+  d0:	00c8a023          	sw	a2,0(a7) # e0000000 <_estack+0xdffff000>
   d4:	ffc68693          	addi	a3,a3,-4
   d8:	fd069ee3          	bne	a3,a6,b4 <print_hex32+0x58>
   dc:	00008067          	ret
@@ -82,10 +82,10 @@ Disassembly of section .text:
   f0:	00912a23          	sw	s1,20(sp)
   f4:	f35ff0ef          	jal	28 <uart_puts>
   f8:	0012d6b7          	lui	a3,0x12d
-  fc:	800007b7          	lui	a5,0x80000
+  fc:	e00007b7          	lui	a5,0xe0000
  100:	68768693          	addi	a3,a3,1671 # 12d687 <_estack+0x12c687>
  104:	000da737          	lui	a4,0xda
- 108:	2007a403          	lw	s0,512(a5) # 80000200 <_estack+0x7ffff200>
+ 108:	0207a403          	lw	s0,32(a5) # e0000020 <_estack+0xdffff020>
  10c:	88370713          	addi	a4,a4,-1917 # d9883 <_estack+0xd8883>
  110:	00d12223          	sw	a3,4(sp)
  114:	00e12423          	sw	a4,8(sp)
@@ -94,7 +94,7 @@ Disassembly of section .text:
  120:	29000513          	li	a0,656
  124:	02d70733          	mul	a4,a4,a3
  128:	00e12623          	sw	a4,12(sp)
- 12c:	2007a483          	lw	s1,512(a5)
+ 12c:	0207a483          	lw	s1,32(a5)
  130:	ef9ff0ef          	jal	28 <uart_puts>
  134:	00412503          	lw	a0,4(sp)
  138:	f25ff0ef          	jal	5c <print_hex32>
@@ -114,16 +114,16 @@ Disassembly of section .text:
  170:	eb9ff0ef          	jal	28 <uart_puts>
  174:	2c000513          	li	a0,704
  178:	eb1ff0ef          	jal	28 <uart_puts>
- 17c:	80000e37          	lui	t3,0x80000
- 180:	80000337          	lui	t1,0x80000
- 184:	80000737          	lui	a4,0x80000
+ 17c:	e0000e37          	lui	t3,0xe0000
+ 180:	e0000337          	lui	t1,0xe0000
+ 184:	e0000737          	lui	a4,0xe0000
  188:	26700513          	li	a0,615
  18c:	2f800813          	li	a6,760
- 190:	104e0e13          	addi	t3,t3,260 # 80000104 <_estack+0x7ffff104>
- 194:	10030313          	addi	t1,t1,256 # 80000100 <_estack+0x7ffff100>
- 198:	00470713          	addi	a4,a4,4 # 80000004 <_estack+0x7ffff004>
+ 190:	014e0e13          	addi	t3,t3,20 # e0000014 <_estack+0xdffff014>
+ 194:	01030313          	addi	t1,t1,16 # e0000010 <_estack+0xdffff010>
+ 198:	00470713          	addi	a4,a4,4 # e0000004 <_estack+0xdffff004>
  19c:	0ff00793          	li	a5,255
- 1a0:	80000637          	lui	a2,0x80000
+ 1a0:	e0000637          	lui	a2,0xe0000
  1a4:	03000293          	li	t0,48
  1a8:	07800f93          	li	t6,120
  1ac:	ffc00893          	li	a7,-4
@@ -139,7 +139,7 @@ Disassembly of section .text:
  1d4:	00072783          	lw	a5,0(a4)
  1d8:	0017f793          	andi	a5,a5,1
  1dc:	fe079ce3          	bnez	a5,1d4 <main+0xf4>
- 1e0:	00862023          	sw	s0,0(a2) # 80000000 <_estack+0x7ffff000>
+ 1e0:	00862023          	sw	s0,0(a2) # e0000000 <_estack+0xdffff000>
  1e4:	0006c403          	lbu	s0,0(a3)
  1e8:	fea694e3          	bne	a3,a0,1d0 <main+0xf0>
  1ec:	00072783          	lw	a5,0(a4)

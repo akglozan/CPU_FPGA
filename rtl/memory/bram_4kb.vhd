@@ -1,7 +1,11 @@
+-- SPDX-License-Identifier: Apache-2.0
+-- Copyright 2026 Ozan Akgül
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use STD.TEXTIO.all;
+use IEEE.STD_LOGIC_TEXTIO.all;
 
 entity bram_4kb is
     generic (
@@ -26,52 +30,16 @@ architecture rtl of bram_4kb is
 
     type ram_type is array (0 to 1023) of std_logic_vector(31 downto 0);
 
-    -- Helper function to convert 8-character hex string to std_logic_vector(31 downto 0)
-    function hex_to_slv32(s : string) return std_logic_vector is
-        variable result : std_logic_vector(31 downto 0) := (others => '0');
-        variable nibble : std_logic_vector(3 downto 0);
-        variable c      : character;
-        variable idx    : integer := 0;
-    begin
-        for i in s'range loop
-            c := s(i);
-            case c is
-                when '0' => nibble := "0000";
-                when '1' => nibble := "0001";
-                when '2' => nibble := "0010";
-                when '3' => nibble := "0011";
-                when '4' => nibble := "0100";
-                when '5' => nibble := "0101";
-                when '6' => nibble := "0110";
-                when '7' => nibble := "0111";
-                when '8' => nibble := "1000";
-                when '9' => nibble := "1001";
-                when 'a' | 'A' => nibble := "1010";
-                when 'b' | 'B' => nibble := "1011";
-                when 'c' | 'C' => nibble := "1100";
-                when 'd' | 'D' => nibble := "1101";
-                when 'e' | 'E' => nibble := "1110";
-                when 'f' | 'F' => nibble := "1111";
-                when others => nibble := "0000";
-            end case;
-            
-            if idx < 8 then
-                result(31 - idx*4 downto 28 - idx*4) := nibble;
-                idx := idx + 1;
-            end if;
-        end loop;
-        return result;
-    end function;
-
-    -- Load memory contents from hex file in simulation; return zero array in synthesis
+    -- Robust RAM initialization function using standard IEEE hread
     impure function init_ram_from_hex(file_name : in string) return ram_type is
         variable ram_data : ram_type := (others => (others => '0'));
 -- synthesis translate_off
         file hex_f        : text;
         variable line_buf : line;
-        variable str_buf  : string(1 to 8);
+        variable word_val : std_logic_vector(31 downto 0);
         variable status   : file_open_status;
         variable i        : integer := 0;
+        variable good     : boolean;
 -- synthesis translate_on
     begin
 -- synthesis translate_off
@@ -79,10 +47,13 @@ architecture rtl of bram_4kb is
         if status = open_ok then
             while not endfile(hex_f) and i < 1024 loop
                 readline(hex_f, line_buf);
+                -- Skip empty or short lines
                 if line_buf'length >= 8 then
-                    read(line_buf, str_buf);
-                    ram_data(i) := hex_to_slv32(str_buf);
-                    i := i + 1;
+                    hread(line_buf, word_val, good);
+                    if good then
+                        ram_data(i) := word_val;
+                        i := i + 1;
+                    end if;
                 end if;
             end loop;
             file_close(hex_f);
@@ -91,7 +62,7 @@ architecture rtl of bram_4kb is
         return ram_data;
     end function;
     
-    -- Synthesis attributes for Intel / Quartus Prime
+    -- Synthesis attributes for Intel Quartus Prime
     attribute ram_init_file : string;
     attribute syn_ramstyle  : string;
     
@@ -102,20 +73,17 @@ architecture rtl of bram_4kb is
 
 begin
     
-   -- ==========================================
-    -- Port A: Instruction Fetch Channel 
-    -- Combinatorial (0-cycle) Read
+    -- ==========================================
+    -- Port A: Instruction Fetch Channel (0-cycle)
     -- ==========================================
     rdata_a <= ram(to_integer(unsigned(addr_a)));
     
     -- ==========================================
     -- Port B: Data Channel
-    -- Synchronous Write, Combinatorial Read
     -- ==========================================
     process(clk)
     begin
         if rising_edge(clk) then 
-            -- Synchronous Byte-Wise Writes
             if we_b(0) = '1' then ram(to_integer(unsigned(addr_b)))(7 downto 0)   <= wdata_b(7 downto 0);   end if;
             if we_b(1) = '1' then ram(to_integer(unsigned(addr_b)))(15 downto 8)  <= wdata_b(15 downto 8);  end if;
             if we_b(2) = '1' then ram(to_integer(unsigned(addr_b)))(23 downto 16) <= wdata_b(23 downto 16); end if;
@@ -123,7 +91,6 @@ begin
         end if;
     end process;
 
-    -- Combinatorial (0-cycle) Read
     rdata_b <= ram(to_integer(unsigned(addr_b)));
 
 end architecture rtl;
