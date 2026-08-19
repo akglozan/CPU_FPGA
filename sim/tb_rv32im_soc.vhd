@@ -47,6 +47,9 @@ begin
 
     -- Device Under Test (DUT)
     DUT : entity work.rv32im_soc
+			generic map (
+            SIMULATION => true
+        )
         port map (
             clk         => clk,
             rst_n       => rst_n,

@@ -6,6 +6,9 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 entity rv32im_soc is
+	generic (
+        SIMULATION : boolean := false
+    );
     port (
         -- Clock and System Controls
         clk         : in    std_logic;
@@ -194,7 +197,8 @@ begin
     -- 4. SDRAM Controller (Slave 1)
     U_SDRAM : entity work.sdram_controller(rtl)
         generic map (
-            CLK_FREQ_MHZ => 50
+            CLK_FREQ_MHZ => 50,
+            SIMULATION   => SIMULATION
         )
         port map (
             clk         => clk,

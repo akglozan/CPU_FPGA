@@ -1,17 +1,5 @@
 -- SPDX-License-Identifier: Apache-2.0
 -- Copyright 2026 Ozan Akgül
---
--- Licensed under the Apache License, Version 2.0 (the "License");
--- you may not use this file except in compliance with the License.
--- You may obtain a copy of the License at
---
---     http://www.apache.org/licenses/LICENSE-2.0
---
--- Unless required by applicable law or agreed to in writing, software
--- distributed under the License is distributed on an "AS IS" BASIS,
--- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
--- See the License for the specific language governing permissions and
--- limitations under the License.
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -19,7 +7,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity sdram_controller is
     generic (
-        CLK_FREQ_MHZ : integer := 50 -- System Clock Frequency in MHz
+        CLK_FREQ_MHZ : integer := 50;   -- System Clock Frequency in MHz
+        SIMULATION   : boolean := false -- Set to true for fast simulation boot
     );
     port (
         clk           : in    std_logic;
@@ -119,10 +108,14 @@ begin
         end procedure;
     begin
         if reset_n = '0' then
-            state      <= ST_BOOT_WAIT;
-            wait_cnt   <= CLK_FREQ_MHZ * 150; -- ~150us power-on delay
-            wb_ack_o   <= '0';
-            dq_oe      <= '0';
+            state    <= ST_BOOT_WAIT;
+            if SIMULATION then
+                wait_cnt <= 10;                     -- Fast boot for simulation
+            else
+                wait_cnt <= CLK_FREQ_MHZ * 150;     -- 150 us physical delay for synthesis
+            end if;
+            wb_ack_o <= '0';
+            dq_oe    <= '0';
             send_cmd(CMD_NOP);
         elsif rising_edge(clk) then
             wb_ack_o <= '0';
@@ -235,9 +228,7 @@ begin
                     end if;
 
                 when ST_READ_DATA =>
-                    -- Latch lower word
                     rdata_reg(15 downto 0)  <= sdram_dq;
-                    -- Next cycle receives upper word
                     state                   <= ST_PRECHARGE;
                     wb_ack_o                <= '1';
                     rdata_reg(31 downto 16) <= sdram_dq;
