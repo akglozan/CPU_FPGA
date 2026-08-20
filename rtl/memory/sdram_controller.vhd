@@ -50,7 +50,7 @@ architecture rtl of sdram_controller is
 
     type state_t is (
         ST_BOOT_WAIT, ST_BOOT_PRECHARGE, ST_BOOT_REF1, ST_BOOT_REF2, ST_BOOT_LMR,
-        ST_IDLE, ST_ACTIVE, ST_READ_CMD, ST_READ_WAIT, ST_READ_DATA,
+        ST_IDLE, ST_ACTIVE, ST_READ_CMD, ST_READ_WAIT, ST_READ_DATA, ST_READ_DATA2,
         ST_WRITE_CMD, ST_WRITE_DATA2, ST_WRITE_REC, ST_PRECHARGE, ST_REFRESH
     );
     signal state : state_t := ST_BOOT_WAIT;
@@ -60,8 +60,8 @@ architecture rtl of sdram_controller is
     signal refresh_cnt      : integer range 0 to REFRESH_PERIOD := 0;
     signal refresh_req      : std_logic := '0';
 
-    -- General Delay / Wait Counter
-    signal wait_cnt         : integer range 0 to 10000 := 0;
+    -- General Delay / Wait Counter (Expanded range to prevent overflow)
+    signal wait_cnt         : integer range 0 to 65535 := 0;
 
     -- Internal Registers
     signal dq_out           : std_logic_vector(15 downto 0);
@@ -108,27 +108,29 @@ begin
         end procedure;
     begin
         if reset_n = '0' then
-            state    <= ST_BOOT_WAIT;
+            state      <= ST_BOOT_WAIT;
+            wb_ack_o   <= '0';
+            dq_oe      <= '0';
+            sdram_ba   <= "00";
+            sdram_addr <= (others => '0');
+            sdram_dqm  <= "11";
+            send_cmd(CMD_NOP);
             if SIMULATION then
-                wait_cnt <= 10;                     -- Fast boot for simulation
+                wait_cnt <= 10;
             else
-                wait_cnt <= CLK_FREQ_MHZ * 150;     -- 150 us physical delay for synthesis
+                wait_cnt <= CLK_FREQ_MHZ * 150;
             end if;
-            wb_ack_o <= '0';
-            dq_oe    <= '0';
-            send_cmd(CMD_NOP);
         elsif rising_edge(clk) then
-            wb_ack_o <= '0';
-            send_cmd(CMD_NOP);
+            send_cmd(CMD_NOP); -- Default command to avoid latching control pulses
+            wb_ack_o <= '0';   -- Single-cycle ACK clear default
 
             case state is
                 ----------------------------------------------------------------
                 -- Power-On Initialization Sequence
                 ----------------------------------------------------------------
                 when ST_BOOT_WAIT =>
-                    send_cmd(CMD_NOP);
                     if wait_cnt = 0 then
-                        state    <= ST_BOOT_PRECHARGE;
+                        state <= ST_BOOT_PRECHARGE;
                     else
                         wait_cnt <= wait_cnt - 1;
                     end if;
@@ -228,10 +230,13 @@ begin
                     end if;
 
                 when ST_READ_DATA =>
-                    rdata_reg(15 downto 0)  <= sdram_dq;
-                    state                   <= ST_PRECHARGE;
-                    wb_ack_o                <= '1';
+                    rdata_reg(15 downto 0) <= sdram_dq;
+                    state                  <= ST_READ_DATA2;
+
+                when ST_READ_DATA2 =>
                     rdata_reg(31 downto 16) <= sdram_dq;
+                    wb_ack_o                <= '1';
+                    state                   <= ST_PRECHARGE;
 
                 ----------------------------------------------------------------
                 -- Write Sequence (BL = 2)
@@ -246,7 +251,6 @@ begin
                     state          <= ST_WRITE_DATA2;
 
                 when ST_WRITE_DATA2 =>
-                    send_cmd(CMD_NOP);
                     sdram_dqm      <= not latched_sel(3 downto 2);
                     dq_out         <= latched_wdata(31 downto 16);
                     wait_cnt       <= 2; -- tWR recovery

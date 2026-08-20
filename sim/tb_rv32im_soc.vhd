@@ -85,7 +85,8 @@ begin
 
     -- UART Output Monitor (Decodes 115200 Baud TX into text output)
     process
-        constant BIT_TIME : time := 8.68 us; -- 1 / 115200
+        -- 1 / 12500000 = 80 ns per bit (instead of 8.68 us for 115200)
+        constant BIT_TIME : time := 80 ns;
         variable char_byte : std_logic_vector(7 downto 0);
         variable l : line;
     begin

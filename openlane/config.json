@@ -1,0 +1,10 @@
+{
+    "DESIGN_NAME": "CPU_FPGA",
+    "VERILOG_FILES": "dir::src/cpu_fpga.v",
+    "CLOCK_PORT": "clk",
+    "CLOCK_PERIOD": 20.0,
+    "DESIGN_IS_CORE": 0,
+    "FP_CORE_UTIL": 35,
+    "PL_TARGET_DENSITY": 0.40,
+    "PDK": "sky130A"
+}

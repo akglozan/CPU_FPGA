@@ -99,6 +99,18 @@ architecture Structural of rv32im_soc is
     signal gpio_rdata    : std_logic_vector(31 downto 0);
     signal timer_we      : std_logic;
     signal timer_rdata   : std_logic_vector(31 downto 0);
+	 
+	 -- Helper function to select baud rate based on SIMULATION generic
+    function get_baud_rate(is_sim : boolean) return positive is
+    begin
+        if is_sim then
+            return 12500000; -- 12.5 Mbps for fast simulation
+        else
+            return 115200;   -- Standard hardware baud rate
+        end if;
+    end function;
+
+    constant UART_BAUD_RATE : positive := get_baud_rate(SIMULATION);
 
 begin
 
@@ -251,7 +263,7 @@ begin
     U_UART : entity work.uart_tx
         generic map (
             CLK_FREQ  => 50000000,
-            BAUD_RATE => 115200
+            BAUD_RATE => UART_BAUD_RATE
         )
         port map (
             clk      => clk,
