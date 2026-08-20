@@ -78,16 +78,29 @@ begin
     -- ==========================================
     rdata_a <= ram(to_integer(unsigned(addr_a)));
     
-    -- ==========================================
-    -- Port B: Data Channel
+   -- ==========================================
+    -- Port B: Data Channel (Corrected Byte-Enable Write)
     -- ==========================================
     process(clk)
+        variable temp_word : std_logic_vector(31 downto 0);
+        variable idx       : integer;
     begin
         if rising_edge(clk) then 
-            if we_b(0) = '1' then ram(to_integer(unsigned(addr_b)))(7 downto 0)   <= wdata_b(7 downto 0);   end if;
-            if we_b(1) = '1' then ram(to_integer(unsigned(addr_b)))(15 downto 8)  <= wdata_b(15 downto 8);  end if;
-            if we_b(2) = '1' then ram(to_integer(unsigned(addr_b)))(23 downto 16) <= wdata_b(23 downto 16); end if;
-            if we_b(3) = '1' then ram(to_integer(unsigned(addr_b)))(31 downto 24) <= wdata_b(31 downto 24); end if;
+            idx := to_integer(unsigned(addr_b));
+            
+            -- Read current memory state
+            temp_word := ram(idx);
+            
+            -- Apply byte-wise overwrites
+            if we_b(0) = '1' then temp_word(7 downto 0)   := wdata_b(7 downto 0);   end if;
+            if we_b(1) = '1' then temp_word(15 downto 8)  := wdata_b(15 downto 8);  end if;
+            if we_b(2) = '1' then temp_word(23 downto 16) := wdata_b(23 downto 16); end if;
+            if we_b(3) = '1' then temp_word(31 downto 24) := wdata_b(31 downto 24); end if;
+            
+            -- Write back the fully assembled 32-bit word atomically if any byte is enabled
+            if unsigned(we_b) /= 0 then
+                ram(idx) <= temp_word;
+            end if;
         end if;
     end process;
 

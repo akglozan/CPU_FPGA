@@ -76,11 +76,11 @@ architecture rtl of bus_interconnect is
     signal active_slave : slave_sel_t;
 begin
 
-    -- Common shared bus lines to all slaves
-    s0_adr_o <= m_adr_i; s0_dat_o <= m_dat_i; s0_sel_o <= m_sel_i; s0_we_o <= m_we_i; s0_cyc_o <= m_cyc_i;
-    s1_adr_o <= m_adr_i; s1_dat_o <= m_dat_i; s1_sel_o <= m_sel_i; s1_we_o <= m_we_i; s1_cyc_o <= m_cyc_i;
-    s2_adr_o <= m_adr_i; s2_dat_o <= m_dat_i; s2_sel_o <= m_sel_i; s2_we_o <= m_we_i; s2_cyc_o <= m_cyc_i;
-    s3_adr_o <= m_adr_i; s3_dat_o <= m_dat_i; s3_sel_o <= m_sel_i; s3_we_o <= m_we_i; s3_cyc_o <= m_cyc_i;
+    -- Shared payload and address lines
+    s0_adr_o <= m_adr_i; s0_dat_o <= m_dat_i; s0_sel_o <= m_sel_i; s0_we_o <= m_we_i;
+    s1_adr_o <= m_adr_i; s1_dat_o <= m_dat_i; s1_sel_o <= m_sel_i; s1_we_o <= m_we_i;
+    s2_adr_o <= m_adr_i; s2_dat_o <= m_dat_i; s2_sel_o <= m_sel_i; s2_we_o <= m_we_i;
+    s3_adr_o <= m_adr_i; s3_dat_o <= m_dat_i; s3_sel_o <= m_sel_i; s3_we_o <= m_we_i;
 
     -- Target Address Decoding
     process(m_adr_i)
@@ -98,11 +98,18 @@ begin
         end if;
     end process;
 
-    -- Strobe Routing
-    s0_stb_o <= m_stb_i when (active_slave = SEL_BRAM   and m_cyc_i = '1') else '0';
-    s1_stb_o <= m_stb_i when (active_slave = SEL_SDRAM  and m_cyc_i = '1') else '0';
-    s2_stb_o <= m_stb_i when (active_slave = SEL_VGA    and m_cyc_i = '1') else '0';
-    s3_stb_o <= m_stb_i when (active_slave = SEL_PERIPH and m_cyc_i = '1') else '0';
+    -- Qualified Wishbone Control Signal Routing (Gated CYC and STB)
+    s0_cyc_o <= m_cyc_i when (active_slave = SEL_BRAM)   else '0';
+    s0_stb_o <= m_stb_i when (active_slave = SEL_BRAM)   else '0';
+
+    s1_cyc_o <= m_cyc_i when (active_slave = SEL_SDRAM)  else '0';
+    s1_stb_o <= m_stb_i when (active_slave = SEL_SDRAM)  else '0';
+
+    s2_cyc_o <= m_cyc_i when (active_slave = SEL_VGA)    else '0';
+    s2_stb_o <= m_stb_i when (active_slave = SEL_VGA)    else '0';
+
+    s3_cyc_o <= m_cyc_i when (active_slave = SEL_PERIPH) else '0';
+    s3_stb_o <= m_stb_i when (active_slave = SEL_PERIPH) else '0';
 
     -- Return Channel Multiplexer
     process(active_slave, s0_dat_i, s0_ack_i, s1_dat_i, s1_ack_i, 

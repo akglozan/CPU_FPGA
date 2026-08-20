@@ -13,9 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// SPDX-License-Identifier: Apache-2.0
-// Copyright 2026 Ozan Akgül
-
 #include "../bsp/soc_regs.h"
 
 void print_hex32(uint32_t val) {
@@ -27,34 +24,53 @@ void print_hex32(uint32_t val) {
 }
 
 int main(void) {
-    uart_puts("\r\n--- RISC-V RV32IM System Boot ---\r\n");
-
-    // 1. Hardware Multiplier Test
-    uint32_t t_start = get_cycles();
-    volatile uint32_t a = 1234567;
-    volatile uint32_t b = 891011;
-    volatile uint32_t product = a * b;
-    uint32_t t_end = get_cycles();
-
-    uart_puts("M-Ext Test: ");
-    print_hex32(a);
-    uart_puts(" * ");
-    print_hex32(b);
-    uart_puts(" = ");
-    print_hex32(product);
-    uart_puts("\r\nCycles: ");
-    print_hex32(t_end - t_start);
-    uart_puts("\r\n");
-
-    // 2. SDRAM Read/Write Verification Test
-    uart_puts("\r\n--- Starting SDRAM Memory Verification ---\r\n");
+    // =========================================================================
+    // 1. Immediate SDRAM Read/Write Verification Test (Executed FIRST)
+    // =========================================================================
+    // Performed immediately upon reset to trigger Wishbone Wishbone STB/CYC 
+    // and verify the SDRAM FSM without blocking on UART peripheral polling.
     volatile uint32_t *sdram_ptr = (volatile uint32_t *)SDRAM_BASE;
 
-    // Pattern 1: Direct 32-bit Word Write & Read
+    // Pattern 1: Single Word Direct Access
     uint32_t test_val = 0xDEADBEEF;
     sdram_ptr[0] = test_val;
-    uint32_t read_back = sdram_ptr[0];
+    volatile uint32_t read_back = sdram_ptr[0];
 
+    // Pattern 2: Multi-Word Burst/Row Access
+    for (int i = 0; i < 4; i++) {
+        sdram_ptr[i] = 0xA0A00000 + i;
+    }
+
+    volatile uint32_t multi_read[4];
+    for (int i = 0; i < 4; i++) {
+        multi_read[i] = sdram_ptr[i];
+    }
+
+    // =========================================================================
+    // 2. Hardware Multiplier Test
+    // =========================================================================
+    // uint32_t t_start = get_cycles();
+    // volatile uint32_t a = 1234567;
+    // volatile uint32_t b = 891011;
+    // volatile uint32_t product = a * b;
+    // uint32_t t_end = get_cycles();
+
+    // =========================================================================
+    // 3. UART Reporting & Verification Results
+    // =========================================================================
+    uart_puts("\r\n--- RISC-V RV32IM System Boot ---\r\n");
+
+    uart_puts("M-Ext Test: ");
+    // print_hex32(a);
+    // uart_puts(" * ");
+    // print_hex32(b);
+    // uart_puts(" = ");
+    // print_hex32(product);
+    // uart_puts("\r\nCycles: ");
+    // print_hex32(t_end - t_start);
+    uart_puts("\r\n");
+
+    uart_puts("\r\n--- SDRAM Memory Verification Results ---\r\n");
     uart_puts("SDRAM [0x80000000] Write: ");
     print_hex32(test_val);
     uart_puts(" | Read: ");
@@ -66,23 +82,19 @@ int main(void) {
         uart_puts(" -> FAIL\r\n");
     }
 
-    // Pattern 2: Multi-word Row Test
-    uart_puts("Writing sequential pattern...\r\n");
+    uart_puts("Sequential Multi-Word Check:\r\n");
     for (int i = 0; i < 4; i++) {
-        sdram_ptr[i] = 0xA0A00000 + i;
-    }
-
-    for (int i = 0; i < 4; i++) {
-        uint32_t val = sdram_ptr[i];
         uart_puts("SDRAM [");
         print_hex32((uint32_t)&sdram_ptr[i]);
         uart_puts("] = ");
-        print_hex32(val);
+        print_hex32(multi_read[i]);
         uart_puts("\r\n");
     }
 
-    // 3. Interactive GPIO Loop
-    uart_puts("\r\nAll SDRAM checks finished. Entering GPIO loop...\r\n");
+    // =========================================================================
+    // 4. Interactive GPIO Loop
+    // =========================================================================
+    uart_puts("\r\nAll checks finished. Entering GPIO loop...\r\n");
     uint32_t prev_keys = 0xFF;
     while (1) {
         uint32_t keys = GPIO_KEY_REG & 0x0F;

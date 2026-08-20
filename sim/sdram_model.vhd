@@ -22,42 +22,42 @@ end entity sdram_model;
 
 architecture sim of sdram_model is
 
-    -- 64 Mbit Memory Array: 4 Banks x 4096 Rows x 512 Columns x 16-bit
-    -- Behavioral model array: 64K x 16-bit
+    -- Memory Array: 64K x 16-bit words (indexed by word address)
     type ram_type is array (0 to 65535) of std_logic_vector(15 downto 0);
     signal ram_block : ram_type := (others => (others => '0'));
 
-    -- Active row per bank
     type row_array is array (0 to 3) of std_logic_vector(11 downto 0);
     signal active_row   : row_array := (others => (others => '0'));
     signal bank_active  : std_logic_vector(3 downto 0) := (others => '0');
 
-    -- Pipeline registers for CAS latency = 2 and Burst = 2
-    signal read_pipeline_valid : std_logic_vector(2 downto 0) := "000";
-    signal read_pipeline_addr  : integer range 0 to 65535 := 0;
-    signal read_pipeline_addr2 : integer range 0 to 65535 := 0;
+    -- CAS Latency 2 / Burst Length 2 Pipeline Registers
+    signal pipe_valid_1 : std_logic := '0';
+    signal pipe_valid_2 : std_logic := '0';
+    signal pipe_data_1  : std_logic_vector(15 downto 0) := (others => '0');
+    signal pipe_data_2  : std_logic_vector(15 downto 0) := (others => '0');
 
     signal dq_out : std_logic_vector(15 downto 0) := (others => 'Z');
     signal dq_oe  : std_logic := '0';
 
 begin
 
-    dq <= dq_out when dq_oe = '1' else (others => 'Z');
+    dq <= dq_out when (dq_oe = '1') else (others => 'Z');
 
     process(clk)
-        variable cmd        : std_logic_vector(3 downto 0);
-        variable bank_idx   : integer range 0 to 3;
-        variable full_addr  : integer range 0 to 65535;
-        variable addr_vec   : std_logic_vector(15 downto 0);
-        variable row_slice  : std_logic_vector(5 downto 0);
+        variable cmd       : std_logic_vector(3 downto 0);
+        variable bank_idx  : integer range 0 to 3;
+        variable full_addr : integer range 0 to 65535;
+        variable col_word  : integer range 0 to 255;
     begin
         if rising_edge(clk) then
             if cke = '1' then
-                cmd := cs_n & ras_n & cas_n & we_n;
+                cmd      := cs_n & ras_n & cas_n & we_n;
                 bank_idx := to_integer(unsigned(ba));
 
-                -- Shift read pipeline
-                read_pipeline_valid <= read_pipeline_valid(1 downto 0) & '0';
+                -- Advance Read Output Pipeline
+                pipe_valid_1 <= '0';
+                pipe_valid_2 <= pipe_valid_1;
+                pipe_data_2  <= pipe_data_1;
 
                 case cmd is
                     when "0011" => -- ACTIVE
@@ -72,37 +72,38 @@ begin
                         end if;
 
                     when "0101" => -- READ
-                        row_slice := active_row(bank_idx)(5 downto 0);
-                        addr_vec  := ba & row_slice & addr(7 downto 0);
-                        full_addr := to_integer(unsigned(addr_vec));
+                        -- addr(9 downto 1) is the 16-bit word column offset
+                        col_word  := to_integer(unsigned(addr(8 downto 1)));
+                        full_addr := (to_integer(unsigned(active_row(bank_idx)(5 downto 0))) * 256) + col_word;
 
-                        read_pipeline_addr     <= full_addr;
-                        read_pipeline_addr2    <= (full_addr + 1) mod 65536;
-                        read_pipeline_valid(0) <= '1';
+                        pipe_valid_1 <= '1';
+                        pipe_data_1  <= ram_block((full_addr + 1) mod 65536);
+                        
+                        -- First word queued for CAS=2 arrival
+                        dq_out <= ram_block(full_addr mod 65536);
 
                     when "0100" => -- WRITE
-                        row_slice := active_row(bank_idx)(5 downto 0);
-                        addr_vec  := ba & row_slice & addr(7 downto 0);
-                        full_addr := to_integer(unsigned(addr_vec));
+                        col_word  := to_integer(unsigned(addr(8 downto 1)));
+                        full_addr := (to_integer(unsigned(active_row(bank_idx)(5 downto 0))) * 256) + col_word;
 
                         if dqm(0) = '0' then
-                            ram_block(full_addr)(7 downto 0) <= dq(7 downto 0);
+                            ram_block(full_addr mod 65536)(7 downto 0) <= dq(7 downto 0);
                         end if;
                         if dqm(1) = '0' then
-                            ram_block(full_addr)(15 downto 8) <= dq(15 downto 8);
+                            ram_block(full_addr mod 65536)(15 downto 8) <= dq(15 downto 8);
                         end if;
 
                     when others =>
                         null;
                 end case;
 
-                -- Read data drive on CAS Latency = 2
-                if read_pipeline_valid(1) = '1' then
+                -- Drive Data Bus during Active Burst Cycles (CAS=2, BL=2)
+                if pipe_valid_1 = '1' then
+                    dq_oe <= '1';
+                    -- dq_out already holds Word 0 from the READ cycle
+                elsif pipe_valid_2 = '1' then
                     dq_oe  <= '1';
-                    dq_out <= ram_block(read_pipeline_addr);
-                elsif read_pipeline_valid(2) = '1' then
-                    dq_oe  <= '1';
-                    dq_out <= ram_block(read_pipeline_addr2);
+                    dq_out <= pipe_data_2; -- Drive Word 1
                 else
                     dq_oe  <= '0';
                     dq_out <= (others => 'Z');
