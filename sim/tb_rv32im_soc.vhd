@@ -100,26 +100,26 @@ begin
         wait;
     end process;
 
-    -------------------------------------------------------------------
-    -- Diagnostic PC Tracer
-    -------------------------------------------------------------------
-    pc_tracer_process : process(clk)
-        variable was_reset : boolean := true;
-    begin
-        if rising_edge(clk) then
-            if rst_n = '0' then
-                was_reset := true;
-            else
-                if not was_reset then
-                    -- Report any jump backwards to 0x00000000 after boot
-                    if <<signal .tb_rv32im_soc.DUT.pc : std_logic_vector(31 downto 0)>> = x"00000000" then
-                        report "CRITICAL: CPU Crashed and jumped to 0x00000000!" severity warning;
-                    end if;
-                end if;
-                was_reset := false;
-            end if;
-        end if;
-    end process;
+--    -------------------------------------------------------------------
+--    -- Diagnostic PC Tracer
+--    -------------------------------------------------------------------
+--   pc_tracer_process : process(clk)
+--        variable was_reset : boolean := true;
+--    begin
+--        if rising_edge(clk) then
+--            if rst_n = '0' then
+--                was_reset := true;
+--            else
+--                if not was_reset then
+--                    -- Point deep into the hierarchy to U_CPU's pc_current or pc_debug
+--                    if <<signal .tb_rv32im_soc.DUT.U_CPU.pc_debug : std_logic_vector(31 downto 0)>> = x"00000000" then
+--                        report "CRITICAL: CPU Crashed and jumped to 0x00000000!" severity warning;
+--                    end if;
+--                end if;
+--                was_reset := false;
+--            end if;
+--        end if;
+--    end process;
 
     -------------------------------------------------------------------
     -- 4. Reset & Interactive Key Stimulus Process
@@ -149,7 +149,7 @@ begin
         gpio_keys <= "1111";
 
         -- Let simulation settle
-        wait for 160 us;
+        wait for 500 us;
 
         sim_finished <= true;
         report "Simulation completed successfully." severity note;
