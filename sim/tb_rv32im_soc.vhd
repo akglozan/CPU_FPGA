@@ -100,20 +100,27 @@ begin
         wait;
     end process;
 
-	 -------------------------------------------------------------------
+    -------------------------------------------------------------------
     -- Diagnostic PC Tracer
     -------------------------------------------------------------------
     pc_tracer_process : process(clk)
+        variable was_reset : boolean := true;
     begin
         if rising_edge(clk) then
-            if rst_n = '1' then
-                -- Report any jump backwards to 0x00000000 after boot
-                if <<signal DUT.pc : std_logic_vector>> = x"00000000" then
-                    report "CRITICAL: CPU Crashed and jumped to 0x00000000!" severity warning;
+            if rst_n = '0' then
+                was_reset := true;
+            else
+                if not was_reset then
+                    -- Report any jump backwards to 0x00000000 after boot
+                    if <<signal .tb_rv32im_soc.DUT.pc : std_logic_vector(31 downto 0)>> = x"00000000" then
+                        report "CRITICAL: CPU Crashed and jumped to 0x00000000!" severity warning;
+                    end if;
                 end if;
+                was_reset := false;
             end if;
         end if;
     end process;
+
     -------------------------------------------------------------------
     -- 4. Reset & Interactive Key Stimulus Process
     -------------------------------------------------------------------
@@ -149,7 +156,7 @@ begin
         wait;
     end process;
 
-  --------------------------------------------------------------------
+    -------------------------------------------------------------------
     -- 5. Unbuffered Diagnostic UART Monitor
     -------------------------------------------------------------------
     uart_monitor_process : process
@@ -157,34 +164,41 @@ begin
         variable c       : character;
         variable val     : integer;
     begin
-        -- Wait for start bit falling edge
-        wait until falling_edge(uart_tx);
-        wait for BIT_TIME / 2; 
-
-        if uart_tx = '0' then
-            -- Sample 8 data bits (LSB first)
-            for i in 0 to 7 loop
-                wait for BIT_TIME;
-                rx_byte(i) := uart_tx;
-            end loop;
-
-            -- Wait for stop bit
-            wait for BIT_TIME;
-            
-            val := to_integer(unsigned(rx_byte));
-            c := character'val(val);
-
-            -- Print every byte instantly to the transcript
-            if val >= 32 and val <= 126 then
-                report "UART: '" & c & "'" severity note;
-            elsif val = 10 then
-                report "UART: [LF / Newline]" severity note;
-            elsif val = 13 then
-                report "UART: [CR]" severity note;
-            else
-                report "UART: [Raw Byte " & integer'image(val) & "]" severity note;
+        while not sim_finished loop
+            -- Wait for start bit falling edge
+            wait until falling_edge(uart_tx) or sim_finished;
+            if sim_finished then
+                exit;
             end if;
-        end if;
+
+            wait for BIT_TIME / 2; 
+
+            if uart_tx = '0' then
+                -- Sample 8 data bits (LSB first)
+                for i in 0 to 7 loop
+                    wait for BIT_TIME;
+                    rx_byte(i) := uart_tx;
+                end loop;
+
+                -- Wait for stop bit
+                wait for BIT_TIME;
+                
+                val := to_integer(unsigned(rx_byte));
+                c   := character'val(val);
+
+                -- Print every byte instantly to the transcript
+                if val >= 32 and val <= 126 then
+                    report "UART: '" & c & "'" severity note;
+                elsif val = 10 then
+                    report "UART: [LF / Newline]" severity note;
+                elsif val = 13 then
+                    report "UART: [CR]" severity note;
+                else
+                    report "UART: [Raw Byte " & integer'image(val) & "]" severity note;
+                end if;
+            end if;
+        end loop;
+        wait;
     end process;
-	 
+     
 end architecture sim;

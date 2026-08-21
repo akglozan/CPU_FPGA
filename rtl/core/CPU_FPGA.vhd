@@ -161,6 +161,7 @@ begin
         port map (
             clk                     => clk,
             rst_n                   => rst_n,
+            stall_ex_mem_in         => ex_mem_stall_wire,
             ex_pc_in                => ex_pc,
             ex_pc_plus4_in          => ex_pc_plus4,
             ex_imm_ext_in           => ex_imm_ext,

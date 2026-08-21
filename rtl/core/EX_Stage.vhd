@@ -21,6 +21,7 @@ entity EX_Stage is
     port (
         clk                     : in  std_logic;
         rst_n                   : in  std_logic;
+        stall_ex_mem_in         : in  std_logic; -- From Hazard Unit
         
         -- Inputs from ID/EX Register
         ex_pc_in                : in  std_logic_vector(31 downto 0);
@@ -150,10 +151,14 @@ architecture Structural of EX_Stage is
     signal ex_final_result        : std_logic_vector(31 downto 0);
     signal stall_m_wire           : std_logic;
     signal branch_cond_met        : std_logic;
+    signal ex_mem_stall_combined  : std_logic;
+    signal jalr_sum               : unsigned(31 downto 0);
+    signal jal_sum                : unsigned(31 downto 0);
 
 begin
 
     stall_m_out <= stall_m_wire;
+    ex_mem_stall_combined <= stall_m_wire or stall_ex_mem_in;
 
     with forward_a select
         ex_operand_a_forwarded <= ex_reg_data1_in when "00",
@@ -242,14 +247,18 @@ begin
 
     take_branch_out <= (ex_branch_in and branch_cond_met) or ex_jump_in;
 
-    target_pc_out <= std_logic_vector(unsigned(ex_operand_a_forwarded) + unsigned(ex_imm_ext_in)) when (ex_jump_in = '1' and ex_alu_src_in = '1')
-                     else std_logic_vector(unsigned(ex_pc_in) + unsigned(ex_imm_ext_in));
+    jalr_sum <= unsigned(ex_operand_a_forwarded) + unsigned(ex_imm_ext_in);
+    jal_sum  <= unsigned(ex_pc_in) + unsigned(ex_imm_ext_in);
+
+    -- JALR target: Bit 0 is always cleared ('0'); JAL target: PC + imm
+    target_pc_out <= std_logic_vector(jalr_sum(31 downto 1)) & '0' when (ex_jump_in = '1' and ex_alu_src_in = '1')
+                     else std_logic_vector(jal_sum);
 
     U_EX_MEM : EX_MEM_Register
         port map (
             clk                    => clk,
             rst_n                  => rst_n,
-            stall                  => stall_m_wire,
+            stall                  => ex_mem_stall_combined,
             flush                  => '0',
             ex_final_result        => ex_final_result,
             ex_operand_b_forwarded => ex_operand_b_forwarded,

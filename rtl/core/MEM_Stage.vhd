@@ -77,19 +77,39 @@ architecture Structural of MEM_Stage is
 
 begin
 
-    mem_result_fwd_out <= mem_result_in;
-    wb_pc_plus4_out    <= mem_pc_plus4_in;
+    -- Select forwarded data: forward PC+4 if the instruction in MEM is JAL/JALR
+    with mem_wb_sel_in select
+        mem_result_fwd_out <= mem_pc_plus4_in when "10",
+                              mem_result_in   when others;
+
+    wb_pc_plus4_out <= mem_pc_plus4_in;
 
     -- Bus control signals
     is_bus_access <= mem_mem_read_in or mem_mem_write_in;
     wb_adr_o      <= mem_result_in;
-    wb_dat_o      <= mem_write_data_in;
     wb_we_o       <= mem_mem_write_in;
     wb_cyc_o      <= is_bus_access;
     wb_stb_o      <= is_bus_access;
     
     -- Stall the CPU pipeline if bus cycle is active and not acknowledged
     bus_stall_out <= is_bus_access and (not wb_ack_i);
+
+    -- Wishbone write data routing: replicate lower byte/halfword across bus lanes
+    process(mem_funct3_in, mem_write_data_in)
+    begin
+        case mem_funct3_in is
+            when "000" => -- SB: Replicate lower byte across all 4 lanes
+                wb_dat_o <= mem_write_data_in(7 downto 0) & 
+                            mem_write_data_in(7 downto 0) & 
+                            mem_write_data_in(7 downto 0) & 
+                            mem_write_data_in(7 downto 0);
+            when "001" => -- SH: Replicate lower 16 bits across both lanes
+                wb_dat_o <= mem_write_data_in(15 downto 0) & 
+                            mem_write_data_in(15 downto 0);
+            when others => -- SW: Direct 32-bit word
+                wb_dat_o <= mem_write_data_in;
+        end case;
+    end process;
 
     -- Generate Wishbone byte-select signals (SB, SH, SW)
     process(mem_funct3_in, mem_result_in(1 downto 0), mem_mem_write_in)

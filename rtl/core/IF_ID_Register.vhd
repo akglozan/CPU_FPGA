@@ -60,21 +60,22 @@ begin
 
 process(clk)
 begin
-
-	if rising_edge(clk) then
-		if rst_n = '0' then
-			pc_out <= (others => '0');
-			instruction_out <= x"00000013";
-		elsif flush = '1' then
-			instruction_out <= x"00000013";
-			pc_out <= (others => '0');
-		elsif stall = '1' then
-			null;
-		else
-			pc_out <= pc_in;
-			instruction_out <= instruction_in;
-		end if;
-	end if;
+    if rising_edge(clk) then
+        if rst_n = '0' then
+            pc_out          <= (others => '0');
+            instruction_out <= x"00000013"; -- NOP (addi x0, x0, 0)
+        elsif stall = '1' then
+            -- Freeze both PC and instruction during bus wait-states and load hazards
+            null;
+        elsif flush = '1' then
+            -- Insert NOP bubble, but maintain pc_in or clear to avoid invalid link target
+            pc_out          <= (others => '0');
+            instruction_out <= x"00000013"; -- NOP (addi x0, x0, 0)
+        else
+            pc_out          <= pc_in;
+            instruction_out <= instruction_in;
+        end if;
+    end if;
 end process;
 
 

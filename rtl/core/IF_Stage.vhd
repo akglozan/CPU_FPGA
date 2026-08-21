@@ -56,7 +56,7 @@ begin
             pc_plus4  => pc_plus4_wire
         );
 
-    -- IF/ID Pipeline Register (receives data directly from external BRAM)
+    -- IF/ID Pipeline Register
     U_IF_ID : entity work.IF_ID_Register
         port map (
             clk             => clk,

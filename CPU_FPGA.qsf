@@ -27,44 +27,12 @@ set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 # Source Files
 # -------------------------------------------------------------------------- #
 # Core Pipeline Files
-set_global_assignment -name VHDL_FILE rtl/core/Program_Counter.vhd
-set_global_assignment -name VHDL_FILE rtl/core/Instruction_Memory.vhd
-set_global_assignment -name VHDL_FILE rtl/core/IF_ID_Register.vhd
-set_global_assignment -name VHDL_FILE rtl/core/RegFile.vhd
-set_global_assignment -name VHDL_FILE rtl/core/ImmGen.vhd
-set_global_assignment -name VHDL_FILE rtl/core/ID_EX_Register.vhd
-set_global_assignment -name VHDL_FILE rtl/core/Control_Unit.vhd
-set_global_assignment -name VHDL_FILE rtl/core/ALU.vhd
-set_global_assignment -name VHDL_FILE rtl/core/M_Extension_Unit.vhd
-set_global_assignment -name VHDL_FILE rtl/core/Hazard_Unit.vhd
-set_global_assignment -name VHDL_FILE rtl/core/Forwarding_Unit.vhd
-set_global_assignment -name VHDL_FILE rtl/core/EX_MEM_Register.vhd
-set_global_assignment -name VHDL_FILE rtl/core/Data_Memory.vhd
-set_global_assignment -name VHDL_FILE rtl/core/MEM_WB_Register.vhd
-set_global_assignment -name VHDL_FILE rtl/core/IF_Stage.vhd
-set_global_assignment -name VHDL_FILE rtl/core/ID_Stage.vhd
-set_global_assignment -name VHDL_FILE rtl/core/EX_Stage.vhd
-set_global_assignment -name VHDL_FILE rtl/core/MEM_Stage.vhd
-set_global_assignment -name VHDL_FILE rtl/core/CPU_FPGA.vhd
-set_global_assignment -name VHDL_FILE rtl/core/CPU_Top_Wrapper.vhd
 
 # Memory & SoC Interconnect Files
-set_global_assignment -name VHDL_FILE rtl/memory/bram_4kb.vhd
-set_global_assignment -name VHDL_FILE rtl/memory/bus_interconnect.vhd
-set_global_assignment -name VHDL_FILE rtl/rv32im_soc.vhd
 
 # Peripheral Core Files
-set_global_assignment -name VHDL_FILE rtl/peripherals/uart_tx.vhd
-set_global_assignment -name VHDL_FILE rtl/peripherals/Bus_Decoder.vhd
-set_global_assignment -name VHDL_FILE rtl/peripherals/gpio_led.vhd
-set_global_assignment -name VHDL_FILE rtl/peripherals/gpio_key.vhd
-set_global_assignment -name VHDL_FILE rtl/peripherals/timer.vhd
 
 # Simulation Testbenches
-set_global_assignment -name VHDL_FILE sim/tb_CPU_FPGA.vhd
-set_global_assignment -name VHDL_FILE sim/ImmGen_tb.vhd
-set_global_assignment -name VHDL_FILE sim/ALU_tb.vhd
-set_global_assignment -name VHDL_FILE sim/M_Extension_Unit_tb.vhd
 
 # -------------------------------------------------------------------------- #
 # FPGA Physical Pin Assignments (Cyclone IV EP4CE6E22C8)
@@ -107,15 +75,47 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name EDA_DESIGN_ENTRY_SYNTHESIS_TOOL "<None>"
 
-set_global_assignment -name SDC_FILE CPU_FPGA.sdc
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_timing
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_symbol
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_signal_integrity
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_boundary_scan
 set_global_assignment -name EDA_INPUT_DATA_FORMAT EDIF -section_id eda_design_synthesis
-set_global_assignment -name VHDL_FILE sim/tb_rv32im_soc.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Program_Counter.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Instruction_Memory.vhd
+set_global_assignment -name VHDL_FILE rtl/core/IF_ID_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/RegFile.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ImmGen.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ID_EX_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Control_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ALU.vhd
+set_global_assignment -name VHDL_FILE rtl/core/M_Extension_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Hazard_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Forwarding_Unit.vhd
+set_global_assignment -name VHDL_FILE rtl/core/EX_MEM_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/Data_Memory.vhd
+set_global_assignment -name VHDL_FILE rtl/core/MEM_WB_Register.vhd
+set_global_assignment -name VHDL_FILE rtl/core/IF_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/ID_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/EX_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/MEM_Stage.vhd
+set_global_assignment -name VHDL_FILE rtl/core/CPU_FPGA.vhd
+set_global_assignment -name VHDL_FILE rtl/core/CPU_Top_Wrapper.vhd
+set_global_assignment -name VHDL_FILE rtl/memory/bram_4kb.vhd
+set_global_assignment -name VHDL_FILE rtl/memory/bus_interconnect.vhd
+set_global_assignment -name VHDL_FILE rtl/rv32im_soc.vhd
+set_global_assignment -name VHDL_FILE rtl/peripherals/uart_tx.vhd
+set_global_assignment -name VHDL_FILE rtl/peripherals/Bus_Decoder.vhd
+set_global_assignment -name VHDL_FILE rtl/peripherals/gpio_led.vhd
+set_global_assignment -name VHDL_FILE rtl/peripherals/gpio_key.vhd
+set_global_assignment -name VHDL_FILE rtl/peripherals/timer.vhd
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_CPU_FPGA.vhd
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/ImmGen_tb.vhd
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/ALU_tb.vhd
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/M_Extension_Unit_tb.vhd
+set_global_assignment -name SDC_FILE CPU_FPGA.sdc
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_rv32im_soc.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/sdram_controller.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/periph_bridge.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/periph_bridge.vhd
-set_global_assignment -name VHDL_FILE sim/sdram_model.vhd
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/sdram_model.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
