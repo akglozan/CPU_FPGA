@@ -22,7 +22,6 @@ end entity sdram_model;
 
 architecture sim of sdram_model is
 
-    -- Memory Array: 64K x 16-bit words (indexed by word address)
     type ram_type is array (0 to 65535) of std_logic_vector(15 downto 0);
     signal ram_block : ram_type := (others => (others => '0'));
 
@@ -30,18 +29,23 @@ architecture sim of sdram_model is
     signal active_row   : row_array := (others => (others => '0'));
     signal bank_active  : std_logic_vector(3 downto 0) := (others => '0');
 
-    -- CAS Latency 2 / Burst Length 2 Pipeline Registers
-    signal pipe_valid_1 : std_logic := '0';
-    signal pipe_valid_2 : std_logic := '0';
-    signal pipe_data_1  : std_logic_vector(15 downto 0) := (others => '0');
-    signal pipe_data_2  : std_logic_vector(15 downto 0) := (others => '0');
-
-    signal dq_out : std_logic_vector(15 downto 0) := (others => 'Z');
-    signal dq_oe  : std_logic := '0';
+    -- CAS Latency 2 Read Pipeline
+    signal read_valid_0 : std_logic := '0';
+    signal read_valid_1 : std_logic := '0';
+    signal read_valid_2 : std_logic := '0';
+    signal word0_reg    : std_logic_vector(15 downto 0) := (others => '0');
+    signal word1_reg    : std_logic_vector(15 downto 0) := (others => '0');
+    
+    -- Burst Write Tracking
+    signal write_active : std_logic := '0';
+    signal write_addr   : integer range 0 to 65535 := 0;
 
 begin
 
-    dq <= dq_out when (dq_oe = '1') else (others => 'Z');
+    -- Tri-state buffer for DQ (delayed by 1 clock to match CAS 2)
+    dq <= word0_reg when (read_valid_1 = '1') else
+          word1_reg when (read_valid_2 = '1') else
+          (others => 'Z');
 
     process(clk)
         variable cmd       : std_logic_vector(3 downto 0);
@@ -53,11 +57,22 @@ begin
             if cke = '1' then
                 cmd      := cs_n & ras_n & cas_n & we_n;
                 bank_idx := to_integer(unsigned(ba));
-
-                -- Advance Read Output Pipeline
-                pipe_valid_1 <= '0';
-                pipe_valid_2 <= pipe_valid_1;
-                pipe_data_2  <= pipe_data_1;
+                
+                -- Shift read valid pipeline
+                read_valid_2 <= read_valid_1;
+                read_valid_1 <= read_valid_0;
+                read_valid_0 <= '0';
+                
+                -- Execute Cycle 2 of Burst Write
+                if write_active = '1' then
+                    if dqm(0) = '0' then
+                        ram_block((write_addr + 1) mod 65536)(7 downto 0) <= dq(7 downto 0);
+                    end if;
+                    if dqm(1) = '0' then
+                        ram_block((write_addr + 1) mod 65536)(15 downto 8) <= dq(15 downto 8);
+                    end if;
+                    write_active <= '0';
+                end if;
 
                 case cmd is
                     when "0011" => -- ACTIVE
@@ -72,17 +87,16 @@ begin
                         end if;
 
                     when "0101" => -- READ
-                        -- addr(9 downto 1) is the 16-bit word column offset
                         col_word  := to_integer(unsigned(addr(8 downto 1)));
                         full_addr := (to_integer(unsigned(active_row(bank_idx)(5 downto 0))) * 256) + col_word;
 
-                        pipe_valid_1 <= '1';
-                        pipe_data_1  <= ram_block((full_addr + 1) mod 65536);
+                        word0_reg <= ram_block(full_addr mod 65536);
+                        word1_reg <= ram_block((full_addr + 1) mod 65536);
                         
-                        -- First word queued for CAS=2 arrival
-                        dq_out <= ram_block(full_addr mod 65536);
+                        -- Trigger pipeline (data appears on pins at Latency Edge 2)
+                        read_valid_0 <= '1';
 
-                    when "0100" => -- WRITE
+                    when "0100" => -- WRITE (Cycle 1)
                         col_word  := to_integer(unsigned(addr(8 downto 1)));
                         full_addr := (to_integer(unsigned(active_row(bank_idx)(5 downto 0))) * 256) + col_word;
 
@@ -92,23 +106,14 @@ begin
                         if dqm(1) = '0' then
                             ram_block(full_addr mod 65536)(15 downto 8) <= dq(15 downto 8);
                         end if;
+                        
+                        -- Queue up Cycle 2
+                        write_active <= '1';
+                        write_addr   <= full_addr mod 65536;
 
                     when others =>
                         null;
                 end case;
-
-                -- Drive Data Bus during Active Burst Cycles (CAS=2, BL=2)
-                if pipe_valid_1 = '1' then
-                    dq_oe <= '1';
-                    -- dq_out already holds Word 0 from the READ cycle
-                elsif pipe_valid_2 = '1' then
-                    dq_oe  <= '1';
-                    dq_out <= pipe_data_2; -- Drive Word 1
-                else
-                    dq_oe  <= '0';
-                    dq_out <= (others => 'Z');
-                end if;
-
             end if;
         end if;
     end process;

@@ -99,6 +99,8 @@ architecture Structural of rv32im_soc is
     signal gpio_rdata    : std_logic_vector(31 downto 0);
     signal timer_we      : std_logic;
     signal timer_rdata   : std_logic_vector(31 downto 0);
+    -- Add this alongside your other internal signals
+    signal timer_rdata_wire : std_logic_vector(31 downto 0);
 	 
 	 -- Helper function to select baud rate based on SIMULATION generic
     function get_baud_rate(is_sim : boolean) return positive is
@@ -253,8 +255,8 @@ begin
             uart_rdata  => uart_rdata,
             gpio_we     => gpio_we,
             gpio_rdata  => gpio_rdata,
-            timer_we    => timer_we,
-            timer_rdata => timer_rdata
+            timer_we    => open,          
+            timer_rdata => timer_rdata_wire
         );
 
     -- 7. UART Transmitter Peripheral
@@ -297,7 +299,7 @@ begin
         port map (
             clk         => clk,
             rst_n       => rst_n,
-            timer_rdata => timer_rdata
+            timer_rdata => timer_rdata_wire
         );
 
 end architecture Structural;

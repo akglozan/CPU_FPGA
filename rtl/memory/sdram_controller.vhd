@@ -1,5 +1,12 @@
 -- SPDX-License-Identifier: Apache-2.0
--- Copyright 2026 Ozan Akgül
+-- Copyright 2026 Ozan Akgul
+--
+-- REVERTED: wait_cnt in ST_READ_CMD restored to 1 (original value).
+-- The actual bug was NOT a wait-count mismatch -- it was in sdram_model.vhd,
+-- where dq_oe was registered one cycle behind dq_out, causing Word 0 to
+-- never actually appear on the sdram_dq bus (see corrected sdram_model.vhd).
+-- With that model fix applied, this controller's original CAS-latency
+-- timing (wait_cnt <= 1) is correct and should NOT be changed to 2.
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -90,7 +97,6 @@ begin
             else
                 refresh_cnt <= refresh_cnt + 1;
             end if;
-
             if state = ST_REFRESH then
                 refresh_req <= '0';
             end if;
@@ -184,7 +190,7 @@ begin
                         latched_adr   <= wb_adr_i;
                         latched_wdata <= wb_dat_i;
                         latched_sel   <= wb_sel_i;
-                        
+
                         -- Issue ACTIVE command
                         send_cmd(CMD_ACTIVE);
                         sdram_ba   <= wb_adr_i(23 downto 22); -- Bank
@@ -219,7 +225,7 @@ begin
                     sdram_ba       <= latched_adr(23 downto 22);
                     sdram_addr     <= "00" & latched_adr(9 downto 1) & '0'; -- 16-bit aligned col
                     sdram_dqm      <= "00";
-                    wait_cnt       <= 1; -- CAS-1 cycles
+                    wait_cnt       <= 1; -- CAS-1 cycles (RESTORED to original value)
                     state          <= ST_READ_WAIT;
 
                 when ST_READ_WAIT =>

@@ -51,23 +51,25 @@ end entity MEM_Stage;
 architecture Structural of MEM_Stage is
 
     component MEM_WB_Register is
-        port (
-            clk              : in  std_logic;
-            rst_n            : in  std_logic;
-            stall            : in  std_logic;
-            flush            : in  std_logic;
-            mem_result_in    : in  std_logic_vector(31 downto 0);
-            mem_read_data_in : in  std_logic_vector(31 downto 0);
-            rd_addr_in       : in  std_logic_vector(4 downto 0);
-            reg_write_in     : in  std_logic;
-            wb_sel_in        : in  std_logic_vector(1 downto 0);
-            wb_result_out    : out std_logic_vector(31 downto 0);
-            wb_read_data_out : out std_logic_vector(31 downto 0);
-            wb_rd_addr_out   : out std_logic_vector(4 downto 0);
-            wb_reg_write_out : out std_logic;
-            wb_sel_out       : out std_logic_vector(1 downto 0)
-        );
-    end component;
+    port (
+        clk              : in  std_logic;
+        rst_n            : in  std_logic;
+        stall            : in  std_logic;
+        flush            : in  std_logic;
+        mem_result_in    : in  std_logic_vector(31 downto 0);
+        mem_read_data_in : in  std_logic_vector(31 downto 0);
+        mem_pc_plus4_in  : in  std_logic_vector(31 downto 0); -- ADD THIS LINE
+        rd_addr_in       : in  std_logic_vector(4 downto 0);
+        reg_write_in     : in  std_logic;
+        wb_sel_in        : in  std_logic_vector(1 downto 0);
+        wb_result_out    : out std_logic_vector(31 downto 0);
+        wb_read_data_out : out std_logic_vector(31 downto 0);
+        wb_pc_plus4_out  : out std_logic_vector(31 downto 0); -- ADD THIS LINE
+        wb_rd_addr_out   : out std_logic_vector(4 downto 0);
+        wb_reg_write_out : out std_logic;
+        wb_sel_out       : out std_logic_vector(1 downto 0)
+    );
+end component;
 
     signal is_bus_access   : std_logic;
     signal byte_enable     : std_logic_vector(3 downto 0);
@@ -82,7 +84,7 @@ begin
         mem_result_fwd_out <= mem_pc_plus4_in when "10",
                               mem_result_in   when others;
 
-    wb_pc_plus4_out <= mem_pc_plus4_in;
+   
 
     -- Bus control signals
     is_bus_access <= mem_mem_read_in or mem_mem_write_in;
@@ -169,11 +171,13 @@ begin
             flush            => '0',
             mem_result_in    => mem_result_in,
             mem_read_data_in => formatted_rdata,
+            mem_pc_plus4_in  => mem_pc_plus4_in,
             rd_addr_in       => mem_rd_addr_in,
             reg_write_in     => mem_reg_write_in,
             wb_sel_in        => mem_wb_sel_in,
             wb_result_out    => wb_result_out,
             wb_read_data_out => wb_read_data_out,
+            wb_pc_plus4_out  => wb_pc_plus4_out,  
             wb_rd_addr_out   => wb_rd_addr_out,
             wb_reg_write_out => wb_reg_write_out,
             wb_sel_out       => wb_sel_out

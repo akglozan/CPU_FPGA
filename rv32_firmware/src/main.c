@@ -49,11 +49,11 @@ int main(void) {
     // =========================================================================
     // 2. Hardware Multiplier Test
     // =========================================================================
-    // uint32_t t_start = get_cycles();
-    // volatile uint32_t a = 1234567;
-    // volatile uint32_t b = 891011;
-    // volatile uint32_t product = a * b;
-    // uint32_t t_end = get_cycles();
+  //  uint32_t t_start = get_cycles();
+    volatile uint32_t a = 1234567;
+    volatile uint32_t b = 891011;
+    volatile uint32_t product = a * b;
+  //  uint32_t t_end = get_cycles();
 
     // =========================================================================
     // 3. UART Reporting & Verification Results
@@ -61,13 +61,13 @@ int main(void) {
     uart_puts("\r\n--- RISC-V RV32IM System Boot ---\r\n");
 
     uart_puts("M-Ext Test: ");
-    // print_hex32(a);
-    // uart_puts(" * ");
-    // print_hex32(b);
-    // uart_puts(" = ");
-    // print_hex32(product);
-    // uart_puts("\r\nCycles: ");
-    // print_hex32(t_end - t_start);
+    print_hex32(a);
+    uart_puts(" * ");
+    print_hex32(b);
+    uart_puts(" = ");
+    print_hex32(product);
+    uart_puts("\r\nCycles: ");
+  //  print_hex32(t_end - t_start);
     uart_puts("\r\n");
 
     uart_puts("\r\n--- SDRAM Memory Verification Results ---\r\n");

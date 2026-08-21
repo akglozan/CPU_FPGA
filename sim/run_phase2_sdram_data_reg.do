@@ -2,6 +2,14 @@
 # ModelSim / QuestaSim Automated Simulation Script (.do)
 # Target: tb_rv32im_soc
 # Execution Directory: akglozan-cpu_fpga/sim/
+#
+# UPDATED: Added waveform/list probes for the newly-registered
+# wb_pc_plus4 path (MEM_WB_Register fix for JAL/JALR ra corruption).
+# Compile order below is unchanged and already correct: MEM_WB_Register.vhd
+# is compiled in Section 3 BEFORE MEM_Stage.vhd in Section 4, so as long as
+# the on-disk MEM_WB_Register.vhd/MEM_Stage.vhd contain the fixed 6-port
+# interface, vopt-1130 will not recur. If you still see it, delete the work
+# library and confirm both files on disk match the fixed versions before rerun.
 # ==============================================================================
 
 # 1. Close any active simulation and reset work library
@@ -26,6 +34,9 @@ vcom -2008 -work work ../rtl/core/Instruction_Memory.vhd
 vcom -2008 -work work ../rtl/core/Data_Memory.vhd
 
 # 3. Compile Core Pipeline Registers (Prior to Stages)
+#    MEM_WB_Register.vhd MUST be compiled here, before MEM_Stage.vhd in
+#    Section 4, otherwise vopt will elaborate MEM_Stage's component
+#    instantiation against a stale/old entity interface (vopt-1130).
 vcom -2008 -work work ../rtl/core/IF_ID_Register.vhd
 vcom -2008 -work work ../rtl/core/ID_EX_Register.vhd
 vcom -2008 -work work ../rtl/core/EX_MEM_Register.vhd
@@ -70,6 +81,15 @@ add wave -noupdate -divider "CPU Execution Context"
 add wave -noupdate -radix hexadecimal /tb_rv32im_soc/DUT/pc
 add wave -noupdate -radix hexadecimal /tb_rv32im_soc/DUT/instr
 add wave -noupdate -radix binary      /tb_rv32im_soc/DUT/U_CPU/bus_stall_wire
+
+add wave -noupdate -divider "MEM/WB Register Fix -- JAL/JALR Return Address (ra)"
+add wave -noupdate -radix hexadecimal /tb_rv32im_soc/DUT/U_CPU/mem_pc_plus4
+add wave -noupdate -radix hexadecimal /tb_rv32im_soc/DUT/U_CPU/wb_pc_plus4
+add wave -noupdate -radix binary      /tb_rv32im_soc/DUT/U_CPU/mem_wb_sel
+add wave -noupdate -radix binary      /tb_rv32im_soc/DUT/U_CPU/wb_sel
+add wave -noupdate -radix unsigned    /tb_rv32im_soc/DUT/U_CPU/wb_rd_addr
+add wave -noupdate -radix binary      /tb_rv32im_soc/DUT/U_CPU/wb_reg_write
+add wave -noupdate -radix hexadecimal /tb_rv32im_soc/DUT/U_CPU/wb_rd_data
 
 add wave -noupdate -divider "Wishbone Master (CPU MEM Stage)"
 add wave -noupdate -radix hexadecimal /tb_rv32im_soc/DUT/U_INTERCONNECT/m_adr_i
@@ -118,6 +138,9 @@ view list
 add list -radix hexadecimal /tb_rv32im_soc/DUT/pc
 add list -radix hexadecimal /tb_rv32im_soc/DUT/instr
 add list -radix binary      /tb_rv32im_soc/DUT/U_CPU/bus_stall_wire
+add list -radix hexadecimal /tb_rv32im_soc/DUT/U_CPU/wb_pc_plus4
+add list -radix hexadecimal /tb_rv32im_soc/DUT/U_CPU/wb_rd_data
+add list -radix unsigned    /tb_rv32im_soc/DUT/U_CPU/wb_rd_addr
 add list -radix binary      /tb_rv32im_soc/DUT/U_INTERCONNECT/s1_cyc_o
 add list -radix binary      /tb_rv32im_soc/DUT/U_INTERCONNECT/s1_stb_o
 add list -radix binary      /tb_rv32im_soc/DUT/U_INTERCONNECT/s1_we_o
@@ -134,8 +157,8 @@ add list -radix hexadecimal /tb_rv32im_soc/sdram_addr
 add list -radix hexadecimal /tb_rv32im_soc/sdram_dq
 
 # 11. Run Simulation
-run 50 us
+run 2 ms
 
 # 12. Export List Buffer to File & Adjust Wave Window Zoom
 write list sim_trace.txt
-WaveRestoreZoom {0 ns} {50 us}
+WaveRestoreZoom {0 ns} {2 ms}

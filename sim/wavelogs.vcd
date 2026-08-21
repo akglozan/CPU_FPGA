@@ -1,0 +1,16 @@
+$date
+	Fri Aug 21 06:23:26 2026
+$end
+$version
+	Questa Altera Starter FPGA Edition Version 2025.2
+$end
+$timescale
+	1ps
+$end
+$scope module tb_rv32im_soc $end
+$scope module DUT $end
+$scope module U_SDRAM $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
