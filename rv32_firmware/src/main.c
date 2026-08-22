@@ -1,67 +1,23 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright 2026 Ozan Akgül
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+#include <stdint.h>
+#include "soc_regs.h"
 
-#include "../bsp/soc_regs.h"
-
-void print_hex32(uint32_t val) {
-    static const char hex_chars[] = "0123456789ABCDEF";
-    uart_puts("0x");
-    for (int i = 28; i >= 0; i -= 4) {
-        uart_putc(hex_chars[(val >> i) & 0x0F]);
-    }
+static void uart_putc(uint8_t c)
+{
+    UART_TX = (uint32_t)c;
 }
 
-int main(void) {
-    // =========================================================================
-    // 1. Hardware Multiplier Test (Executed in Internal BRAM)
-    // =========================================================================
-    uint32_t t_start = get_cycles();
-    volatile uint32_t a = 1234567;
-    volatile uint32_t b = 891011;
-    volatile uint32_t product = a * b;
-    uint32_t t_end = get_cycles();
+int main(void)
+{
+    GPIO_LED = 0x00000000u;
 
-    // =========================================================================
-    // 2. UART Reporting & Verification Results
-    // =========================================================================
-    uart_puts("\r\n--- RISC-V RV32IM System Boot ---\r\n");
+    uart_putc('A');
+    uart_putc('B');
+    uart_putc('C');
+    uart_putc('\r');
+    uart_putc('\n');
 
-    uart_puts("M-Ext Test: ");
-    print_hex32(a);
-    uart_puts(" * ");
-    print_hex32(b);
-    uart_puts(" = ");
-    print_hex32(product);
-    uart_puts("\r\nCycles: ");
-    print_hex32(t_end - t_start);
-    uart_puts("\r\n");
-
-    // =========================================================================
-    // 3. Interactive GPIO Loop
-    // =========================================================================
-    uart_puts("\r\nAll checks finished. Entering GPIO loop...\r\n");
-    uint32_t prev_keys = 0xFF;
     while (1) {
-        uint32_t keys = GPIO_KEY_REG & 0x0F;
-        GPIO_LED_REG = keys;
-        if (keys != prev_keys) {
-            uart_puts("Key State: ");
-            print_hex32(keys);
-            uart_puts("\r\n");
-            prev_keys = keys;
-        }
+        GPIO_LED = 0x00000000u;
     }
 
     return 0;

@@ -1,186 +1,131 @@
--- SPDX-License-Identifier: Apache-2.0
--- Copyright 2026 Ozan Akgül
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.NUMERIC_STD.all;
-
-entity MEM_Stage is
+entity mem_stage is
     port (
-        clk                 : in  std_logic;
-        rst_n               : in  std_logic;
-        stall_wb            : in  std_logic; -- From Hazard Unit
-        
-        -- Inputs from EX/MEM Pipeline Register
-        mem_result_in       : in  std_logic_vector(31 downto 0);
-        mem_write_data_in   : in  std_logic_vector(31 downto 0);
-        mem_rd_addr_in      : in  std_logic_vector(4 downto 0);
-        mem_pc_plus4_in     : in  std_logic_vector(31 downto 0);
-        mem_reg_write_in    : in  std_logic;
-        mem_mem_read_in     : in  std_logic;
-        mem_mem_write_in    : in  std_logic;
-        mem_wb_sel_in       : in  std_logic_vector(1 downto 0);
-        mem_funct3_in       : in  std_logic_vector(2 downto 0);
-        
-        -- Wishbone B4 Master Port (To bus_interconnect)
-        wb_adr_o            : out std_logic_vector(31 downto 0);
-        wb_dat_o            : out std_logic_vector(31 downto 0);
-        wb_dat_i            : in  std_logic_vector(31 downto 0);
-        wb_sel_o            : out std_logic_vector(3 downto 0);
-        wb_we_o             : out std_logic;
-        wb_stb_o            : out std_logic;
-        wb_cyc_o            : out std_logic;
-        wb_ack_i            : in  std_logic;
-        
-        -- Hazard Stall Output to Hazard Unit
-        bus_stall_out       : out std_logic;
+        clk   : in std_logic;
+        rst_n : in std_logic;
 
-        -- Feedback Output for EX Stage Forwarding Unit
-        mem_result_fwd_out  : out std_logic_vector(31 downto 0);
-        
-        -- Outputs to WB Stage
-        wb_result_out       : out std_logic_vector(31 downto 0);
-        wb_read_data_out    : out std_logic_vector(31 downto 0);
-        wb_rd_addr_out      : out std_logic_vector(4 downto 0);
-        wb_reg_write_out    : out std_logic;
-        wb_sel_out          : out std_logic_vector(1 downto 0);
-        wb_pc_plus4_out     : out std_logic_vector(31 downto 0)
+        stall_wb : in std_logic;
+
+        mem_addr       : in std_logic_vector(31 downto 0);
+        mem_result     : in std_logic_vector(31 downto 0);
+        mem_write_data : in std_logic_vector(31 downto 0);
+        mem_rd_addr    : in std_logic_vector(4 downto 0);
+        mem_pc_plus4 : in std_logic_vector(31 downto 0);
+
+        mem_reg_write  : in std_logic;
+        mem_read       : in std_logic;
+        mem_write      : in std_logic;
+        mem_wb_sel      : in std_logic_vector(1 downto 0);
+        mem_funct3      : in std_logic_vector(2 downto 0);
+
+        wb_addr_o      : out std_logic_vector(31 downto 0);
+        wb_data_o      : out std_logic_vector(31 downto 0);
+        wb_data_i      : in  std_logic_vector(31 downto 0);
+        wb_sel_o       : out std_logic_vector(3 downto 0);
+        wb_we_o        : out std_logic;
+        wb_stb_o       : out std_logic;
+        wb_cyc_o       : out std_logic;
+        wb_ack_i       : in  std_logic;
+
+        bus_stall_o    : out std_logic;
+
+        wb_result_o    : out std_logic_vector(31 downto 0);
+        wb_read_data_o : out std_logic_vector(31 downto 0);
+        wb_rd_addr_o   : out std_logic_vector(4 downto 0);
+        wb_pc_plus4_o  : out std_logic_vector(31 downto 0);
+        wb_reg_write_o : out std_logic;
+        wb_sel_o       : out std_logic_vector(1 downto 0)
     );
-end entity MEM_Stage;
+end entity mem_stage;
 
-architecture Structural of MEM_Stage is
+architecture rtl of mem_stage is
 
-    component MEM_WB_Register is
-    port (
-        clk              : in  std_logic;
-        rst_n            : in  std_logic;
-        stall            : in  std_logic;
-        flush            : in  std_logic;
-        mem_result_in    : in  std_logic_vector(31 downto 0);
-        mem_read_data_in : in  std_logic_vector(31 downto 0);
-        mem_pc_plus4_in  : in  std_logic_vector(31 downto 0); -- ADD THIS LINE
-        rd_addr_in       : in  std_logic_vector(4 downto 0);
-        reg_write_in     : in  std_logic;
-        wb_sel_in        : in  std_logic_vector(1 downto 0);
-        wb_result_out    : out std_logic_vector(31 downto 0);
-        wb_read_data_out : out std_logic_vector(31 downto 0);
-        wb_pc_plus4_out  : out std_logic_vector(31 downto 0); -- ADD THIS LINE
-        wb_rd_addr_out   : out std_logic_vector(4 downto 0);
-        wb_reg_write_out : out std_logic;
-        wb_sel_out       : out std_logic_vector(1 downto 0)
-    );
-end component;
-
-    signal is_bus_access   : std_logic;
-    signal byte_enable     : std_logic_vector(3 downto 0);
-    signal selected_byte   : std_logic_vector(7 downto 0);
-    signal selected_half   : std_logic_vector(15 downto 0);
-    signal formatted_rdata : std_logic_vector(31 downto 0);
+    signal bus_access : std_logic;
+    signal byte_sel   : std_logic_vector(3 downto 0);
 
 begin
 
-    -- Select forwarded data: forward PC+4 if the instruction in MEM is JAL/JALR
-    with mem_wb_sel_in select
-        mem_result_fwd_out <= mem_pc_plus4_in when "10",
-                              mem_result_in   when others;
+    bus_access <= mem_read or mem_write;
 
-   
+    -- Complete 32-bit byte address.
+    wb_addr_o <= mem_addr;
 
-    -- Bus control signals
-    is_bus_access <= mem_mem_read_in or mem_mem_write_in;
-    wb_adr_o      <= mem_result_in;
-    wb_we_o       <= mem_mem_write_in;
-    wb_cyc_o      <= is_bus_access;
-    wb_stb_o      <= is_bus_access;
-    
-    -- Stall the CPU pipeline if bus cycle is active and not acknowledged
-    bus_stall_out <= is_bus_access and (not wb_ack_i);
+    wb_we_o  <= mem_write;
+    wb_cyc_o <= bus_access;
+    wb_stb_o <= bus_access;
 
-    -- Wishbone write data routing: replicate lower byte/halfword across bus lanes
-    process(mem_funct3_in, mem_write_data_in)
+    bus_stall_o <= bus_access and not wb_ack_i;
+
+    process (mem_funct3, mem_addr, mem_write)
     begin
-        case mem_funct3_in is
-            when "000" => -- SB: Replicate lower byte across all 4 lanes
-                wb_dat_o <= mem_write_data_in(7 downto 0) & 
-                            mem_write_data_in(7 downto 0) & 
-                            mem_write_data_in(7 downto 0) & 
-                            mem_write_data_in(7 downto 0);
-            when "001" => -- SH: Replicate lower 16 bits across both lanes
-                wb_dat_o <= mem_write_data_in(15 downto 0) & 
-                            mem_write_data_in(15 downto 0);
-            when others => -- SW: Direct 32-bit word
-                wb_dat_o <= mem_write_data_in;
-        end case;
-    end process;
+        byte_sel <= "1111";
 
-    -- Generate Wishbone byte-select signals (SB, SH, SW)
-    process(mem_funct3_in, mem_result_in(1 downto 0), mem_mem_write_in)
-    begin
-        if mem_mem_write_in = '1' then
-            case mem_funct3_in is
-                when "000" => -- SB
-                    case mem_result_in(1 downto 0) is
-                        when "00"   => byte_enable <= "0001";
-                        when "01"   => byte_enable <= "0010";
-                        when "10"   => byte_enable <= "0100";
-                        when others => byte_enable <= "1000";
+        if mem_write = '1' then
+            case mem_funct3 is
+                when "000" =>
+                    case mem_addr(1 downto 0) is
+                        when "00" => byte_sel <= "0001";
+                        when "01" => byte_sel <= "0010";
+                        when "10" => byte_sel <= "0100";
+                        when others => byte_sel <= "1000";
                     end case;
-                when "001" => -- SH
-                    if mem_result_in(1) = '0' then
-                        byte_enable <= "0011";
+
+                when "001" =>
+                    if mem_addr(1) = '0' then
+                        byte_sel <= "0011";
                     else
-                        byte_enable <= "1100";
+                        byte_sel <= "1100";
                     end if;
-                when others => -- SW
-                    byte_enable <= "1111";
+
+                when others =>
+                    byte_sel <= "1111";
             end case;
-        else
-            byte_enable <= "1111"; -- Full read
         end if;
     end process;
-    
-    wb_sel_o <= byte_enable;
 
-    -- Read Data Formatting (LB, LH, LW, LBU, LHU)
-    with mem_result_in(1 downto 0) select
-        selected_byte <= wb_dat_i(7 downto 0)   when "00",
-                         wb_dat_i(15 downto 8)  when "01",
-                         wb_dat_i(23 downto 16) when "10",
-                         wb_dat_i(31 downto 24) when others;
+    wb_sel_o <= byte_sel;
 
-    selected_half <= wb_dat_i(15 downto 0) when mem_result_in(1) = '0' 
-                     else wb_dat_i(31 downto 16);
-
-    process(mem_funct3_in, selected_byte, selected_half, wb_dat_i)
+    process (mem_funct3, mem_write_data)
     begin
-        case mem_funct3_in is
-            when "000"  => formatted_rdata <= std_logic_vector(resize(signed(selected_byte), 32));
-            when "001"  => formatted_rdata <= std_logic_vector(resize(signed(selected_half), 32));
-            when "010"  => formatted_rdata <= wb_dat_i;
-            when "100"  => formatted_rdata <= std_logic_vector(resize(unsigned(selected_byte), 32));
-            when "101"  => formatted_rdata <= std_logic_vector(resize(unsigned(selected_half), 32));
-            when others => formatted_rdata <= wb_dat_i;
+        case mem_funct3 is
+            when "000" =>
+                wb_data_o <= mem_write_data(7 downto 0) &
+                             mem_write_data(7 downto 0) &
+                             mem_write_data(7 downto 0) &
+                             mem_write_data(7 downto 0);
+
+            when "001" =>
+                wb_data_o <= mem_write_data(15 downto 0) &
+                             mem_write_data(15 downto 0);
+
+            when others =>
+                wb_data_o <= mem_write_data;
         end case;
     end process;
 
-    U_MEM_WB : MEM_WB_Register
+    u_mem_wb_register : entity work.mem_wb_register
         port map (
-            clk              => clk,
-            rst_n            => rst_n,
-            stall            => stall_wb,
-            flush            => '0',
-            mem_result_in    => mem_result_in,
-            mem_read_data_in => formatted_rdata,
-            mem_pc_plus4_in  => mem_pc_plus4_in,
-            rd_addr_in       => mem_rd_addr_in,
-            reg_write_in     => mem_reg_write_in,
-            wb_sel_in        => mem_wb_sel_in,
-            wb_result_out    => wb_result_out,
-            wb_read_data_out => wb_read_data_out,
-            wb_pc_plus4_out  => wb_pc_plus4_out,  
-            wb_rd_addr_out   => wb_rd_addr_out,
-            wb_reg_write_out => wb_reg_write_out,
-            wb_sel_out       => wb_sel_out
+            clk           => clk,
+            rst_n         => rst_n,
+            stall         => stall_wb,
+            flush         => '0',
+
+            mem_result    => mem_result,
+            mem_read_data => wb_data_i,
+            mem_pc_plus4 => mem_pc_plus4,
+            mem_rd_addr   => mem_rd_addr,
+            mem_reg_write => mem_reg_write,
+            mem_wb_sel     => mem_wb_sel,
+
+            wb_result     => wb_result_o,
+            wb_read_data  => wb_read_data_o,
+            wb_pc_plus4   => wb_pc_plus4_o,
+            wb_rd_addr    => wb_rd_addr_o,
+            wb_reg_write  => wb_reg_write_o,
+            wb_wb_sel     => wb_sel_o
         );
 
-end architecture Structural;
+end architecture rtl;

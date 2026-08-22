@@ -1,26 +1,21 @@
--- SPDX-License-Identifier: Apache-2.0
--- Copyright 2026 Ozan Akgül
-
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.NUMERIC_STD.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity rv32im_soc is
-	generic (
-        SIMULATION : boolean := false
+    generic (
+        simulation : boolean := false
     );
     port (
-        -- Clock and System Controls
-        clk         : in    std_logic;
+        clk         : inout std_logic;
         rst_n       : in    std_logic;
-        
-        -- Physical Board Peripherals
+
         uart_rx     : in    std_logic;
         gpio_keys   : in    std_logic_vector(3 downto 0);
+
         uart_tx     : out   std_logic;
         gpio_leds   : out   std_logic_vector(3 downto 0);
 
-        -- External SDRAM Chip Pins
         sdram_cke   : out   std_logic;
         sdram_cs_n  : out   std_logic;
         sdram_ras_n : out   std_logic;
@@ -33,273 +28,256 @@ entity rv32im_soc is
     );
 end entity rv32im_soc;
 
-architecture Structural of rv32im_soc is
+architecture structural of rv32im_soc is
 
-    -- Instruction Fetch Bus (CPU IF <-> BRAM Port A)
-    signal pc          : std_logic_vector(31 downto 0);
-    signal instr       : std_logic_vector(31 downto 0);
+    signal pc             : std_logic_vector(31 downto 0);
+    signal instruction    : std_logic_vector(31 downto 0);
 
-    -- Wishbone Master Bus (CPU MEM -> Interconnect)
-    signal wb_cpu_adr  : std_logic_vector(31 downto 0);
-    signal wb_cpu_wdat : std_logic_vector(31 downto 0);
-    signal wb_cpu_rdat : std_logic_vector(31 downto 0);
-    signal wb_cpu_sel  : std_logic_vector(3 downto 0);
-    signal wb_cpu_we   : std_logic;
-    signal wb_cpu_stb  : std_logic;
-    signal wb_cpu_cyc  : std_logic;
-    signal wb_cpu_ack  : std_logic;
+    signal wb_cpu_addr    : std_logic_vector(31 downto 0);
+    signal wb_cpu_wdata   : std_logic_vector(31 downto 0);
+    signal wb_cpu_rdata   : std_logic_vector(31 downto 0);
+    signal wb_cpu_sel     : std_logic_vector(3 downto 0);
+    signal wb_cpu_we      : std_logic;
+    signal wb_cpu_stb     : std_logic;
+    signal wb_cpu_cyc     : std_logic;
+    signal wb_cpu_ack     : std_logic;
 
-    -- Wishbone Slave 0: Internal BRAM (Port B)
-    signal s0_adr      : std_logic_vector(31 downto 0);
-    signal s0_wdat     : std_logic_vector(31 downto 0);
-    signal s0_rdat     : std_logic_vector(31 downto 0);
-    signal s0_sel      : std_logic_vector(3 downto 0);
-    signal s0_we       : std_logic;
-    signal s0_stb      : std_logic;
-    signal s0_cyc      : std_logic;
-    signal s0_ack      : std_logic;
-    signal bram_we_b   : std_logic_vector(3 downto 0);
+    signal s0_addr        : std_logic_vector(31 downto 0);
+    signal s0_wdata       : std_logic_vector(31 downto 0);
+    signal s0_rdata       : std_logic_vector(31 downto 0);
+    signal s0_sel         : std_logic_vector(3 downto 0);
+    signal s0_we          : std_logic;
+    signal s0_stb         : std_logic;
+    signal s0_cyc         : std_logic;
+    signal s0_ack         : std_logic;
+    signal bram_web       : std_logic_vector(3 downto 0);
 
-    -- Wishbone Slave 1: Main SDRAM
-    signal s1_adr      : std_logic_vector(31 downto 0);
-    signal s1_wdat     : std_logic_vector(31 downto 0);
-    signal s1_rdat     : std_logic_vector(31 downto 0);
-    signal s1_sel      : std_logic_vector(3 downto 0);
-    signal s1_we       : std_logic;
-    signal s1_stb      : std_logic;
-    signal s1_cyc      : std_logic;
-    signal s1_ack      : std_logic;
+    signal s1_addr        : std_logic_vector(31 downto 0);
+    signal s1_wdata       : std_logic_vector(31 downto 0);
+    signal s1_rdata       : std_logic_vector(31 downto 0);
+    signal s1_sel         : std_logic_vector(3 downto 0);
+    signal s1_we          : std_logic;
+    signal s1_stb         : std_logic;
+    signal s1_cyc         : std_logic;
+    signal s1_ack         : std_logic;
 
-    -- Wishbone Slave 2: VGA (Placeholder / Terminated)
-    signal s2_adr      : std_logic_vector(31 downto 0);
-    signal s2_wdat     : std_logic_vector(31 downto 0);
-    signal s2_rdat     : std_logic_vector(31 downto 0);
-    signal s2_sel      : std_logic_vector(3 downto 0);
-    signal s2_we       : std_logic;
-    signal s2_stb      : std_logic;
-    signal s2_cyc      : std_logic;
-    signal s2_ack      : std_logic;
+    signal s2_rdata       : std_logic_vector(31 downto 0);
+    signal s2_ack         : std_logic;
 
-    -- Wishbone Slave 3: Peripheral Bridge
-    signal s3_adr      : std_logic_vector(31 downto 0);
-    signal s3_wdat     : std_logic_vector(31 downto 0);
-    signal s3_rdat     : std_logic_vector(31 downto 0);
-    signal s3_sel      : std_logic_vector(3 downto 0);
-    signal s3_we       : std_logic;
-    signal s3_stb      : std_logic;
-    signal s3_cyc      : std_logic;
-    signal s3_ack      : std_logic;
+    signal s3_addr        : std_logic_vector(31 downto 0);
+    signal s3_wdata       : std_logic_vector(31 downto 0);
+    signal s3_rdata       : std_logic_vector(31 downto 0);
+    signal s3_sel         : std_logic_vector(3 downto 0);
+    signal s3_we          : std_logic;
+    signal s3_stb         : std_logic;
+    signal s3_cyc         : std_logic;
+    signal s3_ack         : std_logic;
 
-    -- Legacy Peripheral Signals (Connected through periph_bridge)
-    signal uart_tx_data  : std_logic_vector(7 downto 0);
-    signal uart_tx_start : std_logic;
-    signal uart_tx_busy  : std_logic;
-    signal uart_rdata    : std_logic_vector(31 downto 0);
-    signal gpio_we       : std_logic;
-    signal gpio_rdata    : std_logic_vector(31 downto 0);
-    signal timer_we      : std_logic;
-    signal timer_rdata   : std_logic_vector(31 downto 0);
-    -- Add this alongside your other internal signals
-    signal timer_rdata_wire : std_logic_vector(31 downto 0);
-	 
-	 -- Helper function to select baud rate based on SIMULATION generic
-    function get_baud_rate(is_sim : boolean) return positive is
+    signal uart_tx_data   : std_logic_vector(7 downto 0);
+    signal uart_tx_start  : std_logic;
+    signal uart_tx_busy   : std_logic;
+    signal uart_status    : std_logic_vector(31 downto 0);
+
+    signal gpio_led_we    : std_logic;
+    signal gpio_key_data  : std_logic_vector(31 downto 0);
+
+    signal timer_data     : std_logic_vector(31 downto 0);
+
+    function get_baud_rate(
+        fast_simulation : boolean
+    ) return positive is
     begin
-        if is_sim then
-            return 12500000; -- 12.5 Mbps for fast simulation
+        if fast_simulation then
+            return 12_500_000;
         else
-            return 115200;   -- Standard hardware baud rate
+            return 115_200;
         end if;
     end function;
 
-    constant UART_BAUD_RATE : positive := get_baud_rate(SIMULATION);
+    constant uart_baud_rate : positive :=
+        get_baud_rate(simulation);
 
 begin
 
-   
-    U_CPU : entity work.CPU_FPGA(Structural)
+    u_cpu : entity work.cpu_fpga
         port map (
-            clk           => clk,
-            rst_n         => rst_n,
-            imem_addr_out => pc,
-            imem_rdata_in => instr,
-            pc_debug      => open,
-            instr_debug   => open,
-            rs1_debug     => open,
-            rs2_debug     => open,
-            wb_adr_o      => wb_cpu_adr,
-            wb_dat_o      => wb_cpu_wdat,
-            wb_dat_i      => wb_cpu_rdat,
-            wb_sel_o      => wb_cpu_sel,
-            wb_we_o       => wb_cpu_we,
-            wb_stb_o      => wb_cpu_stb,
-            wb_cyc_o      => wb_cpu_cyc,
-            wb_ack_i      => wb_cpu_ack
+            clk          => clk,
+            rst_n        => rst_n,
+
+            imem_addr_o  => pc,
+            imem_rdata_i => instruction,
+
+            pc_debug     => open,
+            instr_debug  => open,
+            rs1_debug    => open,
+            rs2_debug    => open,
+
+            wb_addr_o    => wb_cpu_addr,
+            wb_data_o    => wb_cpu_wdata,
+            wb_data_i    => wb_cpu_rdata,
+            wb_sel_o     => wb_cpu_sel,
+            wb_we_o      => wb_cpu_we,
+            wb_stb_o     => wb_cpu_stb,
+            wb_cyc_o     => wb_cpu_cyc,
+            wb_ack_i     => wb_cpu_ack
         );
 
-    -- 2. Central Wishbone B4 Interconnect
-    U_INTERCONNECT : entity work.bus_interconnect(rtl)
-        port map (
-            m_adr_i  => wb_cpu_adr,
-            m_dat_i  => wb_cpu_wdat,
-            m_dat_o  => wb_cpu_rdat,
-            m_we_i   => wb_cpu_we,
-            m_sel_i  => wb_cpu_sel,
-            m_stb_i  => wb_cpu_stb,
-            m_cyc_i  => wb_cpu_cyc,
-            m_ack_o  => wb_cpu_ack,
+    u_interconnect : entity work.bus_interconnect
+    port map (
+        m_adr_i => wb_cpu_addr,
+        m_dat_i => wb_cpu_wdata,
+        m_dat_o => wb_cpu_rdata,
+        m_we_i  => wb_cpu_we,
+        m_sel_i => wb_cpu_sel,
+        m_stb_i => wb_cpu_stb,
+        m_cyc_i => wb_cpu_cyc,
+        m_ack_o => wb_cpu_ack,
 
-            -- Slave 0: BRAM (0x0000_0000)
-            s0_adr_o => s0_adr,
-            s0_dat_o => s0_wdat,
-            s0_dat_i => s0_rdat,
-            s0_sel_o => s0_sel,
-            s0_we_o  => s0_we,
-            s0_stb_o => s0_stb,
-            s0_cyc_o => s0_cyc,
-            s0_ack_i => s0_ack,
+        s0_adr_o => s0_addr,
+        s0_dat_o => s0_wdata,
+        s0_dat_i => s0_rdata,
+        s0_sel_o => s0_sel,
+        s0_we_o  => s0_we,
+        s0_stb_o => s0_stb,
+        s0_cyc_o => s0_cyc,
+        s0_ack_i => s0_ack,
 
-            -- Slave 1: SDRAM (0x8000_0000)
-            s1_adr_o => s1_adr,
-            s1_dat_o => s1_wdat,
-            s1_dat_i => s1_rdat,
-            s1_sel_o => s1_sel,
-            s1_we_o  => s1_we,
-            s1_stb_o => s1_stb,
-            s1_cyc_o => s1_cyc,
-            s1_ack_i => s1_ack,
+        s1_adr_o => s1_addr,
+        s1_dat_o => s1_wdata,
+        s1_dat_i => s1_rdata,
+        s1_sel_o => s1_sel,
+        s1_we_o  => s1_we,
+        s1_stb_o => s1_stb,
+        s1_cyc_o => s1_cyc,
+        s1_ack_i => s1_ack,
 
-            -- Slave 2: VGA (0xC000_0000)
-            s2_adr_o => s2_adr,
-            s2_dat_o => s2_wdat,
-            s2_dat_i => s2_rdat,
-            s2_sel_o => s2_sel,
-            s2_we_o  => s2_we,
-            s2_stb_o => s2_stb,
-            s2_cyc_o => s2_cyc,
-            s2_ack_i => s2_ack,
+        s2_adr_o => open,
+        s2_dat_o => open,
+        s2_dat_i => (others => '0'),
+        s2_sel_o => open,
+        s2_we_o  => open,
+        s2_stb_o => open,
+        s2_cyc_o => open,
+        s2_ack_i => '0',
 
-            -- Slave 3: Peripherals (0xE000_0000)
-            s3_adr_o => s3_adr,
-            s3_dat_o => s3_wdat,
-            s3_dat_i => s3_rdat,
-            s3_sel_o => s3_sel,
-            s3_we_o  => s3_we,
-            s3_stb_o => s3_stb,
-            s3_cyc_o => s3_cyc,
-            s3_ack_i => s3_ack
-        );
+        s3_adr_o => s3_addr,
+        s3_dat_o => s3_wdata,
+        s3_dat_i => s3_rdata,
+        s3_sel_o => s3_sel,
+        s3_we_o  => s3_we,
+        s3_stb_o => s3_stb,
+        s3_cyc_o => s3_cyc,
+        s3_ack_i => s3_ack
+    );
 
-    -- 3. Dual-Port 4 KB BRAM Wrapper (Port A: Fetch, Port B: Data)
-    bram_we_b <= s0_sel when (s0_we = '1' and s0_stb = '1' and s0_cyc = '1') else (others => '0');
-    s0_ack    <= s0_stb and s0_cyc; -- 0-wait-state ack
+    bram_web <= s0_sel
+        when s0_we = '1' and s0_stb = '1' and s0_cyc = '1'
+        else (others => '0');
 
-    U_BRAM : entity work.bram_4kb(rtl)
+    s0_ack <= s0_stb and s0_cyc;
+
+    u_bram : entity work.bram_4kb
         generic map (
-            HEX_FILE => "boot_bram.mif"
+            hex_file => "boot_bram.mif"
         )
         port map (
-            clk     => clk,
-            addr_a  => pc(11 downto 2),
-            rdata_a => instr,
-            addr_b  => s0_adr(11 downto 2),
-            wdata_b => s0_wdat,
-            we_b    => bram_we_b,
-            rdata_b => s0_rdat
+            clk    => clk,
+            addr_a => pc(11 downto 2),
+            rdata_a => instruction,
+            addr_b => s0_addr(11 downto 2),
+            wdata_b => s0_wdata,
+            we_b    => bram_web,
+            rdata_b => s0_rdata
         );
 
-    -- 4. SDRAM Controller (Slave 1)
-    U_SDRAM : entity work.sdram_controller(rtl)
+    u_sdram : entity work.sdram_controller
         generic map (
-            CLK_FREQ_MHZ => 50,
-            SIMULATION   => SIMULATION
+            clk_freq_mhz => 50,
+            simulation    => simulation
         )
         port map (
-            clk         => clk,
-            reset_n     => rst_n,
-            wb_adr_i    => s1_adr,
-            wb_dat_i    => s1_wdat,
-            wb_dat_o    => s1_rdat,
-            wb_sel_i    => s1_sel,
-            wb_we_i     => s1_we,
-            wb_stb_i    => s1_stb,
-            wb_cyc_i    => s1_cyc,
-            wb_ack_o    => s1_ack,
-            sdram_cke   => sdram_cke,
-            sdram_cs_n  => sdram_cs_n,
+            clk          => clk,
+            rst_n        => rst_n,
+            wb_addr_i    => s1_addr,
+            wb_data_i    => s1_wdata,
+            wb_data_o    => s1_rdata,
+            wb_sel_i     => s1_sel,
+            wb_we_i      => s1_we,
+            wb_stb_i     => s1_stb,
+            wb_cyc_i     => s1_cyc,
+            wb_ack_o     => s1_ack,
+
+            sdram_cke    => sdram_cke,
+            sdram_cs_n   => sdram_cs_n,
             sdram_ras_n => sdram_ras_n,
             sdram_cas_n => sdram_cas_n,
             sdram_we_n  => sdram_we_n,
-            sdram_ba    => sdram_ba,
-            sdram_addr  => sdram_addr,
-            sdram_dqm   => sdram_dqm,
-            sdram_dq    => sdram_dq
+            sdram_ba     => sdram_ba,
+            sdram_addr   => sdram_addr,
+            sdram_dqm    => sdram_dqm,
+            sdram_dq     => sdram_dq
         );
 
-    -- 5. VGA Framebuffer Port Termination (Placeholder)
-    s2_rdat <= (others => '0');
-    s2_ack  <= s2_stb and s2_cyc;
+    s2_rdata <= (others => '0');
+    s2_ack   <= '0';
 
-    -- 6. Peripheral Sub-Bus Bridge (Slave 3)
-    U_PERIPH_BRIDGE : entity work.periph_bridge(rtl)
+    u_periph_bridge : entity work.periph_bridge
         port map (
-            wb_adr_i    => s3_adr,
-            wb_dat_i    => s3_wdat,
-            wb_dat_o    => s3_rdat,
-            wb_we_i     => s3_we,
-            wb_stb_i    => s3_stb,
-            wb_cyc_i    => s3_cyc,
-            wb_ack_o    => s3_ack,
-            uart_data   => uart_tx_data,
-            uart_we     => uart_tx_start,
-            uart_rdata  => uart_rdata,
-            gpio_we     => gpio_we,
-            gpio_rdata  => gpio_rdata,
-            timer_we    => open,          
-            timer_rdata => timer_rdata_wire
+            wb_addr_i     => s3_addr,
+            wb_data_i     => s3_wdata,
+            wb_data_o     => s3_rdata,
+            wb_sel_i      => s3_sel,
+            wb_we_i       => s3_we,
+            wb_stb_i      => s3_stb,
+            wb_cyc_i      => s3_cyc,
+            wb_ack_o      => s3_ack,
+
+            uart_tx_data  => uart_tx_data,
+            uart_tx_start => uart_tx_start,
+            uart_status   => uart_status,
+
+            gpio_led_we   => gpio_led_we,
+            gpio_key_data => gpio_key_data,
+
+            timer_data    => timer_data
         );
 
-    -- 7. UART Transmitter Peripheral
-    uart_rdata <= (31 downto 1 => '0') & uart_tx_busy;
-
-    U_UART : entity work.uart_tx
+    u_uart_tx : entity work.uart_tx
         generic map (
-            CLK_FREQ  => 50000000,
-            BAUD_RATE => UART_BAUD_RATE
+            clk_freq_hz => 50_000_000,
+            baud_rate   => uart_baud_rate
         )
-        port map (
-            clk      => clk,
-            rst_n    => rst_n,
-            tx_data  => uart_tx_data,
-            tx_start => uart_tx_start,
-            tx_busy  => uart_tx_busy,
-            tx_out   => uart_tx
-        );
-
-    -- 8. GPIO Subsystem
-    U_GPIO_LED : entity work.gpio_led(Behavioral)
-        port map (
-            clk     => clk,
-            rst_n   => rst_n,
-            we      => gpio_we,
-            wdata   => s3_wdat,
-            led_out => gpio_leds
-        );
-
-    U_GPIO_KEY : entity work.gpio_key(Behavioral)
         port map (
             clk       => clk,
             rst_n     => rst_n,
-            key_in    => gpio_keys,
-            key_rdata => gpio_rdata
+            tx_data   => uart_tx_data,
+            tx_start  => uart_tx_start,
+            tx_busy   => uart_tx_busy,
+            tx        => uart_tx
         );
 
-    -- 9. Cycle Timer
-    U_TIMER : entity work.timer(Behavioral)
+    u_gpio_led : entity work.gpio_led
         port map (
-            clk         => clk,
-            rst_n       => rst_n,
-            timer_rdata => timer_rdata_wire
+            clk     => clk,
+            rst_n   => rst_n,
+            we      => gpio_led_we,
+            wdata   => s3_wdata,
+            led_out => gpio_leds
         );
 
-end architecture Structural;
+    u_gpio_key : entity work.gpio_key
+        port map (
+            clk      => clk,
+            rst_n    => rst_n,
+            key_in   => gpio_keys,
+            key_data => gpio_key_data
+        );
+
+    u_timer : entity work.timer
+        port map (
+            clk       => clk,
+            rst_n     => rst_n,
+            timer_data => timer_data
+        );
+
+end architecture structural;

@@ -112,32 +112,37 @@ architecture Structural of EX_Stage is
         );
     end component;
 
-    component EX_MEM_Register is
-        port (
-            clk                    : in  std_logic;
-            rst_n                  : in  std_logic;
-            flush                  : in  std_logic;
-            stall                  : in  std_logic;
-            ex_final_result        : in  std_logic_vector(31 downto 0);
-            ex_operand_b_forwarded : in  std_logic_vector(31 downto 0);
-            ex_rd_addr             : in  std_logic_vector(4 downto 0);
-            ex_pc_plus4            : in  std_logic_vector(31 downto 0);
-            ex_reg_write           : in  std_logic;
-            ex_mem_read            : in  std_logic;
-            ex_mem_write           : in  std_logic;
-            ex_wb_sel              : in  std_logic_vector(1 downto 0);
-            ex_funct3              : in  std_logic_vector(2 downto 0);
-            mem_result             : out std_logic_vector(31 downto 0);
-            mem_write_data         : out std_logic_vector(31 downto 0);
-            mem_rd_addr            : out std_logic_vector(4 downto 0);
-            mem_pc_plus4           : out std_logic_vector(31 downto 0);
-            mem_reg_write          : out std_logic;
-            mem_mem_read           : out std_logic;
-            mem_mem_write          : out std_logic;
-            mem_wb_sel             : out std_logic_vector(1 downto 0);
-            mem_funct3             : out std_logic_vector(2 downto 0)
-        );
-    end component;
+    component ex_mem_register is
+    port (
+        clk   : in std_logic;
+        rst_n : in std_logic;
+        flush : in std_logic;
+        stall : in std_logic;
+
+        ex_result       : in std_logic_vector(31 downto 0);
+        ex_operand_b    : in std_logic_vector(31 downto 0);
+        ex_rd_addr      : in std_logic_vector(4 downto 0);
+        ex_pc_plus4     : in std_logic_vector(31 downto 0);
+
+        ex_reg_write    : in std_logic;
+        ex_mem_read     : in std_logic;
+        ex_mem_write    : in std_logic;
+        ex_wb_sel       : in std_logic_vector(1 downto 0);
+        ex_funct3       : in std_logic_vector(2 downto 0);
+
+        mem_addr        : out std_logic_vector(31 downto 0);
+        mem_result      : out std_logic_vector(31 downto 0);
+        mem_write_data  : out std_logic_vector(31 downto 0);
+        mem_rd_addr     : out std_logic_vector(4 downto 0);
+        mem_pc_plus4    : out std_logic_vector(31 downto 0);
+
+        mem_reg_write   : out std_logic;
+        mem_read        : out std_logic;
+        mem_write       : out std_logic;
+        mem_wb_sel      : out std_logic_vector(1 downto 0);
+        mem_funct3      : out std_logic_vector(2 downto 0)
+    );
+end component;
 
     signal forward_a              : std_logic_vector(1 downto 0);
     signal forward_b              : std_logic_vector(1 downto 0);
@@ -254,30 +259,35 @@ begin
     target_pc_out <= std_logic_vector(jalr_sum(31 downto 1)) & '0' when (ex_jump_in = '1' and ex_alu_src_in = '1')
                      else std_logic_vector(jal_sum);
 
-    U_EX_MEM : EX_MEM_Register
-        port map (
-            clk                    => clk,
-            rst_n                  => rst_n,
-            stall                  => ex_mem_stall_combined,
-            flush                  => '0',
-            ex_final_result        => ex_final_result,
-            ex_operand_b_forwarded => ex_operand_b_forwarded,
-            ex_rd_addr             => ex_rd_addr_in,
-            ex_pc_plus4            => ex_pc_plus4_in,
-            ex_reg_write           => ex_reg_write_in,
-            ex_mem_read            => ex_mem_read_in,
-            ex_mem_write           => ex_mem_write_in,
-            ex_wb_sel              => ex_wb_sel_in,
-            ex_funct3              => ex_funct3_in,
-            mem_result             => mem_result_out,
-            mem_write_data         => mem_write_data_out,
-            mem_rd_addr            => mem_rd_addr_out,
-            mem_pc_plus4           => mem_pc_plus4_out,
-            mem_reg_write          => mem_reg_write_out,
-            mem_mem_read           => mem_mem_read_out,
-            mem_mem_write          => mem_mem_write_out,
-            mem_wb_sel             => mem_wb_sel_out,
-            mem_funct3             => mem_funct3_out
-        );
+    u_ex_mem_register : ex_mem_register
+    port map (
+        clk   => clk,
+        rst_n => rst_n,
+        flush => '0',
+        stall => ex_mem_stall,
+
+        ex_result       => ex_final_result,
+        ex_operand_b    => ex_operand_b_forwarded,
+        ex_rd_addr      => ex_rd_addr_in,
+        ex_pc_plus4     => ex_pc_plus4_in,
+
+        ex_reg_write    => ex_reg_write_in,
+        ex_mem_read     => ex_mem_read_in,
+        ex_mem_write    => ex_mem_write_in,
+        ex_wb_sel       => ex_wb_sel_in,
+        ex_funct3       => ex_funct3_in,
+
+        mem_addr        => mem_addr_out,
+        mem_result      => mem_result_out,
+        mem_write_data  => mem_write_data_out,
+        mem_rd_addr     => mem_rd_addr_out,
+        mem_pc_plus4    => mem_pc_plus4_out,
+
+        mem_reg_write   => mem_reg_write_out,
+        mem_read        => mem_read_out,
+        mem_write       => mem_write_out,
+        mem_wb_sel      => mem_wb_sel_out,
+        mem_funct3      => mem_funct3_out
+    );
 
 end architecture Structural;

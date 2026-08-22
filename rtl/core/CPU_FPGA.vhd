@@ -87,6 +87,7 @@ architecture Structural of CPU_FPGA is
     signal mem_wb_sel        : std_logic_vector(1 downto 0);
     signal mem_funct3        : std_logic_vector(2 downto 0);
     signal mem_result_fwd    : std_logic_vector(31 downto 0);
+    signal mem_addr : std_logic_vector(31 downto 0);
 
     signal wb_result         : std_logic_vector(31 downto 0);
     signal wb_read_data      : std_logic_vector(31 downto 0);
@@ -191,6 +192,7 @@ begin
             take_branch_out         => take_branch_wire,
             target_pc_out           => target_pc_wire,
             stall_m_out             => stall_m_wire,
+            mem_addr_out            => mem_addr,
             mem_result_out          => mem_result,
             mem_write_data_out      => mem_write_data,
             mem_rd_addr_out         => mem_rd_addr,
@@ -203,37 +205,43 @@ begin
         );
 
     -- 4. Memory Stage (Wishbone Master)
-    U_STAGE_MEM : entity work.MEM_Stage
-        port map (
-            clk                 => clk,
-            rst_n               => rst_n,
-            stall_wb            => mem_wb_stall_wire,
-            mem_result_in       => mem_result,
-            mem_write_data_in   => mem_write_data, 
-            mem_rd_addr_in      => mem_rd_addr,
-            mem_pc_plus4_in     => mem_pc_plus4,
-            mem_reg_write_in    => mem_reg_write,
-            mem_mem_read_in     => mem_mem_read,
-            mem_mem_write_in    => mem_mem_write,
-            mem_wb_sel_in       => mem_wb_sel,
-            mem_funct3_in       => mem_funct3,
-            wb_adr_o            => wb_adr_o,
-            wb_dat_o            => wb_dat_o,
-            wb_dat_i            => wb_dat_i,
-            wb_sel_o            => wb_sel_o,
-            wb_we_o             => wb_we_o,
-            wb_stb_o            => wb_stb_o,
-            wb_cyc_o            => wb_cyc_o,
-            wb_ack_i            => wb_ack_i,
-            bus_stall_out       => bus_stall_wire,
-            mem_result_fwd_out  => mem_result_fwd,
-            wb_result_out       => wb_result,
-            wb_read_data_out    => wb_read_data,
-            wb_rd_addr_out      => wb_rd_addr,
-            wb_reg_write_out    => wb_reg_write,
-            wb_sel_out          => wb_sel,
-            wb_pc_plus4_out     => wb_pc_plus4
-        );
+    u_mem_stage : entity work.mem_stage
+    port map (
+        clk   => clk,
+        rst_n => rst_n,
+
+        stall_wb => mem_wb_stall,
+
+        mem_addr       => mem_addr,
+        mem_result     => mem_result,
+        mem_write_data => mem_write_data,
+        mem_rd_addr    => mem_rd_addr,
+        mem_pc_plus4   => mem_pc_plus4,
+
+        mem_reg_write  => mem_reg_write,
+        mem_read       => mem_read,
+        mem_write      => mem_write,
+        mem_wb_sel     => mem_wb_sel,
+        mem_funct3     => mem_funct3,
+
+        wb_addr_o      => wb_addr,
+        wb_data_o      => wb_wdata,
+        wb_data_i      => wb_rdata,
+        wb_sel_o       => wb_sel,
+        wb_we_o        => wb_we,
+        wb_stb_o       => wb_stb,
+        wb_cyc_o       => wb_cyc,
+        wb_ack_i       => wb_ack,
+
+        bus_stall_o    => bus_stall,
+
+        wb_result_o    => wb_result,
+        wb_read_data_o => wb_read_data,
+        wb_rd_addr_o   => wb_rd_addr,
+        wb_pc_plus4_o  => wb_pc_plus4,
+        wb_reg_write_o => wb_reg_write,
+        wb_sel_o       => wb_sel_stage
+    );
 
     -- 5. Hazard & Pipeline Stall Unit
     U_HAZARD : entity work.Hazard_Unit
