@@ -25,38 +25,16 @@ void print_hex32(uint32_t val) {
 
 int main(void) {
     // =========================================================================
-    // 1. Immediate SDRAM Read/Write Verification Test (Executed FIRST)
+    // 1. Hardware Multiplier Test (Executed in Internal BRAM)
     // =========================================================================
-    // Performed immediately upon reset to trigger Wishbone Wishbone STB/CYC 
-    // and verify the SDRAM FSM without blocking on UART peripheral polling.
-    volatile uint32_t *sdram_ptr = (volatile uint32_t *)SDRAM_BASE;
-
-    // Pattern 1: Single Word Direct Access
-    uint32_t test_val = 0xDEADBEEF;
-    sdram_ptr[0] = test_val;
-    volatile uint32_t read_back = sdram_ptr[0];
-
-    // Pattern 2: Multi-Word Burst/Row Access
-    for (int i = 0; i < 4; i++) {
-        sdram_ptr[i] = 0xA0A00000 + i;
-    }
-
-    volatile uint32_t multi_read[4];
-    for (int i = 0; i < 4; i++) {
-        multi_read[i] = sdram_ptr[i];
-    }
-
-    // =========================================================================
-    // 2. Hardware Multiplier Test
-    // =========================================================================
-     uint32_t t_start = get_cycles();
+    uint32_t t_start = get_cycles();
     volatile uint32_t a = 1234567;
     volatile uint32_t b = 891011;
     volatile uint32_t product = a * b;
     uint32_t t_end = get_cycles();
 
     // =========================================================================
-    // 3. UART Reporting & Verification Results
+    // 2. UART Reporting & Verification Results
     // =========================================================================
     uart_puts("\r\n--- RISC-V RV32IM System Boot ---\r\n");
 
@@ -70,29 +48,8 @@ int main(void) {
     print_hex32(t_end - t_start);
     uart_puts("\r\n");
 
-    uart_puts("\r\n--- SDRAM Memory Verification Results ---\r\n");
-    uart_puts("SDRAM [0x80000000] Write: ");
-    print_hex32(test_val);
-    uart_puts(" | Read: ");
-    print_hex32(read_back);
-    
-    if (read_back == test_val) {
-        uart_puts(" -> PASS\r\n");
-    } else {
-        uart_puts(" -> FAIL\r\n");
-    }
-
-    uart_puts("Sequential Multi-Word Check:\r\n");
-    for (int i = 0; i < 4; i++) {
-        uart_puts("SDRAM [");
-        print_hex32((uint32_t)&sdram_ptr[i]);
-        uart_puts("] = ");
-        print_hex32(multi_read[i]);
-        uart_puts("\r\n");
-    }
-
     // =========================================================================
-    // 4. Interactive GPIO Loop
+    // 3. Interactive GPIO Loop
     // =========================================================================
     uart_puts("\r\nAll checks finished. Entering GPIO loop...\r\n");
     uint32_t prev_keys = 0xFF;

@@ -196,7 +196,7 @@ begin
 
     U_BRAM : entity work.bram_4kb(rtl)
         generic map (
-            HEX_FILE => "boot_bram.hex"
+            HEX_FILE => "boot_bram.mif"
         )
         port map (
             clk     => clk,

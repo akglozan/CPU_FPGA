@@ -223,7 +223,7 @@ begin
                 when ST_READ_CMD =>
                     send_cmd(CMD_READ);
                     sdram_ba       <= latched_adr(23 downto 22);
-                    sdram_addr     <= "00" & latched_adr(9 downto 1) & '0'; -- 16-bit aligned col
+                    sdram_addr     <= "000" & latched_adr(9 downto 1); -- Fixed 16-bit word alignment
                     sdram_dqm      <= "00";
                     wait_cnt       <= 1; -- CAS-1 cycles (RESTORED to original value)
                     state          <= ST_READ_WAIT;
@@ -250,7 +250,7 @@ begin
                 when ST_WRITE_CMD =>
                     send_cmd(CMD_WRITE);
                     sdram_ba       <= latched_adr(23 downto 22);
-                    sdram_addr     <= "00" & latched_adr(9 downto 1) & '0';
+                    sdram_addr     <= "000" & latched_adr(9 downto 1); -- Fixed 16-bit word alignment
                     sdram_dqm      <= not latched_sel(1 downto 0);
                     dq_out         <= latched_wdata(15 downto 0);
                     dq_oe          <= '1';

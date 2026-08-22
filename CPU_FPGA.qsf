@@ -57,6 +57,66 @@ set_location_assignment PIN_84 -to gpio_leds[3]
 set_location_assignment PIN_114 -to uart_tx
 set_location_assignment PIN_115 -to uart_rx
 
+# ==============================================================================
+# SDRAM Physical Pin Assignments (Cyclone IV EP4CE6E22C8)
+# ==============================================================================
+# SDRAM Control Signals
+set_location_assignment PIN_58 -to sdram_cke
+set_location_assignment PIN_72 -to sdram_cs_n
+set_location_assignment PIN_71 -to sdram_ras_n
+set_location_assignment PIN_70 -to sdram_cas_n
+set_location_assignment PIN_69 -to sdram_we_n
+set_location_assignment PIN_73 -to sdram_ba[0]
+set_location_assignment PIN_74 -to sdram_ba[1]
+set_location_assignment PIN_42 -to sdram_dqm[0]
+set_location_assignment PIN_55 -to sdram_dqm[1]
+
+# SDRAM Address Bus
+set_location_assignment PIN_76 -to sdram_addr[0]
+set_location_assignment PIN_77 -to sdram_addr[1]
+set_location_assignment PIN_80 -to sdram_addr[2]
+set_location_assignment PIN_83 -to sdram_addr[3]
+set_location_assignment PIN_68 -to sdram_addr[4]
+set_location_assignment PIN_67 -to sdram_addr[5]
+set_location_assignment PIN_66 -to sdram_addr[6]
+set_location_assignment PIN_65 -to sdram_addr[7]
+set_location_assignment PIN_64 -to sdram_addr[8]
+set_location_assignment PIN_60 -to sdram_addr[9]
+set_location_assignment PIN_75 -to sdram_addr[10]
+set_location_assignment PIN_59 -to sdram_addr[11]
+
+# SDRAM Bidirectional Data Bus
+set_location_assignment PIN_28 -to sdram_dq[0]
+set_location_assignment PIN_30 -to sdram_dq[1]
+set_location_assignment PIN_31 -to sdram_dq[2]
+set_location_assignment PIN_32 -to sdram_dq[3]
+set_location_assignment PIN_33 -to sdram_dq[4]
+set_location_assignment PIN_34 -to sdram_dq[5]
+set_location_assignment PIN_38 -to sdram_dq[6]
+set_location_assignment PIN_39 -to sdram_dq[7]
+set_location_assignment PIN_54 -to sdram_dq[8]
+set_location_assignment PIN_53 -to sdram_dq[9]
+set_location_assignment PIN_52 -to sdram_dq[10]
+set_location_assignment PIN_51 -to sdram_dq[11]
+set_location_assignment PIN_50 -to sdram_dq[12]
+set_location_assignment PIN_49 -to sdram_dq[13]
+set_location_assignment PIN_46 -to sdram_dq[14]
+set_location_assignment PIN_44 -to sdram_dq[15]
+
+# ==============================================================================
+# Fast I/O Registers for Timing Closure
+# ==============================================================================
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to sdram_dq[*]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_dq[*]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_addr[*]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_ba[*]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_dqm[*]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_ras_n
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_cas_n
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_we_n
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_cs_n
+set_instance_assignment -name FAST_OUTPUT_ENABLE_REGISTER ON -to sdram_dq[*]
+
 # I/O Standards & Configuration
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
 set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
@@ -99,7 +159,6 @@ set_global_assignment -name VHDL_FILE rtl/core/ID_Stage.vhd
 set_global_assignment -name VHDL_FILE rtl/core/EX_Stage.vhd
 set_global_assignment -name VHDL_FILE rtl/core/MEM_Stage.vhd
 set_global_assignment -name VHDL_FILE rtl/core/CPU_FPGA.vhd
-set_global_assignment -name VHDL_FILE rtl/core/CPU_Top_Wrapper.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/bram_4kb.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/bus_interconnect.vhd
 set_global_assignment -name VHDL_FILE rtl/rv32im_soc.vhd
@@ -115,7 +174,20 @@ set_global_assignment -name VHDL_TEST_BENCH_FILE sim/M_Extension_Unit_tb.vhd
 set_global_assignment -name SDC_FILE CPU_FPGA.sdc
 set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_rv32im_soc.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/sdram_controller.vhd
-set_global_assignment -name VHDL_FILE rtl/memory/periph_bridge.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/periph_bridge.vhd
 set_global_assignment -name VHDL_TEST_BENCH_FILE sim/sdram_model.vhd
+
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_WEAK_PULLUP "AS INPUT TRI-STATED WITH WEAK PULL-UP"
+
+# ==============================================================================
+# Physical Synthesis & Optimization for Timing Closure
+# ==============================================================================
+set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
+set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
+
+
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
