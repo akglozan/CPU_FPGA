@@ -17,22 +17,51 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- Single-cycle instruction decoder / control unit. Decodes the 7-bit
+-- opcode (with funct3/funct7) into datapath control signals for the
+-- ALU, register write-back, memory access, and branch/jump resolution.
+-- Decode happens in two stages internally: the first process maps
+-- opcode to imm_src/alu_src/wb_sel/branch/jump plus a coarse 2-bit
+-- alu_op; the second expands alu_op (with funct3/funct7) into the
+-- final 4-bit alu_ctrl consumed by the ALU, and flags RV32M
+-- multiply/divide ops via is_m_ext.
 entity Control_Unit is
     port (
+        -- 7-bit RISC-V opcode field (instr[6:0]); selects the instruction
+        -- format/operation class.
         opcode    : in  std_logic_vector(6 downto 0);
+        -- funct3 field (instr[14:12]); disambiguates instructions within
+        -- an opcode group.
         funct3    : in  std_logic_vector(2 downto 0);
+        -- funct7 field (instr[31:25]); distinguishes ADD/SUB, logical vs
+        -- arithmetic shifts, and RV32M multiply/divide ops.
         funct7    : in  std_logic_vector(6 downto 0);
         
+        -- Selects which immediate encoding ImmGen should sign-extend
+        -- (I/S/B/U/J format).
         imm_src   : out std_logic_vector(2 downto 0);
+        -- Selects ALU operand B source: '0' = register file (rs2),
+        -- '1' = the decoded immediate.
         alu_src   : out std_logic;
         alu_src_a : out std_logic; -- '1' selects PC for AUIPC
+        -- Enables the register file write for this instruction.
         reg_write : out std_logic;
+        -- Enables a data memory read (loads).
         mem_read  : out std_logic;
+        -- Enables a data memory write (stores).
         mem_write : out std_logic;
+        -- Selects the write-back source: ALU result, memory read data,
+        -- or PC+4 (JAL/JALR link address).
         wb_sel    : out std_logic_vector(1 downto 0);
+        -- Asserted for conditional branch instructions; combined with
+        -- the ALU's zero_flag to decide whether to redirect the PC.
         branch    : out std_logic;
+        -- Asserted for unconditional jump instructions (JAL/JALR).
         jump      : out std_logic;
+        -- Final 4-bit ALU operation select, forwarded to the ALU.
         alu_ctrl  : out std_logic_vector(3 downto 0);
+        -- Asserted when the decoded R-type instruction is an RV32M
+        -- multiply/divide extension op (funct7 = "0000001").
         is_m_ext  : out std_logic
     );
 end entity Control_Unit;

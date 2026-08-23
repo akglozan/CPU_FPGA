@@ -17,23 +17,25 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- IF/ID pipeline register. Latches the fetched PC and instruction
+-- into the ID stage each cycle, or holds (stall) / clears to a NOP
+-- (flush) as directed by the hazard unit.
 entity IF_ID_Register is
 
 	port(
 	
 		clk		: in std_logic;
+		-- Active-low synchronous reset; clears to PC=0, instruction=NOP.
 		rst_n		: in std_logic;
 
-		/*Hazard control signal. 
-		When stall = '1', the register holds its current value 
-		freezes execution).*/
+		-- Hazard control signal. When stall = '1', the register holds
+		-- its current value (freezes execution).
 		stall 	: in std_logic; 
 		
 		
-		/*Control hazard signal (e.g., taken branch/jump).
-		When flush = '1', the register clears the instruction 
-		to a NOP (0x00000013 in RISC-V, which is addi x0, x0, 0).
-		*/
+		-- Control hazard signal (e.g., taken branch/jump). When
+		-- flush = '1', the register clears the instruction to a NOP
+		-- (0x00000013 in RISC-V, which is addi x0, x0, 0).
 		flush 	: in std_logic;
 		
 		--Program Counter from IF stage.

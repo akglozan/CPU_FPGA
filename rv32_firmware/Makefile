@@ -28,16 +28,18 @@ SRC_DIR   = src
 SRCS      = $(BSP_DIR)/crt0.s $(SRC_DIR)/main.c
 TARGET    = $(BUILD_DIR)/firmware
 
-# Output hex destinations for root and ModelSim simulation
+# Output hex/mif destinations for root and ModelSim simulation
 HEX_ROOT  = ../boot_bram.hex
 HEX_SIM   = ../sim/boot_bram.hex
+MIF_ROOT  = ../boot_bram.mif
+MIF_DEPTH = 1024
 
 .PHONY: all clean
 
-all: $(BUILD_DIR) $(TARGET).hex $(TARGET).bin $(TARGET).dis
+all: $(BUILD_DIR) $(TARGET).hex $(TARGET).mif $(TARGET).bin $(TARGET).dis
 	@echo "=========================================="
 	@echo "Firmware build successful."
-	@echo "Generated 32-bit raw hex for BRAM."
+	@echo "Generated 32-bit raw hex and Quartus MIF for BRAM."
 	@echo "=========================================="
 
 $(BUILD_DIR):
@@ -58,5 +60,21 @@ $(TARGET).hex: $(TARGET).bin
 	cp $@ $(HEX_ROOT)
 	cp $@ $(HEX_SIM)
 
+# Convert binary to a Quartus Memory Initialization File (.mif). Any bytes
+# beyond the program image are zero-padded out to MIF_DEPTH words, and any
+# words beyond the raw file length default to zero (i.e. NOP / addi x0,x0,0).
+$(TARGET).mif: $(TARGET).bin
+	python3 -c "\
+import struct; \
+f = open('$<', 'rb').read(); \
+depth = $(MIF_DEPTH); \
+words = [struct.unpack('<I', f[i:i+4].ljust(4, b'\\x00'))[0] for i in range(0, len(f), 4)]; \
+words = (words + [0] * depth)[:depth]; \
+lines = ['WIDTH = 32;', 'DEPTH = %d;' % depth, 'ADDRESS_RADIX = HEX;', 'DATA_RADIX = HEX;', '', 'CONTENT BEGIN']; \
+lines += ['%03X : %08x;' % (i, w) for i, w in enumerate(words)]; \
+lines.append('END;'); \
+open('$@', 'w').write('\\n'.join(lines) + '\\n')"
+	cp $@ $(MIF_ROOT)
+
 clean:
-	rm -rf $(BUILD_DIR) $(HEX_ROOT) $(HEX_SIM)
+	rm -rf $(BUILD_DIR) $(HEX_ROOT) $(HEX_SIM) $(MIF_ROOT)

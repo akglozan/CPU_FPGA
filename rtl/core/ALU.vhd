@@ -17,14 +17,28 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- 4-bit-controlled combinational Arithmetic Logic Unit for the RV32I/M
+-- execute stage. Implements ADD, SUB, logical/arithmetic shifts,
+-- SLT/SLTU set-less-than compares, bitwise XOR/OR/AND, and a LUI
+-- pass-through, selected by alu_ctrl (see the case statement in the
+-- architecture body for the full opcode encoding). Also produces a
+-- zero_flag alongside the result, used by the branch unit to resolve
+-- BEQ/BNE after a SUB-based comparison.
 entity ALU is
 
 	port(
 		
+		-- ALU operation select (0000=ADD 0001=SUB 0010=SLL 0011=SLT
+		-- 0100=SLTU 0101=XOR 0110=SRL 0111=SRA 1000=OR 1001=AND
+		-- 1010=LUI passthrough).
 		alu_ctrl		:	in		std_logic_vector(3 downto 0);
+		-- First ALU operand (typically rs1, or the PC for AUIPC-related adds).
 		operand_a	:	in		std_logic_vector(31 downto 0);
+		-- Second ALU operand (typically rs2, or a sign-extended immediate).
 		operand_b	:	in		std_logic_vector(31 downto 0);
+		-- Result of the selected operation.
 		alu_result	:	out	std_logic_vector(31 downto 0);
+		-- Asserted when alu_result is all zeros.
 		zero_flag	:	out	std_logic
 
 	

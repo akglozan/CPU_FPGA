@@ -17,13 +17,18 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- Free-running 32-bit up-counter peripheral, incrementing by one every
+-- clock cycle. Read-only; provides a simple cycle-counter / timestamp
+-- source for firmware.
 entity timer is
 
 	port(
 	
 		clk		:	in std_logic;
+		-- Active-low synchronous reset; clears the counter to zero.
 		rst_n		: 	in std_logic;
 		
+		-- Current free-running counter value.
 		timer_rdata	: out std_logic_vector(31 downto 0)
 	
 	);

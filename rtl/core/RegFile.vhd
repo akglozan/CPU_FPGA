@@ -17,16 +17,32 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- 32-word by 32-bit RISC-V register file (x0-x31). x0 is hardwired to
+-- zero: writes to rd_addr = 0 are ignored and reads of address 0
+-- always return zero. Provides two asynchronous read ports (rs1, rs2)
+-- with same-cycle write-bypass forwarding, so a value written this
+-- cycle is visible to a read of the same address this cycle -- this
+-- resolves same-cycle RAW hazards without an extra forwarding path.
+-- The single write port is synchronous with an active-low reset.
 entity RegFile is
     port (
+        -- System clock; the write port updates on the rising edge.
         clk       : in  std_logic;
+        -- Active-low synchronous reset; clears all 32 registers to zero.
         rst_n     : in  std_logic;
+        -- Write enable for rd_addr/rd_data on this clock edge.
         reg_write : in  std_logic;
+        -- Destination register address for the write port.
         rd_addr   : in  std_logic_vector(4 downto 0);
+        -- Source register 1 read address.
         rs1_addr  : in  std_logic_vector(4 downto 0);
+        -- Source register 2 read address.
         rs2_addr  : in  std_logic_vector(4 downto 0);
+        -- Data to write into rd_addr when reg_write is asserted.
         rd_data   : in  std_logic_vector(31 downto 0);
+        -- Asynchronously read data for rs1_addr (write-forwarded).
         rs1_data  : out std_logic_vector(31 downto 0);
+        -- Asynchronously read data for rs2_addr (write-forwarded).
         rs2_data  : out std_logic_vector(31 downto 0)
     );
 end entity RegFile;

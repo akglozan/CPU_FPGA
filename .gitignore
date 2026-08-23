@@ -77,6 +77,12 @@ vsim_stacktrace.pts
 *.dll
 
 # ==============================================================================
+# Sphinx Documentation Build Artifacts
+# ==============================================================================
+docs/_build/
+docs/_to_delete/
+
+# ==============================================================================
 # System / OS / IDE Artifacts
 # ==============================================================================
 # Operating system metadata
@@ -97,3 +103,15 @@ desktop.ini
 *~
 *.bak
 work-obj08.cf
+cpu_debug_top.vhd
+cpu_debug_top10.vhd
+cpu_debug_top9.vhd
+cpu_debug_top8.vhd
+cpu_debug_top6.vhd
+cpu_debug_top5.vhd
+cpu_debug_top2.vhd
+cpu_debug_top11.vhd
+cpu_debug_top3.vhd
+cpu_debug_top7.vhd
+cpu_debug_top4.vhd
+blinky_top.vhd

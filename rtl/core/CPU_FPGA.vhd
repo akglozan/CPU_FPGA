@@ -5,28 +5,43 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- Top-level 5-stage pipelined RV32IM CPU core (IF/ID/EX/MEM/WB), with
+-- full hazard detection, operand forwarding, and stall/flush control.
+-- Composed here from IF_Stage, ID_Stage, EX_Stage, mem_stage, and
+-- Hazard_Unit. Presents a simple synchronous-read port for instruction
+-- fetch (external BRAM) and a Wishbone B4 master interface for the
+-- data side (loads/stores to SDRAM/MMIO via the system bus).
 entity CPU_FPGA is
     generic (
+        -- Datapath / address width in bits (32 for RV32).
         DATA_WIDTH : integer := 32
     );
     port (
         clk             : in  std_logic;
+        -- Active-low synchronous reset.
         rst_n           : in  std_logic;
         
         -- Instruction Fetch Bus (Port A of BRAM)
-        imem_addr_out   : out std_logic_vector(31 downto 0);
-        imem_rdata_in   : in  std_logic_vector(31 downto 0);
+        -- Fetch address presented to the external instruction BRAM.
+        imem_addr_o     : out std_logic_vector(31 downto 0);
+        -- Instruction word returned by the BRAM (one cycle after the
+        -- address was presented).
+        imem_rdata_i    : in  std_logic_vector(31 downto 0);
         
         -- Debug Outputs
+        -- Current program counter, for on-chip debug (SignalTap/etc.).
         pc_debug        : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        -- Instruction currently in the ID stage, for debug.
         instr_debug     : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        -- ID-stage rs1 register file read data, for debug.
         rs1_debug       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        -- ID-stage rs2 register file read data, for debug.
         rs2_debug       : out std_logic_vector(DATA_WIDTH-1 downto 0);
         
         -- Wishbone B4 Master Bus Interface (Data Side)
-        wb_adr_o        : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_dat_o        : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_dat_i        : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_addr_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_data_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_data_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
         wb_sel_o        : out std_logic_vector(3 downto 0);
         wb_we_o         : out std_logic;
         wb_stb_o        : out std_logic;
@@ -112,8 +127,8 @@ begin
             if_id_flush     => if_id_flush_wire,
             pc_src          => take_branch_wire,
             target_pc       => target_pc_wire,
-            pc_fetch_out    => imem_addr_out,
-            instr_fetch_in  => imem_rdata_in,
+            pc_fetch_out    => imem_addr_o,
+            instr_fetch_in  => imem_rdata_i,
             pc_current_out  => pc_current,
             id_pc_out       => id_pc,
             id_instr_out    => id_instr
@@ -204,13 +219,17 @@ begin
             mem_funct3_out          => mem_funct3
         );
 
+    -- Forward the EX/MEM-registered ALU/memory result back into EX_Stage's
+    -- forwarding mux (forward_a/forward_b = "10" selects this signal).
+    mem_result_fwd <= mem_result;
+
     -- 4. Memory Stage (Wishbone Master)
     u_mem_stage : entity work.mem_stage
     port map (
         clk   => clk,
         rst_n => rst_n,
 
-        stall_wb => mem_wb_stall,
+        stall_wb => mem_wb_stall_wire,
 
         mem_addr       => mem_addr,
         mem_result     => mem_result,
@@ -219,33 +238,35 @@ begin
         mem_pc_plus4   => mem_pc_plus4,
 
         mem_reg_write  => mem_reg_write,
-        mem_read       => mem_read,
-        mem_write      => mem_write,
+        mem_read       => mem_mem_read,
+        mem_write      => mem_mem_write,
         mem_wb_sel     => mem_wb_sel,
         mem_funct3     => mem_funct3,
 
-        wb_addr_o      => wb_addr,
-        wb_data_o      => wb_wdata,
-        wb_data_i      => wb_rdata,
-        wb_sel_o       => wb_sel,
-        wb_we_o        => wb_we,
-        wb_stb_o       => wb_stb,
-        wb_cyc_o       => wb_cyc,
-        wb_ack_i       => wb_ack,
+        wb_addr_o      => wb_addr_o,
+        wb_data_o      => wb_data_o,
+        wb_data_i      => wb_data_i,
+        wb_sel_bus_o   => wb_sel_o,
+        wb_we_o        => wb_we_o,
+        wb_stb_o       => wb_stb_o,
+        wb_cyc_o       => wb_cyc_o,
+        wb_ack_i       => wb_ack_i,
 
-        bus_stall_o    => bus_stall,
+        bus_stall_o    => bus_stall_wire,
 
         wb_result_o    => wb_result,
         wb_read_data_o => wb_read_data,
         wb_rd_addr_o   => wb_rd_addr,
         wb_pc_plus4_o  => wb_pc_plus4,
         wb_reg_write_o => wb_reg_write,
-        wb_sel_o       => wb_sel_stage
+        wb_sel_o       => wb_sel
     );
 
     -- 5. Hazard & Pipeline Stall Unit
     U_HAZARD : entity work.Hazard_Unit
         port map (
+            clk           => clk,
+            rst_n         => rst_n,
             stall_m       => stall_m_wire,
             stall_wb_mem  => bus_stall_wire,
             id_rs1_addr   => id_rs1_addr,

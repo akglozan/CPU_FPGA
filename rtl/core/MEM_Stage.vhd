@@ -2,36 +2,63 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+-- MEM-stage top-level wrapper. Drives a Wishbone-style bus transaction
+-- for loads and stores (address, byte-lane select, write data,
+-- cyc/stb/we, waiting on ack), and latches the result -- memory read
+-- data or the carried-through ALU result -- into the MEM/WB pipeline
+-- register via MEM_WB_Register.
 entity mem_stage is
     port (
         clk   : in std_logic;
+        -- Active-low synchronous reset.
         rst_n : in std_logic;
 
+        -- Stall from the Hazard Unit (mirrors bus_stall_o upstream).
         stall_wb : in std_logic;
 
+        -- Byte address of the memory access.
         mem_addr       : in std_logic_vector(31 downto 0);
+        -- ALU result, carried through for non-memory write-back.
         mem_result     : in std_logic_vector(31 downto 0);
+        -- rs2 data to store (pre-formatted, not yet lane-aligned).
         mem_write_data : in std_logic_vector(31 downto 0);
+        -- Destination register address.
         mem_rd_addr    : in std_logic_vector(4 downto 0);
+        -- PC+4, latched through for JAL/JALR write-back.
         mem_pc_plus4 : in std_logic_vector(31 downto 0);
 
+        -- Register file write enable.
         mem_reg_write  : in std_logic;
+        -- Asserted for load instructions.
         mem_read       : in std_logic;
+        -- Asserted for store instructions.
         mem_write      : in std_logic;
+        -- Write-back source select.
         mem_wb_sel      : in std_logic_vector(1 downto 0);
+        -- funct3 field; selects byte lane and store data replication.
         mem_funct3      : in std_logic_vector(2 downto 0);
 
+        -- Bus address output.
         wb_addr_o      : out std_logic_vector(31 downto 0);
+        -- Byte-replicated store data output to the bus.
         wb_data_o      : out std_logic_vector(31 downto 0);
+        -- Bus read data input.
         wb_data_i      : in  std_logic_vector(31 downto 0);
-        wb_sel_o       : out std_logic_vector(3 downto 0);
+        -- Byte-lane select for the bus write.
+        wb_sel_bus_o   : out std_logic_vector(3 downto 0);
+        -- Bus write-enable.
         wb_we_o        : out std_logic;
+        -- Bus strobe.
         wb_stb_o       : out std_logic;
+        -- Bus cycle indicator.
         wb_cyc_o       : out std_logic;
+        -- Bus acknowledge input.
         wb_ack_i       : in  std_logic;
 
+        -- Asserted while a bus transaction is in progress without ack.
         bus_stall_o    : out std_logic;
 
+        -- Registered write-back outputs from MEM_WB_Register, below.
         wb_result_o    : out std_logic_vector(31 downto 0);
         wb_read_data_o : out std_logic_vector(31 downto 0);
         wb_rd_addr_o   : out std_logic_vector(4 downto 0);
@@ -86,7 +113,7 @@ begin
         end if;
     end process;
 
-    wb_sel_o <= byte_sel;
+    wb_sel_bus_o <= byte_sel;
 
     process (mem_funct3, mem_write_data)
     begin
@@ -106,26 +133,27 @@ begin
         end case;
     end process;
 
-    u_mem_wb_register : entity work.mem_wb_register
+    u_mem_wb_register : entity work.MEM_WB_Register
         port map (
-            clk           => clk,
-            rst_n         => rst_n,
-            stall         => stall_wb,
-            flush         => '0',
+            clk               => clk,
+            rst_n             => rst_n,
+            stall             => stall_wb,
+            flush             => '0',
 
-            mem_result    => mem_result,
-            mem_read_data => wb_data_i,
-            mem_pc_plus4 => mem_pc_plus4,
-            mem_rd_addr   => mem_rd_addr,
-            mem_reg_write => mem_reg_write,
-            mem_wb_sel     => mem_wb_sel,
+            mem_result_in     => mem_result,
+            mem_read_data_in  => wb_data_i,
+            mem_pc_plus4_in   => mem_pc_plus4,
+            rd_addr_in        => mem_rd_addr,
 
-            wb_result     => wb_result_o,
-            wb_read_data  => wb_read_data_o,
-            wb_pc_plus4   => wb_pc_plus4_o,
-            wb_rd_addr    => wb_rd_addr_o,
-            wb_reg_write  => wb_reg_write_o,
-            wb_wb_sel     => wb_sel_o
+            reg_write_in      => mem_reg_write,
+            wb_sel_in         => mem_wb_sel,
+
+            wb_result_out     => wb_result_o,
+            wb_read_data_out  => wb_read_data_o,
+            wb_pc_plus4_out   => wb_pc_plus4_o,
+            wb_rd_addr_out    => wb_rd_addr_o,
+            wb_reg_write_out  => wb_reg_write_o,
+            wb_sel_out        => wb_sel_o
         );
 
 end architecture rtl;

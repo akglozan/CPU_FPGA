@@ -17,52 +17,90 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- ID-stage top-level wrapper. Instantiates the RegFile, Control_Unit,
+-- ImmGen, and ID_EX_Register, wiring the decoded instruction fields
+-- and register reads through to the pipeline register that latches
+-- everything for the EX stage. Also exposes the raw (pre-register)
+-- rs1/rs2 addresses and read data to the Hazard Unit and Forwarding
+-- Unit for hazard detection.
 entity ID_Stage is
     port (
         clk             : in  std_logic;
+        -- Active-low synchronous reset.
         rst_n           : in  std_logic;
         
         -- Hazard Controls from Hazard_Unit
+        -- Forwarded to ID_EX_Register's stall input.
         id_ex_stall     : in  std_logic;
+        -- Forwarded to ID_EX_Register's flush input.
         id_ex_flush     : in  std_logic;
         
         -- Inputs from IF/ID Register
+        -- Program counter of the instruction being decoded.
         id_pc_in        : in  std_logic_vector(31 downto 0);
+        -- PC+4, carried through for JAL/JALR write-back.
         id_pc_plus4_in  : in  std_logic_vector(31 downto 0);
+        -- Raw instruction word to decode.
         id_instr_in     : in  std_logic_vector(31 downto 0);
         
         -- Inputs from WB Stage
+        -- Register file write enable from the WB stage.
         wb_reg_write    : in  std_logic;
+        -- Register file write address from the WB stage.
         wb_rd_addr      : in  std_logic_vector(4 downto 0);
+        -- Register file write data from the WB stage.
         wb_rd_data      : in  std_logic_vector(31 downto 0);
         
         -- Outputs to Hazard Unit
+        -- Raw (pre-pipeline-register) rs1 address, decoded this cycle.
         id_rs1_addr_out : out std_logic_vector(4 downto 0);
+        -- Raw (pre-pipeline-register) rs2 address, decoded this cycle.
         id_rs2_addr_out : out std_logic_vector(4 downto 0);
+        -- RegFile read data for rs1 this cycle.
         id_rs1_data_out : out std_logic_vector(31 downto 0);
+        -- RegFile read data for rs2 this cycle.
         id_rs2_data_out : out std_logic_vector(31 downto 0);
         
         -- Outputs from ID/EX Pipeline Register to EX Stage
+        -- See ID_EX_Register's pc_out.
         ex_pc_out       : out std_logic_vector(31 downto 0);
+        -- See ID_EX_Register's pc_plus4_out.
         ex_pc_plus4_out : out std_logic_vector(31 downto 0);
+        -- See ID_EX_Register's imm_ext_out.
         ex_imm_ext_out  : out std_logic_vector(31 downto 0);
+        -- See ID_EX_Register's reg_data1_out.
         ex_reg_data1_out: out std_logic_vector(31 downto 0);
+        -- See ID_EX_Register's reg_data2_out.
         ex_reg_data2_out: out std_logic_vector(31 downto 0);
+        -- See ID_EX_Register's rs1_addr_out.
         ex_rs1_addr_out : out std_logic_vector(4 downto 0);
+        -- See ID_EX_Register's rs2_addr_out.
         ex_rs2_addr_out : out std_logic_vector(4 downto 0);
+        -- See ID_EX_Register's rd_addr_out.
         ex_rd_addr_out  : out std_logic_vector(4 downto 0);
+        -- See ID_EX_Register's funct3_out.
         ex_funct3_out   : out std_logic_vector(2 downto 0);
         
         -- EX Control Outputs
+        -- See ID_EX_Register's alu_src_out.
         ex_alu_src_out  : out std_logic;
+        -- See ID_EX_Register's alu_src_a_out.
         ex_alu_src_a_out: out std_logic;
+        -- See ID_EX_Register's alu_ctrl_out.
         ex_alu_ctrl_out : out std_logic_vector(3 downto 0);
+        -- See ID_EX_Register's is_m_ext_out.
         ex_is_m_ext_out : out std_logic;
+        -- See ID_EX_Register's mem_read_out.
         ex_mem_read_out : out std_logic;
+        -- See ID_EX_Register's mem_write_out.
         ex_mem_write_out: out std_logic;
+        -- See ID_EX_Register's branch_out.
         ex_branch_out   : out std_logic;
+        -- See ID_EX_Register's jump_out.
         ex_jump_out     : out std_logic;
+        -- See ID_EX_Register's reg_write_out.
         ex_reg_write_out: out std_logic;
+        -- See ID_EX_Register's wb_sel_out.
         ex_wb_sel_out   : out std_logic_vector(1 downto 0)
     );
 end entity ID_Stage;

@@ -18,16 +18,34 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 
+-- Byte-addressable synchronous data memory (BRAM), implementing RV32I
+-- load/store byte/halfword/word semantics with sign/zero extension.
+-- 1024 words x 32 bits (4 KB). Writes are byte-masked according to
+-- funct3 and the address's alignment bits; reads are registered for
+-- one cycle (raw_read_data) and then combinationally formatted --
+-- sign- or zero-extended per the latched funct3 -- for output.
 entity Data_Memory is
 
 	port(
 	
+		-- System clock; both the write and the raw read register update
+		-- on the rising edge.
 		clk			:	in std_logic;
+		-- Write enable for a store operation this cycle.
 		mem_write	:	in std_logic;
+		-- Read enable for a load operation this cycle (latched for the
+		-- following cycle's output formatting).
 		mem_read		:	in std_logic;
+		-- RISC-V funct3 field: selects SB/SH/SW on write, and
+		-- LB/LBU/LH/LHU/LW formatting on read.
 		funct3		:	in std_logic_vector(2 downto 0);
+		-- Byte address for both the read and write access.
 		addr			:	in	std_logic_vector(31 downto 0);
+		-- Data to store; internally byte-replicated so the byte_enable
+		-- mask can select the correct lane regardless of alignment.
 		write_data	:	in	std_logic_vector(31 downto 0);
+		-- Formatted, sign/zero-extended read result; forced to zero
+		-- during non-load cycles or pipeline bubbles.
 		read_data	:	out	std_logic_vector(31 downto 0)
 	
 	);

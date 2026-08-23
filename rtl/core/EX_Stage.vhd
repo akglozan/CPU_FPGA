@@ -17,58 +17,105 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- EX-stage top-level wrapper. Instantiates the Forwarding_Unit, ALU,
+-- M_Extension_Unit, and ex_mem_register, resolving forwarded operands,
+-- computing the ALU/M-extension result, evaluating branch conditions
+-- and JAL/JALR target addresses, and latching everything into the
+-- EX/MEM pipeline register.
 entity EX_Stage is
     port (
         clk                     : in  std_logic;
+        -- Active-low synchronous reset.
         rst_n                   : in  std_logic;
         stall_ex_mem_in         : in  std_logic; -- From Hazard Unit
         
         -- Inputs from ID/EX Register
+        -- Program counter of the instruction in EX.
         ex_pc_in                : in  std_logic_vector(31 downto 0);
+        -- PC+4, used for JAL/JALR target calc and write-back.
         ex_pc_plus4_in          : in  std_logic_vector(31 downto 0);
+        -- Sign-extended immediate.
         ex_imm_ext_in           : in  std_logic_vector(31 downto 0);
+        -- Register file read data for rs1 (pre-forwarding).
         ex_reg_data1_in         : in  std_logic_vector(31 downto 0);
+        -- Register file read data for rs2 (pre-forwarding).
         ex_reg_data2_in         : in  std_logic_vector(31 downto 0);
+        -- Source register 1 address, for the Forwarding Unit.
         ex_rs1_addr_in          : in  std_logic_vector(4 downto 0);
+        -- Source register 2 address, for the Forwarding Unit.
         ex_rs2_addr_in          : in  std_logic_vector(4 downto 0);
+        -- Destination register address.
         ex_rd_addr_in           : in  std_logic_vector(4 downto 0);
+        -- funct3 field, for M-extension op selection and branch
+        -- condition evaluation.
         ex_funct3_in            : in  std_logic_vector(2 downto 0);
         
         -- Control Inputs from ID/EX Register
+        -- Selects ALU operand B: forwarded register value or immediate.
         ex_alu_src_in           : in  std_logic;
+        -- Selects ALU operand A: forwarded register value or PC (AUIPC).
         ex_alu_src_a_in         : in  std_logic;
+        -- 4-bit ALU operation select.
         ex_alu_ctrl_in          : in  std_logic_vector(3 downto 0);
+        -- Asserted for RV32M multiply/divide instructions.
         ex_is_m_ext_in          : in  std_logic;
+        -- Asserted for load instructions.
         ex_mem_read_in          : in  std_logic;
+        -- Asserted for store instructions.
         ex_mem_write_in         : in  std_logic;
+        -- Asserted for conditional branch instructions.
         ex_branch_in            : in  std_logic;
+        -- Asserted for unconditional jump instructions.
         ex_jump_in              : in  std_logic;
+        -- Register file write enable.
         ex_reg_write_in         : in  std_logic;
+        -- Write-back source select.
         ex_wb_sel_in            : in  std_logic_vector(1 downto 0);
         
         -- Feedback Inputs from MEM and WB Stages for Forwarding
+        -- MEM-stage destination register address.
         mem_rd_addr_in          : in  std_logic_vector(4 downto 0);
+        -- MEM-stage register-write enable.
         mem_reg_write_in        : in  std_logic;
+        -- MEM-stage load indicator (inhibits MEM-stage forwarding).
         mem_mem_read_in         : in  std_logic;
+        -- MEM-stage result value, available for forwarding.
         mem_result_in           : in  std_logic_vector(31 downto 0);
+        -- WB-stage destination register address.
         wb_rd_addr_in           : in  std_logic_vector(4 downto 0);
+        -- WB-stage register-write enable.
         wb_reg_write_in         : in  std_logic;
+        -- WB-stage write-back data, available for forwarding.
         wb_rd_data_in           : in  std_logic_vector(31 downto 0);
         
         -- Outputs to Hazard Unit & Program Counter
+        -- Asserted when a branch/jump in this stage resolves as taken.
         take_branch_out         : out std_logic;
+        -- Computed branch/jump target address.
         target_pc_out           : out std_logic_vector(31 downto 0);
+        -- Asserted while the M-extension unit needs extra cycles.
         stall_m_out             : out std_logic;
         
         -- Outputs to EX/MEM Pipeline Register
+        -- See ex_mem_register's mem_addr.
+        mem_addr_out            : out std_logic_vector(31 downto 0);
+        -- See ex_mem_register's mem_result.
         mem_result_out          : out std_logic_vector(31 downto 0);
+        -- See ex_mem_register's mem_write_data.
         mem_write_data_out      : out std_logic_vector(31 downto 0);
+        -- See ex_mem_register's mem_rd_addr.
         mem_rd_addr_out         : out std_logic_vector(4 downto 0);
+        -- See ex_mem_register's mem_pc_plus4.
         mem_pc_plus4_out        : out std_logic_vector(31 downto 0);
+        -- See ex_mem_register's mem_reg_write.
         mem_reg_write_out       : out std_logic;
+        -- See ex_mem_register's mem_read.
         mem_mem_read_out        : out std_logic;
+        -- See ex_mem_register's mem_write.
         mem_mem_write_out       : out std_logic;
+        -- See ex_mem_register's mem_wb_sel.
         mem_wb_sel_out          : out std_logic_vector(1 downto 0);
+        -- See ex_mem_register's mem_funct3.
         mem_funct3_out          : out std_logic_vector(2 downto 0)
     );
 end entity EX_Stage;
@@ -264,7 +311,7 @@ begin
         clk   => clk,
         rst_n => rst_n,
         flush => '0',
-        stall => ex_mem_stall,
+        stall => ex_mem_stall_combined,
 
         ex_result       => ex_final_result,
         ex_operand_b    => ex_operand_b_forwarded,
@@ -284,8 +331,8 @@ begin
         mem_pc_plus4    => mem_pc_plus4_out,
 
         mem_reg_write   => mem_reg_write_out,
-        mem_read        => mem_read_out,
-        mem_write       => mem_write_out,
+        mem_read        => mem_mem_read_out,
+        mem_write       => mem_mem_write_out,
         mem_wb_sel      => mem_wb_sel_out,
         mem_funct3      => mem_funct3_out
     );

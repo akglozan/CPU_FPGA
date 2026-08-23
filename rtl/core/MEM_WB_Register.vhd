@@ -14,32 +14,50 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 
+-- MEM/WB pipeline register. Latches the memory-stage result -- either
+-- the raw ALU result or the formatted memory read data, selected
+-- later in WB by wb_sel_out -- along with the destination register
+-- address and PC+4 (for JAL/JALR), so the WB stage and the
+-- Forwarding Unit see a stable snapshot for exactly one cycle.
 entity MEM_WB_Register is
 
 	port(
 
 	--System Inputs
 		clk					:	in	std_logic;
+		-- Active-low synchronous reset.
 		rst_n					:	in	std_logic;
+		-- Holds the register's current outputs unchanged this cycle.
 		stall					:	in std_logic;
+		-- Clears all outputs to a bubble this cycle.
 		flush					:	in std_logic;
 
 	--Data Inputs (from MEM Stage)
+		-- ALU result, carried through for non-memory write-back.
 		mem_result_in		:	in std_logic_vector(31 downto 0);
+		-- Formatted memory read data, for load write-back.
 		mem_read_data_in	:	in std_logic_vector(31 downto 0);
 		mem_pc_plus4_in		:	in std_logic_vector(31 downto 0); -- NEW: latched PC+4
+		-- Destination register address.
 		rd_addr_in			:	in	std_logic_vector(4 downto 0);
 
 	--Control Inputs (from MEM Stage)
+		-- Register file write enable.
 		reg_write_in		:	in	std_logic;
+		-- Write-back source select (ALU result / memory data / PC+4).
 		wb_sel_in			:	in std_logic_vector(1 downto 0);
 
 	--Outputs (to WB Stage & Forwarding Unit):
+		-- Registered mem_result_in.
 		wb_result_out		:	out	std_logic_vector(31 downto 0);
+		-- Registered mem_read_data_in.
 		wb_read_data_out	:	out	std_logic_vector(31 downto 0);
 		wb_pc_plus4_out		:	out	std_logic_vector(31 downto 0); -- NEW: registered output
+		-- Registered rd_addr_in.
 		wb_rd_addr_out		:	out	std_logic_vector(4 downto 0);
+		-- Registered reg_write_in.
 		wb_reg_write_out	:	out	std_logic;
+		-- Registered wb_sel_in.
 		wb_sel_out			:	out	std_logic_vector(1 downto 0)
 
 	);

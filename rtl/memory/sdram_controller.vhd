@@ -12,6 +12,14 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+-- SDRAM controller for a 16-bit-wide SDR SDRAM chip, exposed as a
+-- Wishbone B4 slave. Handles the power-on init sequence (precharge
+-- all banks, two auto-refresh cycles, mode register load: sequential
+-- burst, BL=2, CAS=2), periodic auto-refresh, and single-word
+-- transactions -- each 32-bit CPU word is split across two 16-bit
+-- SDRAM beats (burst length 2). Only one row is ever open at a time:
+-- every transaction precharges the row it used before returning to
+-- ST_IDLE, trading peak throughput for a much simpler FSM.
 entity sdram_controller is
     generic (
         CLK_FREQ_MHZ : integer := 50;   -- System Clock Frequency in MHz
@@ -19,6 +27,7 @@ entity sdram_controller is
     );
     port (
         clk           : in    std_logic;
+        -- Active-low asynchronous reset.
         reset_n       : in    std_logic;
 
         -- Wishbone B4 Slave Interface
@@ -32,14 +41,23 @@ entity sdram_controller is
         wb_ack_o      : out   std_logic;
 
         -- Physical SDRAM Pins
+        -- Clock enable; tied permanently high.
         sdram_cke     : out   std_logic;
+        -- Chip select, active low (part of the 4-bit command bus).
         sdram_cs_n    : out   std_logic;
+        -- Row address strobe, active low (part of the command bus).
         sdram_ras_n   : out   std_logic;
+        -- Column address strobe, active low (part of the command bus).
         sdram_cas_n   : out   std_logic;
+        -- Write enable, active low (part of the command bus).
         sdram_we_n    : out   std_logic;
+        -- Bank address select.
         sdram_ba      : out   std_logic_vector(1 downto 0);
+        -- Multiplexed row/column address bus.
         sdram_addr    : out   std_logic_vector(11 downto 0);
+        -- Data mask, one bit per byte lane of the 16-bit data bus.
         sdram_dqm     : out   std_logic_vector(1 downto 0);
+        -- Bidirectional 16-bit SDRAM data bus.
         sdram_dq      : inout std_logic_vector(15 downto 0)
     );
 end entity sdram_controller;

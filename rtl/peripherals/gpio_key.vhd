@@ -17,13 +17,20 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- 4-button GPIO input peripheral. Double-flops the raw asynchronous
+-- key inputs onto the system clock (a standard 2-stage synchronizer)
+-- to avoid metastability, and exposes the synchronized value
+-- zero-extended to a 32-bit MMIO read word.
 entity gpio_key is
 
 	port(
 		clk 	:	in std_logic;
+		-- Active-low synchronous reset.
 		rst_n	:	in std_logic;
+		-- Raw, asynchronous button inputs.
 		key_in:	in std_logic_vector(3 downto 0);
 		
+		-- Synchronized key state, zero-extended to 32 bits.
 		key_rdata	: out std_logic_vector(31 downto 0)
 		
 		

@@ -1,0 +1,62 @@
+
+build/firmware.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:	00001117          	auipc	sp,0x1
+   4:	00010113          	mv	sp,sp
+   8:	0b400293          	li	t0,180
+   c:	0b400313          	li	t1,180
+
+00000010 <bss_check>:
+  10:	0062d863          	bge	t0,t1,20 <bss_clear_done>
+
+00000014 <bss_clear_loop>:
+  14:	0002a023          	sw	zero,0(t0)
+  18:	00428293          	addi	t0,t0,4
+  1c:	fe62cce3          	blt	t0,t1,14 <bss_clear_loop>
+
+00000020 <bss_clear_done>:
+  20:	008000ef          	jal	28 <main>
+
+00000024 <trap_loop>:
+  24:	0000006f          	j	24 <trap_loop>
+
+00000028 <main>:
+  28:	e00006b7          	lui	a3,0xe0000
+  2c:	00f00613          	li	a2,15
+  30:	ff010113          	addi	sp,sp,-16 # ff0 <_ebss+0xf3c>
+  34:	04100713          	li	a4,65
+  38:	00c6a023          	sw	a2,0(a3) # e0000000 <_estack+0xdffff000>
+  3c:	00e6a423          	sw	a4,8(a3)
+  40:	04200713          	li	a4,66
+  44:	00e6a423          	sw	a4,8(a3)
+  48:	04300713          	li	a4,67
+  4c:	00e6a423          	sw	a4,8(a3)
+  50:	00d00713          	li	a4,13
+  54:	00e6a423          	sw	a4,8(a3)
+  58:	00a00593          	li	a1,10
+  5c:	001e8737          	lui	a4,0x1e8
+  60:	00b6a423          	sw	a1,8(a3)
+  64:	47f70713          	addi	a4,a4,1151 # 1e847f <_estack+0x1e747f>
+  68:	0006a023          	sw	zero,0(a3)
+  6c:	00012623          	sw	zero,12(sp)
+  70:	00c12783          	lw	a5,12(sp)
+  74:	00f76c63          	bltu	a4,a5,8c <main+0x64>
+  78:	00c12783          	lw	a5,12(sp)
+  7c:	00178793          	addi	a5,a5,1
+  80:	00f12623          	sw	a5,12(sp)
+  84:	00c12783          	lw	a5,12(sp)
+  88:	fef778e3          	bgeu	a4,a5,78 <main+0x50>
+  8c:	00c6a023          	sw	a2,0(a3)
+  90:	00012423          	sw	zero,8(sp)
+  94:	00812783          	lw	a5,8(sp)
+  98:	fcf768e3          	bltu	a4,a5,68 <main+0x40>
+  9c:	00812783          	lw	a5,8(sp)
+  a0:	00178793          	addi	a5,a5,1
+  a4:	00f12423          	sw	a5,8(sp)
+  a8:	00812783          	lw	a5,8(sp)
+  ac:	fef778e3          	bgeu	a4,a5,9c <main+0x74>
+  b0:	fb9ff06f          	j	68 <main+0x40>

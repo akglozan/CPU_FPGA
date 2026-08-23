@@ -17,6 +17,13 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- Legacy MMIO address decoder: splits the CPU's data address space
+-- into internal data RAM (bit 31 = '0') and a memory-mapped
+-- peripheral region (bit 31 = '1'), decoding an 8-bit offset within
+-- MMIO space to individual peripheral read muxes and write strobes
+-- (LED at 0x00, key input at 0x04, UART TX/busy at 0x08/0x0C, timer
+-- at 0x10). Superseded in the current bus topology by
+-- bus_interconnect.vhd + periph_bridge.vhd, but still present.
 entity Bus_Decoder is
     
     port (

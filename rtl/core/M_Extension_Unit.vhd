@@ -17,16 +17,28 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- RV32M multiply/divide extension unit. MUL/MULH/MULHSU/MULHU are
+-- computed combinationally in a single cycle via a 33x33-bit signed
+-- multiplier; DIV/DIVU/REM/REMU run through a 32-cycle
+-- restoring-division FSM (IDLE -> COMPUTE -> DONE), asserting stall_m
+-- for the duration so the pipeline holds until the result is ready.
+-- Division by zero and the INT_MIN / -1 overflow case are special-
+-- cased per the RISC-V spec (quotient = all-ones or INT_MIN,
+-- remainder = dividend or zero).
 entity M_Extension_Unit is
 
 	port(
 	
 	--System Inputs
 		clk	:	in std_logic;
+		-- Active-low synchronous reset.
 		rst_n	:	in std_logic;
 		
 	--Control Inputs
+		-- Asserted for RV32M multiply/divide instructions.
 		is_m_ext	: 	in std_logic;
+		-- funct3 field: selects MUL/MULH/MULHSU/MULHU or
+		-- DIV/DIVU/REM/REMU and their signedness.
 		funct3	:	in std_logic_vector(2 downto 0);
 		
 	--Data Inputs
@@ -34,9 +46,11 @@ entity M_Extension_Unit is
 		operand_b	: in std_logic_vector(31 downto 0);
 		
 	--Data Outputs
+		-- Selected multiply or divide/remainder result.
 		m_result		: out std_logic_vector(31 downto 0);
 		
 	--Status Outputs
+		-- Asserted while a multi-cycle divide is still in progress.
 		stall_m		: out std_logic
 		
 	

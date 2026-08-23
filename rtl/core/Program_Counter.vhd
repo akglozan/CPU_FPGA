@@ -17,9 +17,15 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- Program counter register for the IF stage. Synchronously updates
+-- each clock unless frozen by pc_write='0' (pipeline stall), either
+-- incrementing by 4 for the next sequential instruction or loading a
+-- branch/jump target when pc_src='1'. Also exposes pc_plus4 for
+-- link-address calculation (JAL/JALR return address).
 entity Program_Counter is
 	generic(
 	
+	-- Width of the PC register in bits (32 for RV32).
 	data_width:integer :=32
 	
 	);
@@ -27,6 +33,7 @@ entity Program_Counter is
 	port(
 		clk		:	in	std_logic;
 		
+		-- Active-low synchronous reset; clears the PC to 0.
 		rst_n		:	in	std_logic;
 		
 		pc_write :	in	std_logic; -- Write Enable / Stall Signal

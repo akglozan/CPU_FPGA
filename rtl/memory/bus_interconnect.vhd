@@ -5,16 +5,31 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+-- Central Wishbone B4 bus interconnect / address decoder. Routes the
+-- single CPU master onto one of four slaves based on the address
+-- range presented on m_adr_i: internal BRAM (bootloader), external
+-- SDRAM, the VGA framebuffer, or the peripheral bridge (UART, GPIO,
+-- timer, etc). Only one slave's cyc/stb are ever asserted at a time;
+-- an address matching no slave still generates a synchronous-looking
+-- ack so the CPU doesn't hang on a stray access.
 entity bus_interconnect is
     port (
         -- Wishbone master interface
+        -- Byte address from the CPU.
         m_adr_i : in  std_logic_vector(31 downto 0);
+        -- Write data from the CPU.
         m_dat_i : in  std_logic_vector(31 downto 0);
+        -- Read data returned to the CPU from the selected slave.
         m_dat_o : out std_logic_vector(31 downto 0);
+        -- Write enable from the CPU.
         m_we_i  : in  std_logic;
+        -- Byte-lane select from the CPU.
         m_sel_i : in  std_logic_vector(3 downto 0);
+        -- Strobe from the CPU.
         m_stb_i : in  std_logic;
+        -- Cycle indicator from the CPU.
         m_cyc_i : in  std_logic;
+        -- Acknowledge returned to the CPU from the selected slave.
         m_ack_o : out std_logic;
 
         -- Slave 0: internal BRAM
@@ -23,7 +38,9 @@ entity bus_interconnect is
         s0_dat_i : in  std_logic_vector(31 downto 0);
         s0_sel_o : out std_logic_vector(3 downto 0);
         s0_we_o  : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s0_stb_o : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s0_cyc_o : out std_logic;
         s0_ack_i : in  std_logic;
 
@@ -33,7 +50,9 @@ entity bus_interconnect is
         s1_dat_i : in  std_logic_vector(31 downto 0);
         s1_sel_o : out std_logic_vector(3 downto 0);
         s1_we_o  : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s1_stb_o : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s1_cyc_o : out std_logic;
         s1_ack_i : in  std_logic;
 
@@ -43,7 +62,9 @@ entity bus_interconnect is
         s2_dat_i : in  std_logic_vector(31 downto 0);
         s2_sel_o : out std_logic_vector(3 downto 0);
         s2_we_o  : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s2_stb_o : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s2_cyc_o : out std_logic;
         s2_ack_i : in  std_logic;
 
@@ -53,7 +74,9 @@ entity bus_interconnect is
         s3_dat_i : in  std_logic_vector(31 downto 0);
         s3_sel_o : out std_logic_vector(3 downto 0);
         s3_we_o  : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s3_stb_o : out std_logic;
+        -- Asserted only while address decode selects this slave.
         s3_cyc_o : out std_logic;
         s3_ack_i : in  std_logic
     );
@@ -137,7 +160,9 @@ begin
         s2_dat_i,
         s2_ack_i,
         s3_dat_i,
-        s3_ack_i
+        s3_ack_i,
+        m_stb_i,
+        m_cyc_i
     )
     begin
         m_dat_o <= (others => '0');
@@ -162,7 +187,7 @@ begin
 
             when slave_none =>
                 m_dat_o <= (others => '0');
-                m_ack_o <= '0';
+                m_ack_o <= m_stb_i and m_cyc_i;
         end case;
     end process;
 

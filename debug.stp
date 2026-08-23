@@ -1,0 +1,988 @@
+<session jtag_chain="USB-Blaster [USB-0]" jtag_device="@1: 10CL006(Y|Z)/10CL010(Y|Z)/.. (0x020F10DD)" sof_file="output_files/CPU_FPGA.sof">
+  <display_tree gui_logging_enabled="0">
+    <display_branch instance="auto_signaltap_0" signal_set="USE_GLOBAL_TEMP" trigger="USE_GLOBAL_TEMP"/>
+  </display_tree>
+  <global_info>
+    <single attribute="active instance" value="0"/>
+    <single attribute="lock mode" value="0"/>
+    <multi attribute="frame size" size="2" value="1426,819"/>
+    <single attribute="jtag widget visible" value="1"/>
+    <multi attribute="jtag widget size" size="2" value="316,187"/>
+    <single attribute="instance widget visible" value="1"/>
+    <single attribute="config widget visible" value="1"/>
+    <single attribute="hierarchy widget visible" value="1"/>
+    <single attribute="data log widget visible" value="1"/>
+    <multi attribute="column width" size="23" value="34,34,348,74,68,78,95,96,98,98,88,88,110,101,101,101,101,101,101,101,101,107,78"/>
+    <single attribute="sof manager visible" value="1"/>
+  </global_info>
+  <instance enabled="true" entity_name="sld_signaltap" is_auto_node="yes" is_expanded="true" name="auto_signaltap_0" source_file="sld_signaltap.vhd">
+    <node_ip_info instance_id="0" mfg_id="110" node_id="0" version="6"/>
+    <position_info>
+      <single attribute="setup vertical scroll position" value="0"/>
+      <single attribute="setup horizontal scroll position" value="0"/>
+      <single attribute="active tab" value="0"/>
+      <single attribute="data vertical scroll position" value="0"/>
+      <single attribute="data horizontal scroll position" value="0"/>
+      <single attribute="zoom level numerator" value="1"/>
+      <single attribute="zoom level denominator" value="1"/>
+      <single attribute="zoom offset numerator" value="129024"/>
+      <single attribute="zoom offset denominator" value="1"/>
+    </position_info>
+    <signal_set is_expanded="true" name="signal_set: 2026/08/23 02:39:51  #0">
+      <clock name="clk" polarity="posedge" tap_mode="probeonly"/>
+      <config pipeline_level="1" ram_type="AUTO" reserved_data_nodes="0" reserved_storage_qualifier_nodes="0" reserved_trigger_nodes="0" sample_depth="2048" trigger_in_enable="no" trigger_out_enable="no"/>
+      <top_entity/>
+      <signal_vec>
+        <trigger_input_vec>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" tap_mode="classic"/>
+          <wire name="instruction[0]" tap_mode="classic"/>
+          <wire name="instruction[10]" tap_mode="classic"/>
+          <wire name="instruction[11]" tap_mode="classic"/>
+          <wire name="instruction[12]" tap_mode="classic"/>
+          <wire name="instruction[13]" tap_mode="classic"/>
+          <wire name="instruction[14]" tap_mode="classic"/>
+          <wire name="instruction[15]" tap_mode="classic"/>
+          <wire name="instruction[16]" tap_mode="classic"/>
+          <wire name="instruction[17]" tap_mode="classic"/>
+          <wire name="instruction[18]" tap_mode="classic"/>
+          <wire name="instruction[19]" tap_mode="classic"/>
+          <wire name="instruction[1]" tap_mode="classic"/>
+          <wire name="instruction[20]" tap_mode="classic"/>
+          <wire name="instruction[21]" tap_mode="classic"/>
+          <wire name="instruction[22]" tap_mode="classic"/>
+          <wire name="instruction[23]" tap_mode="classic"/>
+          <wire name="instruction[24]" tap_mode="classic"/>
+          <wire name="instruction[25]" tap_mode="classic"/>
+          <wire name="instruction[26]" tap_mode="classic"/>
+          <wire name="instruction[27]" tap_mode="classic"/>
+          <wire name="instruction[28]" tap_mode="classic"/>
+          <wire name="instruction[29]" tap_mode="classic"/>
+          <wire name="instruction[2]" tap_mode="classic"/>
+          <wire name="instruction[30]" tap_mode="classic"/>
+          <wire name="instruction[31]" tap_mode="classic"/>
+          <wire name="instruction[3]" tap_mode="classic"/>
+          <wire name="instruction[4]" tap_mode="classic"/>
+          <wire name="instruction[5]" tap_mode="classic"/>
+          <wire name="instruction[6]" tap_mode="classic"/>
+          <wire name="instruction[7]" tap_mode="classic"/>
+          <wire name="instruction[8]" tap_mode="classic"/>
+          <wire name="instruction[9]" tap_mode="classic"/>
+          <wire name="pc[0]" tap_mode="classic"/>
+          <wire name="pc[10]" tap_mode="classic"/>
+          <wire name="pc[11]" tap_mode="classic"/>
+          <wire name="pc[12]" tap_mode="classic"/>
+          <wire name="pc[13]" tap_mode="classic"/>
+          <wire name="pc[14]" tap_mode="classic"/>
+          <wire name="pc[15]" tap_mode="classic"/>
+          <wire name="pc[16]" tap_mode="classic"/>
+          <wire name="pc[17]" tap_mode="classic"/>
+          <wire name="pc[18]" tap_mode="classic"/>
+          <wire name="pc[19]" tap_mode="classic"/>
+          <wire name="pc[1]" tap_mode="classic"/>
+          <wire name="pc[20]" tap_mode="classic"/>
+          <wire name="pc[21]" tap_mode="classic"/>
+          <wire name="pc[22]" tap_mode="classic"/>
+          <wire name="pc[23]" tap_mode="classic"/>
+          <wire name="pc[24]" tap_mode="classic"/>
+          <wire name="pc[25]" tap_mode="classic"/>
+          <wire name="pc[26]" tap_mode="classic"/>
+          <wire name="pc[27]" tap_mode="classic"/>
+          <wire name="pc[28]" tap_mode="classic"/>
+          <wire name="pc[29]" tap_mode="classic"/>
+          <wire name="pc[2]" tap_mode="classic"/>
+          <wire name="pc[30]" tap_mode="classic"/>
+          <wire name="pc[31]" tap_mode="classic"/>
+          <wire name="pc[3]" tap_mode="classic"/>
+          <wire name="pc[4]" tap_mode="classic"/>
+          <wire name="pc[5]" tap_mode="classic"/>
+          <wire name="pc[6]" tap_mode="classic"/>
+          <wire name="pc[7]" tap_mode="classic"/>
+          <wire name="pc[8]" tap_mode="classic"/>
+          <wire name="pc[9]" tap_mode="classic"/>
+          <wire name="periph_bridge:u_periph_bridge|gpio_led_we" tap_mode="classic"/>
+          <wire name="rst_sync:u_rst_sync|rst_n_sync" tap_mode="classic"/>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" tap_mode="probeonly"/>
+        </trigger_input_vec>
+        <data_input_vec>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" tap_mode="classic"/>
+          <wire name="instruction[0]" tap_mode="classic"/>
+          <wire name="instruction[10]" tap_mode="classic"/>
+          <wire name="instruction[11]" tap_mode="classic"/>
+          <wire name="instruction[12]" tap_mode="classic"/>
+          <wire name="instruction[13]" tap_mode="classic"/>
+          <wire name="instruction[14]" tap_mode="classic"/>
+          <wire name="instruction[15]" tap_mode="classic"/>
+          <wire name="instruction[16]" tap_mode="classic"/>
+          <wire name="instruction[17]" tap_mode="classic"/>
+          <wire name="instruction[18]" tap_mode="classic"/>
+          <wire name="instruction[19]" tap_mode="classic"/>
+          <wire name="instruction[1]" tap_mode="classic"/>
+          <wire name="instruction[20]" tap_mode="classic"/>
+          <wire name="instruction[21]" tap_mode="classic"/>
+          <wire name="instruction[22]" tap_mode="classic"/>
+          <wire name="instruction[23]" tap_mode="classic"/>
+          <wire name="instruction[24]" tap_mode="classic"/>
+          <wire name="instruction[25]" tap_mode="classic"/>
+          <wire name="instruction[26]" tap_mode="classic"/>
+          <wire name="instruction[27]" tap_mode="classic"/>
+          <wire name="instruction[28]" tap_mode="classic"/>
+          <wire name="instruction[29]" tap_mode="classic"/>
+          <wire name="instruction[2]" tap_mode="classic"/>
+          <wire name="instruction[30]" tap_mode="classic"/>
+          <wire name="instruction[31]" tap_mode="classic"/>
+          <wire name="instruction[3]" tap_mode="classic"/>
+          <wire name="instruction[4]" tap_mode="classic"/>
+          <wire name="instruction[5]" tap_mode="classic"/>
+          <wire name="instruction[6]" tap_mode="classic"/>
+          <wire name="instruction[7]" tap_mode="classic"/>
+          <wire name="instruction[8]" tap_mode="classic"/>
+          <wire name="instruction[9]" tap_mode="classic"/>
+          <wire name="pc[0]" tap_mode="classic"/>
+          <wire name="pc[10]" tap_mode="classic"/>
+          <wire name="pc[11]" tap_mode="classic"/>
+          <wire name="pc[12]" tap_mode="classic"/>
+          <wire name="pc[13]" tap_mode="classic"/>
+          <wire name="pc[14]" tap_mode="classic"/>
+          <wire name="pc[15]" tap_mode="classic"/>
+          <wire name="pc[16]" tap_mode="classic"/>
+          <wire name="pc[17]" tap_mode="classic"/>
+          <wire name="pc[18]" tap_mode="classic"/>
+          <wire name="pc[19]" tap_mode="classic"/>
+          <wire name="pc[1]" tap_mode="classic"/>
+          <wire name="pc[20]" tap_mode="classic"/>
+          <wire name="pc[21]" tap_mode="classic"/>
+          <wire name="pc[22]" tap_mode="classic"/>
+          <wire name="pc[23]" tap_mode="classic"/>
+          <wire name="pc[24]" tap_mode="classic"/>
+          <wire name="pc[25]" tap_mode="classic"/>
+          <wire name="pc[26]" tap_mode="classic"/>
+          <wire name="pc[27]" tap_mode="classic"/>
+          <wire name="pc[28]" tap_mode="classic"/>
+          <wire name="pc[29]" tap_mode="classic"/>
+          <wire name="pc[2]" tap_mode="classic"/>
+          <wire name="pc[30]" tap_mode="classic"/>
+          <wire name="pc[31]" tap_mode="classic"/>
+          <wire name="pc[3]" tap_mode="classic"/>
+          <wire name="pc[4]" tap_mode="classic"/>
+          <wire name="pc[5]" tap_mode="classic"/>
+          <wire name="pc[6]" tap_mode="classic"/>
+          <wire name="pc[7]" tap_mode="classic"/>
+          <wire name="pc[8]" tap_mode="classic"/>
+          <wire name="pc[9]" tap_mode="classic"/>
+          <wire name="periph_bridge:u_periph_bridge|gpio_led_we" tap_mode="classic"/>
+          <wire name="rst_sync:u_rst_sync|rst_n_sync" tap_mode="classic"/>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" tap_mode="probeonly"/>
+        </data_input_vec>
+        <storage_qualifier_input_vec>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" tap_mode="classic"/>
+          <wire name="instruction[0]" tap_mode="classic"/>
+          <wire name="instruction[10]" tap_mode="classic"/>
+          <wire name="instruction[11]" tap_mode="classic"/>
+          <wire name="instruction[12]" tap_mode="classic"/>
+          <wire name="instruction[13]" tap_mode="classic"/>
+          <wire name="instruction[14]" tap_mode="classic"/>
+          <wire name="instruction[15]" tap_mode="classic"/>
+          <wire name="instruction[16]" tap_mode="classic"/>
+          <wire name="instruction[17]" tap_mode="classic"/>
+          <wire name="instruction[18]" tap_mode="classic"/>
+          <wire name="instruction[19]" tap_mode="classic"/>
+          <wire name="instruction[1]" tap_mode="classic"/>
+          <wire name="instruction[20]" tap_mode="classic"/>
+          <wire name="instruction[21]" tap_mode="classic"/>
+          <wire name="instruction[22]" tap_mode="classic"/>
+          <wire name="instruction[23]" tap_mode="classic"/>
+          <wire name="instruction[24]" tap_mode="classic"/>
+          <wire name="instruction[25]" tap_mode="classic"/>
+          <wire name="instruction[26]" tap_mode="classic"/>
+          <wire name="instruction[27]" tap_mode="classic"/>
+          <wire name="instruction[28]" tap_mode="classic"/>
+          <wire name="instruction[29]" tap_mode="classic"/>
+          <wire name="instruction[2]" tap_mode="classic"/>
+          <wire name="instruction[30]" tap_mode="classic"/>
+          <wire name="instruction[31]" tap_mode="classic"/>
+          <wire name="instruction[3]" tap_mode="classic"/>
+          <wire name="instruction[4]" tap_mode="classic"/>
+          <wire name="instruction[5]" tap_mode="classic"/>
+          <wire name="instruction[6]" tap_mode="classic"/>
+          <wire name="instruction[7]" tap_mode="classic"/>
+          <wire name="instruction[8]" tap_mode="classic"/>
+          <wire name="instruction[9]" tap_mode="classic"/>
+          <wire name="pc[0]" tap_mode="classic"/>
+          <wire name="pc[10]" tap_mode="classic"/>
+          <wire name="pc[11]" tap_mode="classic"/>
+          <wire name="pc[12]" tap_mode="classic"/>
+          <wire name="pc[13]" tap_mode="classic"/>
+          <wire name="pc[14]" tap_mode="classic"/>
+          <wire name="pc[15]" tap_mode="classic"/>
+          <wire name="pc[16]" tap_mode="classic"/>
+          <wire name="pc[17]" tap_mode="classic"/>
+          <wire name="pc[18]" tap_mode="classic"/>
+          <wire name="pc[19]" tap_mode="classic"/>
+          <wire name="pc[1]" tap_mode="classic"/>
+          <wire name="pc[20]" tap_mode="classic"/>
+          <wire name="pc[21]" tap_mode="classic"/>
+          <wire name="pc[22]" tap_mode="classic"/>
+          <wire name="pc[23]" tap_mode="classic"/>
+          <wire name="pc[24]" tap_mode="classic"/>
+          <wire name="pc[25]" tap_mode="classic"/>
+          <wire name="pc[26]" tap_mode="classic"/>
+          <wire name="pc[27]" tap_mode="classic"/>
+          <wire name="pc[28]" tap_mode="classic"/>
+          <wire name="pc[29]" tap_mode="classic"/>
+          <wire name="pc[2]" tap_mode="classic"/>
+          <wire name="pc[30]" tap_mode="classic"/>
+          <wire name="pc[31]" tap_mode="classic"/>
+          <wire name="pc[3]" tap_mode="classic"/>
+          <wire name="pc[4]" tap_mode="classic"/>
+          <wire name="pc[5]" tap_mode="classic"/>
+          <wire name="pc[6]" tap_mode="classic"/>
+          <wire name="pc[7]" tap_mode="classic"/>
+          <wire name="pc[8]" tap_mode="classic"/>
+          <wire name="pc[9]" tap_mode="classic"/>
+          <wire name="periph_bridge:u_periph_bridge|gpio_led_we" tap_mode="classic"/>
+          <wire name="rst_sync:u_rst_sync|rst_n_sync" tap_mode="classic"/>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" tap_mode="probeonly"/>
+        </storage_qualifier_input_vec>
+      </signal_vec>
+      <presentation>
+        <unified_setup_data_view>
+          <node data_index="67" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" storage_index="67" tap_mode="probeonly" trigger_index="67" type="unknown"/>
+          <node is_selected="false" level-0="alt_or" name="instruction[31..0]" order="msb_to_lsb" type="combinatorial">
+            <node data_index="25" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[31]" storage_index="25" tap_mode="classic" trigger_index="25" type="unknown"/>
+            <node data_index="24" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[30]" storage_index="24" tap_mode="classic" trigger_index="24" type="unknown"/>
+            <node data_index="22" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[29]" storage_index="22" tap_mode="classic" trigger_index="22" type="unknown"/>
+            <node data_index="21" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[28]" storage_index="21" tap_mode="classic" trigger_index="21" type="unknown"/>
+            <node data_index="20" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[27]" storage_index="20" tap_mode="classic" trigger_index="20" type="unknown"/>
+            <node data_index="19" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[26]" storage_index="19" tap_mode="classic" trigger_index="19" type="unknown"/>
+            <node data_index="18" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[25]" storage_index="18" tap_mode="classic" trigger_index="18" type="unknown"/>
+            <node data_index="17" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[24]" storage_index="17" tap_mode="classic" trigger_index="17" type="unknown"/>
+            <node data_index="16" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[23]" storage_index="16" tap_mode="classic" trigger_index="16" type="unknown"/>
+            <node data_index="15" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[22]" storage_index="15" tap_mode="classic" trigger_index="15" type="unknown"/>
+            <node data_index="14" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[21]" storage_index="14" tap_mode="classic" trigger_index="14" type="unknown"/>
+            <node data_index="13" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[20]" storage_index="13" tap_mode="classic" trigger_index="13" type="unknown"/>
+            <node data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[19]" storage_index="11" tap_mode="classic" trigger_index="11" type="unknown"/>
+            <node data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[18]" storage_index="10" tap_mode="classic" trigger_index="10" type="unknown"/>
+            <node data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[17]" storage_index="9" tap_mode="classic" trigger_index="9" type="unknown"/>
+            <node data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[16]" storage_index="8" tap_mode="classic" trigger_index="8" type="unknown"/>
+            <node data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[15]" storage_index="7" tap_mode="classic" trigger_index="7" type="unknown"/>
+            <node data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[14]" storage_index="6" tap_mode="classic" trigger_index="6" type="unknown"/>
+            <node data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[13]" storage_index="5" tap_mode="classic" trigger_index="5" type="unknown"/>
+            <node data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[12]" storage_index="4" tap_mode="classic" trigger_index="4" type="unknown"/>
+            <node data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[11]" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+            <node data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[10]" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+            <node data_index="32" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[9]" storage_index="32" tap_mode="classic" trigger_index="32" type="unknown"/>
+            <node data_index="31" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[8]" storage_index="31" tap_mode="classic" trigger_index="31" type="unknown"/>
+            <node data_index="30" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[7]" storage_index="30" tap_mode="classic" trigger_index="30" type="unknown"/>
+            <node data_index="29" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[6]" storage_index="29" tap_mode="classic" trigger_index="29" type="unknown"/>
+            <node data_index="28" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[5]" storage_index="28" tap_mode="classic" trigger_index="28" type="unknown"/>
+            <node data_index="27" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[4]" storage_index="27" tap_mode="classic" trigger_index="27" type="unknown"/>
+            <node data_index="26" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[3]" storage_index="26" tap_mode="classic" trigger_index="26" type="unknown"/>
+            <node data_index="23" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[2]" storage_index="23" tap_mode="classic" trigger_index="23" type="unknown"/>
+            <node data_index="12" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[1]" storage_index="12" tap_mode="classic" trigger_index="12" type="unknown"/>
+            <node data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[0]" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+          </node>
+          <node data_index="66" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="true" is_storage_input="true" is_trigger_input="true" name="rst_sync:u_rst_sync|rst_n_sync" storage_index="66" tap_mode="classic" trigger_index="66" type="unknown"/>
+          <node data_index="65" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="periph_bridge:u_periph_bridge|gpio_led_we" storage_index="65" tap_mode="classic" trigger_index="65" type="unknown"/>
+          <node is_selected="false" level-0="alt_or" name="pc[31..0]" order="msb_to_lsb" state="collapse" type="combinatorial">
+            <node data_index="57" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[31]" storage_index="57" tap_mode="classic" trigger_index="57" type="unknown"/>
+            <node data_index="56" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[30]" storage_index="56" tap_mode="classic" trigger_index="56" type="unknown"/>
+            <node data_index="54" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[29]" storage_index="54" tap_mode="classic" trigger_index="54" type="unknown"/>
+            <node data_index="53" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[28]" storage_index="53" tap_mode="classic" trigger_index="53" type="unknown"/>
+            <node data_index="52" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[27]" storage_index="52" tap_mode="classic" trigger_index="52" type="unknown"/>
+            <node data_index="51" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[26]" storage_index="51" tap_mode="classic" trigger_index="51" type="unknown"/>
+            <node data_index="50" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[25]" storage_index="50" tap_mode="classic" trigger_index="50" type="unknown"/>
+            <node data_index="49" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[24]" storage_index="49" tap_mode="classic" trigger_index="49" type="unknown"/>
+            <node data_index="48" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[23]" storage_index="48" tap_mode="classic" trigger_index="48" type="unknown"/>
+            <node data_index="47" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[22]" storage_index="47" tap_mode="classic" trigger_index="47" type="unknown"/>
+            <node data_index="46" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[21]" storage_index="46" tap_mode="classic" trigger_index="46" type="unknown"/>
+            <node data_index="45" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[20]" storage_index="45" tap_mode="classic" trigger_index="45" type="unknown"/>
+            <node data_index="43" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[19]" storage_index="43" tap_mode="classic" trigger_index="43" type="unknown"/>
+            <node data_index="42" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[18]" storage_index="42" tap_mode="classic" trigger_index="42" type="unknown"/>
+            <node data_index="41" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[17]" storage_index="41" tap_mode="classic" trigger_index="41" type="unknown"/>
+            <node data_index="40" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[16]" storage_index="40" tap_mode="classic" trigger_index="40" type="unknown"/>
+            <node data_index="39" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[15]" storage_index="39" tap_mode="classic" trigger_index="39" type="unknown"/>
+            <node data_index="38" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[14]" storage_index="38" tap_mode="classic" trigger_index="38" type="unknown"/>
+            <node data_index="37" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[13]" storage_index="37" tap_mode="classic" trigger_index="37" type="unknown"/>
+            <node data_index="36" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[12]" storage_index="36" tap_mode="classic" trigger_index="36" type="unknown"/>
+            <node data_index="35" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[11]" storage_index="35" tap_mode="classic" trigger_index="35" type="unknown"/>
+            <node data_index="34" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[10]" storage_index="34" tap_mode="classic" trigger_index="34" type="unknown"/>
+            <node data_index="64" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[9]" storage_index="64" tap_mode="classic" trigger_index="64" type="unknown"/>
+            <node data_index="63" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[8]" storage_index="63" tap_mode="classic" trigger_index="63" type="unknown"/>
+            <node data_index="62" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[7]" storage_index="62" tap_mode="classic" trigger_index="62" type="unknown"/>
+            <node data_index="61" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[6]" storage_index="61" tap_mode="classic" trigger_index="61" type="unknown"/>
+            <node data_index="60" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[5]" storage_index="60" tap_mode="classic" trigger_index="60" type="unknown"/>
+            <node data_index="59" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[4]" storage_index="59" tap_mode="classic" trigger_index="59" type="unknown"/>
+            <node data_index="58" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[3]" storage_index="58" tap_mode="classic" trigger_index="58" type="unknown"/>
+            <node data_index="55" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[2]" storage_index="55" tap_mode="classic" trigger_index="55" type="unknown"/>
+            <node data_index="44" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[1]" storage_index="44" tap_mode="classic" trigger_index="44" type="unknown"/>
+            <node data_index="33" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[0]" storage_index="33" tap_mode="classic" trigger_index="33" type="unknown"/>
+          </node>
+          <node data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+        </unified_setup_data_view>
+        <data_view>
+          <net data_index="67" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" storage_index="67" tap_mode="probeonly" trigger_index="67" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="instruction[31..0]" order="msb_to_lsb" type="combinatorial">
+            <net data_index="25" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[31]" storage_index="25" tap_mode="classic" trigger_index="25" type="unknown"/>
+            <net data_index="24" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[30]" storage_index="24" tap_mode="classic" trigger_index="24" type="unknown"/>
+            <net data_index="22" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[29]" storage_index="22" tap_mode="classic" trigger_index="22" type="unknown"/>
+            <net data_index="21" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[28]" storage_index="21" tap_mode="classic" trigger_index="21" type="unknown"/>
+            <net data_index="20" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[27]" storage_index="20" tap_mode="classic" trigger_index="20" type="unknown"/>
+            <net data_index="19" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[26]" storage_index="19" tap_mode="classic" trigger_index="19" type="unknown"/>
+            <net data_index="18" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[25]" storage_index="18" tap_mode="classic" trigger_index="18" type="unknown"/>
+            <net data_index="17" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[24]" storage_index="17" tap_mode="classic" trigger_index="17" type="unknown"/>
+            <net data_index="16" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[23]" storage_index="16" tap_mode="classic" trigger_index="16" type="unknown"/>
+            <net data_index="15" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[22]" storage_index="15" tap_mode="classic" trigger_index="15" type="unknown"/>
+            <net data_index="14" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[21]" storage_index="14" tap_mode="classic" trigger_index="14" type="unknown"/>
+            <net data_index="13" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[20]" storage_index="13" tap_mode="classic" trigger_index="13" type="unknown"/>
+            <net data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[19]" storage_index="11" tap_mode="classic" trigger_index="11" type="unknown"/>
+            <net data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[18]" storage_index="10" tap_mode="classic" trigger_index="10" type="unknown"/>
+            <net data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[17]" storage_index="9" tap_mode="classic" trigger_index="9" type="unknown"/>
+            <net data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[16]" storage_index="8" tap_mode="classic" trigger_index="8" type="unknown"/>
+            <net data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[15]" storage_index="7" tap_mode="classic" trigger_index="7" type="unknown"/>
+            <net data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[14]" storage_index="6" tap_mode="classic" trigger_index="6" type="unknown"/>
+            <net data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[13]" storage_index="5" tap_mode="classic" trigger_index="5" type="unknown"/>
+            <net data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[12]" storage_index="4" tap_mode="classic" trigger_index="4" type="unknown"/>
+            <net data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[11]" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+            <net data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[10]" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+            <net data_index="32" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[9]" storage_index="32" tap_mode="classic" trigger_index="32" type="unknown"/>
+            <net data_index="31" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[8]" storage_index="31" tap_mode="classic" trigger_index="31" type="unknown"/>
+            <net data_index="30" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[7]" storage_index="30" tap_mode="classic" trigger_index="30" type="unknown"/>
+            <net data_index="29" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[6]" storage_index="29" tap_mode="classic" trigger_index="29" type="unknown"/>
+            <net data_index="28" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[5]" storage_index="28" tap_mode="classic" trigger_index="28" type="unknown"/>
+            <net data_index="27" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[4]" storage_index="27" tap_mode="classic" trigger_index="27" type="unknown"/>
+            <net data_index="26" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[3]" storage_index="26" tap_mode="classic" trigger_index="26" type="unknown"/>
+            <net data_index="23" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[2]" storage_index="23" tap_mode="classic" trigger_index="23" type="unknown"/>
+            <net data_index="12" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[1]" storage_index="12" tap_mode="classic" trigger_index="12" type="unknown"/>
+            <net data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[0]" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+          </bus>
+          <net data_index="66" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="true" is_storage_input="true" is_trigger_input="true" name="rst_sync:u_rst_sync|rst_n_sync" storage_index="66" tap_mode="classic" trigger_index="66" type="unknown"/>
+          <net data_index="65" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="periph_bridge:u_periph_bridge|gpio_led_we" storage_index="65" tap_mode="classic" trigger_index="65" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="pc[31..0]" order="msb_to_lsb" state="collapse" type="combinatorial">
+            <net data_index="57" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[31]" storage_index="57" tap_mode="classic" trigger_index="57" type="unknown"/>
+            <net data_index="56" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[30]" storage_index="56" tap_mode="classic" trigger_index="56" type="unknown"/>
+            <net data_index="54" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[29]" storage_index="54" tap_mode="classic" trigger_index="54" type="unknown"/>
+            <net data_index="53" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[28]" storage_index="53" tap_mode="classic" trigger_index="53" type="unknown"/>
+            <net data_index="52" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[27]" storage_index="52" tap_mode="classic" trigger_index="52" type="unknown"/>
+            <net data_index="51" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[26]" storage_index="51" tap_mode="classic" trigger_index="51" type="unknown"/>
+            <net data_index="50" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[25]" storage_index="50" tap_mode="classic" trigger_index="50" type="unknown"/>
+            <net data_index="49" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[24]" storage_index="49" tap_mode="classic" trigger_index="49" type="unknown"/>
+            <net data_index="48" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[23]" storage_index="48" tap_mode="classic" trigger_index="48" type="unknown"/>
+            <net data_index="47" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[22]" storage_index="47" tap_mode="classic" trigger_index="47" type="unknown"/>
+            <net data_index="46" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[21]" storage_index="46" tap_mode="classic" trigger_index="46" type="unknown"/>
+            <net data_index="45" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[20]" storage_index="45" tap_mode="classic" trigger_index="45" type="unknown"/>
+            <net data_index="43" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[19]" storage_index="43" tap_mode="classic" trigger_index="43" type="unknown"/>
+            <net data_index="42" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[18]" storage_index="42" tap_mode="classic" trigger_index="42" type="unknown"/>
+            <net data_index="41" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[17]" storage_index="41" tap_mode="classic" trigger_index="41" type="unknown"/>
+            <net data_index="40" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[16]" storage_index="40" tap_mode="classic" trigger_index="40" type="unknown"/>
+            <net data_index="39" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[15]" storage_index="39" tap_mode="classic" trigger_index="39" type="unknown"/>
+            <net data_index="38" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[14]" storage_index="38" tap_mode="classic" trigger_index="38" type="unknown"/>
+            <net data_index="37" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[13]" storage_index="37" tap_mode="classic" trigger_index="37" type="unknown"/>
+            <net data_index="36" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[12]" storage_index="36" tap_mode="classic" trigger_index="36" type="unknown"/>
+            <net data_index="35" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[11]" storage_index="35" tap_mode="classic" trigger_index="35" type="unknown"/>
+            <net data_index="34" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[10]" storage_index="34" tap_mode="classic" trigger_index="34" type="unknown"/>
+            <net data_index="64" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[9]" storage_index="64" tap_mode="classic" trigger_index="64" type="unknown"/>
+            <net data_index="63" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[8]" storage_index="63" tap_mode="classic" trigger_index="63" type="unknown"/>
+            <net data_index="62" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[7]" storage_index="62" tap_mode="classic" trigger_index="62" type="unknown"/>
+            <net data_index="61" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[6]" storage_index="61" tap_mode="classic" trigger_index="61" type="unknown"/>
+            <net data_index="60" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[5]" storage_index="60" tap_mode="classic" trigger_index="60" type="unknown"/>
+            <net data_index="59" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[4]" storage_index="59" tap_mode="classic" trigger_index="59" type="unknown"/>
+            <net data_index="58" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[3]" storage_index="58" tap_mode="classic" trigger_index="58" type="unknown"/>
+            <net data_index="55" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[2]" storage_index="55" tap_mode="classic" trigger_index="55" type="unknown"/>
+            <net data_index="44" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[1]" storage_index="44" tap_mode="classic" trigger_index="44" type="unknown"/>
+            <net data_index="33" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[0]" storage_index="33" tap_mode="classic" trigger_index="33" type="unknown"/>
+          </bus>
+          <net data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+        </data_view>
+        <setup_view>
+          <net data_index="67" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" storage_index="67" tap_mode="probeonly" trigger_index="67" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="instruction[31..0]" order="msb_to_lsb" type="combinatorial">
+            <net data_index="25" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[31]" storage_index="25" tap_mode="classic" trigger_index="25" type="unknown"/>
+            <net data_index="24" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[30]" storage_index="24" tap_mode="classic" trigger_index="24" type="unknown"/>
+            <net data_index="22" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[29]" storage_index="22" tap_mode="classic" trigger_index="22" type="unknown"/>
+            <net data_index="21" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[28]" storage_index="21" tap_mode="classic" trigger_index="21" type="unknown"/>
+            <net data_index="20" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[27]" storage_index="20" tap_mode="classic" trigger_index="20" type="unknown"/>
+            <net data_index="19" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[26]" storage_index="19" tap_mode="classic" trigger_index="19" type="unknown"/>
+            <net data_index="18" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[25]" storage_index="18" tap_mode="classic" trigger_index="18" type="unknown"/>
+            <net data_index="17" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[24]" storage_index="17" tap_mode="classic" trigger_index="17" type="unknown"/>
+            <net data_index="16" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[23]" storage_index="16" tap_mode="classic" trigger_index="16" type="unknown"/>
+            <net data_index="15" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[22]" storage_index="15" tap_mode="classic" trigger_index="15" type="unknown"/>
+            <net data_index="14" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[21]" storage_index="14" tap_mode="classic" trigger_index="14" type="unknown"/>
+            <net data_index="13" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[20]" storage_index="13" tap_mode="classic" trigger_index="13" type="unknown"/>
+            <net data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[19]" storage_index="11" tap_mode="classic" trigger_index="11" type="unknown"/>
+            <net data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[18]" storage_index="10" tap_mode="classic" trigger_index="10" type="unknown"/>
+            <net data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[17]" storage_index="9" tap_mode="classic" trigger_index="9" type="unknown"/>
+            <net data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[16]" storage_index="8" tap_mode="classic" trigger_index="8" type="unknown"/>
+            <net data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[15]" storage_index="7" tap_mode="classic" trigger_index="7" type="unknown"/>
+            <net data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[14]" storage_index="6" tap_mode="classic" trigger_index="6" type="unknown"/>
+            <net data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[13]" storage_index="5" tap_mode="classic" trigger_index="5" type="unknown"/>
+            <net data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[12]" storage_index="4" tap_mode="classic" trigger_index="4" type="unknown"/>
+            <net data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[11]" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+            <net data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[10]" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+            <net data_index="32" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[9]" storage_index="32" tap_mode="classic" trigger_index="32" type="unknown"/>
+            <net data_index="31" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[8]" storage_index="31" tap_mode="classic" trigger_index="31" type="unknown"/>
+            <net data_index="30" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[7]" storage_index="30" tap_mode="classic" trigger_index="30" type="unknown"/>
+            <net data_index="29" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[6]" storage_index="29" tap_mode="classic" trigger_index="29" type="unknown"/>
+            <net data_index="28" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[5]" storage_index="28" tap_mode="classic" trigger_index="28" type="unknown"/>
+            <net data_index="27" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[4]" storage_index="27" tap_mode="classic" trigger_index="27" type="unknown"/>
+            <net data_index="26" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[3]" storage_index="26" tap_mode="classic" trigger_index="26" type="unknown"/>
+            <net data_index="23" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[2]" storage_index="23" tap_mode="classic" trigger_index="23" type="unknown"/>
+            <net data_index="12" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[1]" storage_index="12" tap_mode="classic" trigger_index="12" type="unknown"/>
+            <net data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[0]" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+          </bus>
+          <net data_index="66" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="true" is_storage_input="true" is_trigger_input="true" name="rst_sync:u_rst_sync|rst_n_sync" storage_index="66" tap_mode="classic" trigger_index="66" type="unknown"/>
+          <net data_index="65" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="periph_bridge:u_periph_bridge|gpio_led_we" storage_index="65" tap_mode="classic" trigger_index="65" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="pc[31..0]" order="msb_to_lsb" state="collapse" type="combinatorial">
+            <net data_index="57" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[31]" storage_index="57" tap_mode="classic" trigger_index="57" type="unknown"/>
+            <net data_index="56" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[30]" storage_index="56" tap_mode="classic" trigger_index="56" type="unknown"/>
+            <net data_index="54" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[29]" storage_index="54" tap_mode="classic" trigger_index="54" type="unknown"/>
+            <net data_index="53" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[28]" storage_index="53" tap_mode="classic" trigger_index="53" type="unknown"/>
+            <net data_index="52" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[27]" storage_index="52" tap_mode="classic" trigger_index="52" type="unknown"/>
+            <net data_index="51" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[26]" storage_index="51" tap_mode="classic" trigger_index="51" type="unknown"/>
+            <net data_index="50" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[25]" storage_index="50" tap_mode="classic" trigger_index="50" type="unknown"/>
+            <net data_index="49" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[24]" storage_index="49" tap_mode="classic" trigger_index="49" type="unknown"/>
+            <net data_index="48" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[23]" storage_index="48" tap_mode="classic" trigger_index="48" type="unknown"/>
+            <net data_index="47" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[22]" storage_index="47" tap_mode="classic" trigger_index="47" type="unknown"/>
+            <net data_index="46" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[21]" storage_index="46" tap_mode="classic" trigger_index="46" type="unknown"/>
+            <net data_index="45" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[20]" storage_index="45" tap_mode="classic" trigger_index="45" type="unknown"/>
+            <net data_index="43" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[19]" storage_index="43" tap_mode="classic" trigger_index="43" type="unknown"/>
+            <net data_index="42" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[18]" storage_index="42" tap_mode="classic" trigger_index="42" type="unknown"/>
+            <net data_index="41" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[17]" storage_index="41" tap_mode="classic" trigger_index="41" type="unknown"/>
+            <net data_index="40" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[16]" storage_index="40" tap_mode="classic" trigger_index="40" type="unknown"/>
+            <net data_index="39" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[15]" storage_index="39" tap_mode="classic" trigger_index="39" type="unknown"/>
+            <net data_index="38" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[14]" storage_index="38" tap_mode="classic" trigger_index="38" type="unknown"/>
+            <net data_index="37" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[13]" storage_index="37" tap_mode="classic" trigger_index="37" type="unknown"/>
+            <net data_index="36" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[12]" storage_index="36" tap_mode="classic" trigger_index="36" type="unknown"/>
+            <net data_index="35" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[11]" storage_index="35" tap_mode="classic" trigger_index="35" type="unknown"/>
+            <net data_index="34" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[10]" storage_index="34" tap_mode="classic" trigger_index="34" type="unknown"/>
+            <net data_index="64" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[9]" storage_index="64" tap_mode="classic" trigger_index="64" type="unknown"/>
+            <net data_index="63" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[8]" storage_index="63" tap_mode="classic" trigger_index="63" type="unknown"/>
+            <net data_index="62" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[7]" storage_index="62" tap_mode="classic" trigger_index="62" type="unknown"/>
+            <net data_index="61" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[6]" storage_index="61" tap_mode="classic" trigger_index="61" type="unknown"/>
+            <net data_index="60" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[5]" storage_index="60" tap_mode="classic" trigger_index="60" type="unknown"/>
+            <net data_index="59" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[4]" storage_index="59" tap_mode="classic" trigger_index="59" type="unknown"/>
+            <net data_index="58" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[3]" storage_index="58" tap_mode="classic" trigger_index="58" type="unknown"/>
+            <net data_index="55" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[2]" storage_index="55" tap_mode="classic" trigger_index="55" type="unknown"/>
+            <net data_index="44" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[1]" storage_index="44" tap_mode="classic" trigger_index="44" type="unknown"/>
+            <net data_index="33" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[0]" storage_index="33" tap_mode="classic" trigger_index="33" type="unknown"/>
+          </bus>
+          <net data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+        </setup_view>
+        <trigger_in_editor/>
+        <trigger_out_editor/>
+      </presentation>
+      <trigger CRC="C90E5B54" attribute_mem_mode="false" gap_record="true" is_expanded="true" name="trigger: 2026/08/23 02:39:51  #1" position="pre" power_up_trigger_mode="false" record_data_gap="true" segment_size="64" storage_mode="off" storage_qualifier_disabled="no" storage_qualifier_port_is_pin="true" storage_qualifier_port_name="auto_stp_external_storage_qualifier" storage_qualifier_port_tap_mode="classic" trigger_type="circular">
+        <power_up_trigger position="pre" storage_qualifier_disabled="no"/>
+        <events use_custom_flow_control="no">
+          <level enabled="yes" name="condition1" type="basic">'instruction[0]' == rising edge &amp;&amp; 'instruction[10]' == rising edge &amp;&amp; 'instruction[11]' == rising edge &amp;&amp; 'instruction[12]' == rising edge &amp;&amp; 'instruction[13]' == rising edge &amp;&amp; 'instruction[14]' == rising edge &amp;&amp; 'instruction[15]' == rising edge &amp;&amp; 'instruction[16]' == rising edge &amp;&amp; 'instruction[17]' == rising edge &amp;&amp; 'instruction[18]' == rising edge &amp;&amp; 'instruction[19]' == rising edge &amp;&amp; 'instruction[1]' == rising edge &amp;&amp; 'instruction[20]' == rising edge &amp;&amp; 'instruction[21]' == rising edge &amp;&amp; 'instruction[22]' == rising edge &amp;&amp; 'instruction[23]' == rising edge &amp;&amp; 'instruction[24]' == rising edge &amp;&amp; 'instruction[25]' == rising edge &amp;&amp; 'instruction[26]' == rising edge &amp;&amp; 'instruction[27]' == rising edge &amp;&amp; 'instruction[28]' == rising edge &amp;&amp; 'instruction[29]' == rising edge &amp;&amp; 'instruction[2]' == rising edge &amp;&amp; 'instruction[30]' == rising edge &amp;&amp; 'instruction[31]' == rising edge &amp;&amp; 'instruction[3]' == rising edge &amp;&amp; 'instruction[4]' == rising edge &amp;&amp; 'instruction[5]' == rising edge &amp;&amp; 'instruction[6]' == rising edge &amp;&amp; 'instruction[7]' == rising edge &amp;&amp; 'instruction[8]' == rising edge &amp;&amp; 'instruction[9]' == rising edge
+            <power_up enabled="yes">
+            </power_up>
+            <op_node/>
+          </level>
+        </events>
+        <storage_qualifier_events>
+          <transitional>11111111111111111111111111111111111111111111111111111111111111111111
+            <pwr_up_transitional>11111111111111111111111111111111111111111111111111111111111111111111</pwr_up_transitional>
+          </transitional>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+        </storage_qualifier_events>
+        <log>
+          <data name="log: 2026/08/23 02:39:51  #2"/>
+          <extradata/>
+        </log>
+        <log>
+          <data name="log: 2026/08/23 02:39:53  #0"/>
+          <extradata/>
+        </log>
+      </trigger>
+    </signal_set>
+    <signal_set global_temp="1" name="signal_set: 2026/08/23 02:39:51  #0">
+      <clock name="clk" polarity="posedge" tap_mode="probeonly"/>
+      <config pipeline_level="1" ram_type="AUTO" reserved_data_nodes="0" reserved_storage_qualifier_nodes="0" reserved_trigger_nodes="0" sample_depth="2048" trigger_in_enable="no" trigger_out_enable="no"/>
+      <top_entity/>
+      <signal_vec>
+        <trigger_input_vec>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" tap_mode="classic"/>
+          <wire name="instruction[0]" tap_mode="classic"/>
+          <wire name="instruction[10]" tap_mode="classic"/>
+          <wire name="instruction[11]" tap_mode="classic"/>
+          <wire name="instruction[12]" tap_mode="classic"/>
+          <wire name="instruction[13]" tap_mode="classic"/>
+          <wire name="instruction[14]" tap_mode="classic"/>
+          <wire name="instruction[15]" tap_mode="classic"/>
+          <wire name="instruction[16]" tap_mode="classic"/>
+          <wire name="instruction[17]" tap_mode="classic"/>
+          <wire name="instruction[18]" tap_mode="classic"/>
+          <wire name="instruction[19]" tap_mode="classic"/>
+          <wire name="instruction[1]" tap_mode="classic"/>
+          <wire name="instruction[20]" tap_mode="classic"/>
+          <wire name="instruction[21]" tap_mode="classic"/>
+          <wire name="instruction[22]" tap_mode="classic"/>
+          <wire name="instruction[23]" tap_mode="classic"/>
+          <wire name="instruction[24]" tap_mode="classic"/>
+          <wire name="instruction[25]" tap_mode="classic"/>
+          <wire name="instruction[26]" tap_mode="classic"/>
+          <wire name="instruction[27]" tap_mode="classic"/>
+          <wire name="instruction[28]" tap_mode="classic"/>
+          <wire name="instruction[29]" tap_mode="classic"/>
+          <wire name="instruction[2]" tap_mode="classic"/>
+          <wire name="instruction[30]" tap_mode="classic"/>
+          <wire name="instruction[31]" tap_mode="classic"/>
+          <wire name="instruction[3]" tap_mode="classic"/>
+          <wire name="instruction[4]" tap_mode="classic"/>
+          <wire name="instruction[5]" tap_mode="classic"/>
+          <wire name="instruction[6]" tap_mode="classic"/>
+          <wire name="instruction[7]" tap_mode="classic"/>
+          <wire name="instruction[8]" tap_mode="classic"/>
+          <wire name="instruction[9]" tap_mode="classic"/>
+          <wire name="pc[0]" tap_mode="classic"/>
+          <wire name="pc[10]" tap_mode="classic"/>
+          <wire name="pc[11]" tap_mode="classic"/>
+          <wire name="pc[12]" tap_mode="classic"/>
+          <wire name="pc[13]" tap_mode="classic"/>
+          <wire name="pc[14]" tap_mode="classic"/>
+          <wire name="pc[15]" tap_mode="classic"/>
+          <wire name="pc[16]" tap_mode="classic"/>
+          <wire name="pc[17]" tap_mode="classic"/>
+          <wire name="pc[18]" tap_mode="classic"/>
+          <wire name="pc[19]" tap_mode="classic"/>
+          <wire name="pc[1]" tap_mode="classic"/>
+          <wire name="pc[20]" tap_mode="classic"/>
+          <wire name="pc[21]" tap_mode="classic"/>
+          <wire name="pc[22]" tap_mode="classic"/>
+          <wire name="pc[23]" tap_mode="classic"/>
+          <wire name="pc[24]" tap_mode="classic"/>
+          <wire name="pc[25]" tap_mode="classic"/>
+          <wire name="pc[26]" tap_mode="classic"/>
+          <wire name="pc[27]" tap_mode="classic"/>
+          <wire name="pc[28]" tap_mode="classic"/>
+          <wire name="pc[29]" tap_mode="classic"/>
+          <wire name="pc[2]" tap_mode="classic"/>
+          <wire name="pc[30]" tap_mode="classic"/>
+          <wire name="pc[31]" tap_mode="classic"/>
+          <wire name="pc[3]" tap_mode="classic"/>
+          <wire name="pc[4]" tap_mode="classic"/>
+          <wire name="pc[5]" tap_mode="classic"/>
+          <wire name="pc[6]" tap_mode="classic"/>
+          <wire name="pc[7]" tap_mode="classic"/>
+          <wire name="pc[8]" tap_mode="classic"/>
+          <wire name="pc[9]" tap_mode="classic"/>
+          <wire name="periph_bridge:u_periph_bridge|gpio_led_we" tap_mode="classic"/>
+          <wire name="rst_sync:u_rst_sync|rst_n_sync" tap_mode="classic"/>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" tap_mode="probeonly"/>
+        </trigger_input_vec>
+        <data_input_vec>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" tap_mode="classic"/>
+          <wire name="instruction[0]" tap_mode="classic"/>
+          <wire name="instruction[10]" tap_mode="classic"/>
+          <wire name="instruction[11]" tap_mode="classic"/>
+          <wire name="instruction[12]" tap_mode="classic"/>
+          <wire name="instruction[13]" tap_mode="classic"/>
+          <wire name="instruction[14]" tap_mode="classic"/>
+          <wire name="instruction[15]" tap_mode="classic"/>
+          <wire name="instruction[16]" tap_mode="classic"/>
+          <wire name="instruction[17]" tap_mode="classic"/>
+          <wire name="instruction[18]" tap_mode="classic"/>
+          <wire name="instruction[19]" tap_mode="classic"/>
+          <wire name="instruction[1]" tap_mode="classic"/>
+          <wire name="instruction[20]" tap_mode="classic"/>
+          <wire name="instruction[21]" tap_mode="classic"/>
+          <wire name="instruction[22]" tap_mode="classic"/>
+          <wire name="instruction[23]" tap_mode="classic"/>
+          <wire name="instruction[24]" tap_mode="classic"/>
+          <wire name="instruction[25]" tap_mode="classic"/>
+          <wire name="instruction[26]" tap_mode="classic"/>
+          <wire name="instruction[27]" tap_mode="classic"/>
+          <wire name="instruction[28]" tap_mode="classic"/>
+          <wire name="instruction[29]" tap_mode="classic"/>
+          <wire name="instruction[2]" tap_mode="classic"/>
+          <wire name="instruction[30]" tap_mode="classic"/>
+          <wire name="instruction[31]" tap_mode="classic"/>
+          <wire name="instruction[3]" tap_mode="classic"/>
+          <wire name="instruction[4]" tap_mode="classic"/>
+          <wire name="instruction[5]" tap_mode="classic"/>
+          <wire name="instruction[6]" tap_mode="classic"/>
+          <wire name="instruction[7]" tap_mode="classic"/>
+          <wire name="instruction[8]" tap_mode="classic"/>
+          <wire name="instruction[9]" tap_mode="classic"/>
+          <wire name="pc[0]" tap_mode="classic"/>
+          <wire name="pc[10]" tap_mode="classic"/>
+          <wire name="pc[11]" tap_mode="classic"/>
+          <wire name="pc[12]" tap_mode="classic"/>
+          <wire name="pc[13]" tap_mode="classic"/>
+          <wire name="pc[14]" tap_mode="classic"/>
+          <wire name="pc[15]" tap_mode="classic"/>
+          <wire name="pc[16]" tap_mode="classic"/>
+          <wire name="pc[17]" tap_mode="classic"/>
+          <wire name="pc[18]" tap_mode="classic"/>
+          <wire name="pc[19]" tap_mode="classic"/>
+          <wire name="pc[1]" tap_mode="classic"/>
+          <wire name="pc[20]" tap_mode="classic"/>
+          <wire name="pc[21]" tap_mode="classic"/>
+          <wire name="pc[22]" tap_mode="classic"/>
+          <wire name="pc[23]" tap_mode="classic"/>
+          <wire name="pc[24]" tap_mode="classic"/>
+          <wire name="pc[25]" tap_mode="classic"/>
+          <wire name="pc[26]" tap_mode="classic"/>
+          <wire name="pc[27]" tap_mode="classic"/>
+          <wire name="pc[28]" tap_mode="classic"/>
+          <wire name="pc[29]" tap_mode="classic"/>
+          <wire name="pc[2]" tap_mode="classic"/>
+          <wire name="pc[30]" tap_mode="classic"/>
+          <wire name="pc[31]" tap_mode="classic"/>
+          <wire name="pc[3]" tap_mode="classic"/>
+          <wire name="pc[4]" tap_mode="classic"/>
+          <wire name="pc[5]" tap_mode="classic"/>
+          <wire name="pc[6]" tap_mode="classic"/>
+          <wire name="pc[7]" tap_mode="classic"/>
+          <wire name="pc[8]" tap_mode="classic"/>
+          <wire name="pc[9]" tap_mode="classic"/>
+          <wire name="periph_bridge:u_periph_bridge|gpio_led_we" tap_mode="classic"/>
+          <wire name="rst_sync:u_rst_sync|rst_n_sync" tap_mode="classic"/>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" tap_mode="probeonly"/>
+        </data_input_vec>
+        <storage_qualifier_input_vec>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" tap_mode="classic"/>
+          <wire name="instruction[0]" tap_mode="classic"/>
+          <wire name="instruction[10]" tap_mode="classic"/>
+          <wire name="instruction[11]" tap_mode="classic"/>
+          <wire name="instruction[12]" tap_mode="classic"/>
+          <wire name="instruction[13]" tap_mode="classic"/>
+          <wire name="instruction[14]" tap_mode="classic"/>
+          <wire name="instruction[15]" tap_mode="classic"/>
+          <wire name="instruction[16]" tap_mode="classic"/>
+          <wire name="instruction[17]" tap_mode="classic"/>
+          <wire name="instruction[18]" tap_mode="classic"/>
+          <wire name="instruction[19]" tap_mode="classic"/>
+          <wire name="instruction[1]" tap_mode="classic"/>
+          <wire name="instruction[20]" tap_mode="classic"/>
+          <wire name="instruction[21]" tap_mode="classic"/>
+          <wire name="instruction[22]" tap_mode="classic"/>
+          <wire name="instruction[23]" tap_mode="classic"/>
+          <wire name="instruction[24]" tap_mode="classic"/>
+          <wire name="instruction[25]" tap_mode="classic"/>
+          <wire name="instruction[26]" tap_mode="classic"/>
+          <wire name="instruction[27]" tap_mode="classic"/>
+          <wire name="instruction[28]" tap_mode="classic"/>
+          <wire name="instruction[29]" tap_mode="classic"/>
+          <wire name="instruction[2]" tap_mode="classic"/>
+          <wire name="instruction[30]" tap_mode="classic"/>
+          <wire name="instruction[31]" tap_mode="classic"/>
+          <wire name="instruction[3]" tap_mode="classic"/>
+          <wire name="instruction[4]" tap_mode="classic"/>
+          <wire name="instruction[5]" tap_mode="classic"/>
+          <wire name="instruction[6]" tap_mode="classic"/>
+          <wire name="instruction[7]" tap_mode="classic"/>
+          <wire name="instruction[8]" tap_mode="classic"/>
+          <wire name="instruction[9]" tap_mode="classic"/>
+          <wire name="pc[0]" tap_mode="classic"/>
+          <wire name="pc[10]" tap_mode="classic"/>
+          <wire name="pc[11]" tap_mode="classic"/>
+          <wire name="pc[12]" tap_mode="classic"/>
+          <wire name="pc[13]" tap_mode="classic"/>
+          <wire name="pc[14]" tap_mode="classic"/>
+          <wire name="pc[15]" tap_mode="classic"/>
+          <wire name="pc[16]" tap_mode="classic"/>
+          <wire name="pc[17]" tap_mode="classic"/>
+          <wire name="pc[18]" tap_mode="classic"/>
+          <wire name="pc[19]" tap_mode="classic"/>
+          <wire name="pc[1]" tap_mode="classic"/>
+          <wire name="pc[20]" tap_mode="classic"/>
+          <wire name="pc[21]" tap_mode="classic"/>
+          <wire name="pc[22]" tap_mode="classic"/>
+          <wire name="pc[23]" tap_mode="classic"/>
+          <wire name="pc[24]" tap_mode="classic"/>
+          <wire name="pc[25]" tap_mode="classic"/>
+          <wire name="pc[26]" tap_mode="classic"/>
+          <wire name="pc[27]" tap_mode="classic"/>
+          <wire name="pc[28]" tap_mode="classic"/>
+          <wire name="pc[29]" tap_mode="classic"/>
+          <wire name="pc[2]" tap_mode="classic"/>
+          <wire name="pc[30]" tap_mode="classic"/>
+          <wire name="pc[31]" tap_mode="classic"/>
+          <wire name="pc[3]" tap_mode="classic"/>
+          <wire name="pc[4]" tap_mode="classic"/>
+          <wire name="pc[5]" tap_mode="classic"/>
+          <wire name="pc[6]" tap_mode="classic"/>
+          <wire name="pc[7]" tap_mode="classic"/>
+          <wire name="pc[8]" tap_mode="classic"/>
+          <wire name="pc[9]" tap_mode="classic"/>
+          <wire name="periph_bridge:u_periph_bridge|gpio_led_we" tap_mode="classic"/>
+          <wire name="rst_sync:u_rst_sync|rst_n_sync" tap_mode="classic"/>
+          <wire name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" tap_mode="probeonly"/>
+        </storage_qualifier_input_vec>
+      </signal_vec>
+      <presentation>
+        <unified_setup_data_view>
+          <node data_index="67" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" storage_index="67" tap_mode="probeonly" trigger_index="67" type="unknown"/>
+          <node is_selected="false" level-0="alt_or" name="instruction[31..0]" order="msb_to_lsb" type="combinatorial">
+            <node data_index="25" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[31]" storage_index="25" tap_mode="classic" trigger_index="25" type="unknown"/>
+            <node data_index="24" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[30]" storage_index="24" tap_mode="classic" trigger_index="24" type="unknown"/>
+            <node data_index="22" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[29]" storage_index="22" tap_mode="classic" trigger_index="22" type="unknown"/>
+            <node data_index="21" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[28]" storage_index="21" tap_mode="classic" trigger_index="21" type="unknown"/>
+            <node data_index="20" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[27]" storage_index="20" tap_mode="classic" trigger_index="20" type="unknown"/>
+            <node data_index="19" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[26]" storage_index="19" tap_mode="classic" trigger_index="19" type="unknown"/>
+            <node data_index="18" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[25]" storage_index="18" tap_mode="classic" trigger_index="18" type="unknown"/>
+            <node data_index="17" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[24]" storage_index="17" tap_mode="classic" trigger_index="17" type="unknown"/>
+            <node data_index="16" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[23]" storage_index="16" tap_mode="classic" trigger_index="16" type="unknown"/>
+            <node data_index="15" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[22]" storage_index="15" tap_mode="classic" trigger_index="15" type="unknown"/>
+            <node data_index="14" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[21]" storage_index="14" tap_mode="classic" trigger_index="14" type="unknown"/>
+            <node data_index="13" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[20]" storage_index="13" tap_mode="classic" trigger_index="13" type="unknown"/>
+            <node data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[19]" storage_index="11" tap_mode="classic" trigger_index="11" type="unknown"/>
+            <node data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[18]" storage_index="10" tap_mode="classic" trigger_index="10" type="unknown"/>
+            <node data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[17]" storage_index="9" tap_mode="classic" trigger_index="9" type="unknown"/>
+            <node data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[16]" storage_index="8" tap_mode="classic" trigger_index="8" type="unknown"/>
+            <node data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[15]" storage_index="7" tap_mode="classic" trigger_index="7" type="unknown"/>
+            <node data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[14]" storage_index="6" tap_mode="classic" trigger_index="6" type="unknown"/>
+            <node data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[13]" storage_index="5" tap_mode="classic" trigger_index="5" type="unknown"/>
+            <node data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[12]" storage_index="4" tap_mode="classic" trigger_index="4" type="unknown"/>
+            <node data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[11]" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+            <node data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[10]" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+            <node data_index="32" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[9]" storage_index="32" tap_mode="classic" trigger_index="32" type="unknown"/>
+            <node data_index="31" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[8]" storage_index="31" tap_mode="classic" trigger_index="31" type="unknown"/>
+            <node data_index="30" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[7]" storage_index="30" tap_mode="classic" trigger_index="30" type="unknown"/>
+            <node data_index="29" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[6]" storage_index="29" tap_mode="classic" trigger_index="29" type="unknown"/>
+            <node data_index="28" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[5]" storage_index="28" tap_mode="classic" trigger_index="28" type="unknown"/>
+            <node data_index="27" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[4]" storage_index="27" tap_mode="classic" trigger_index="27" type="unknown"/>
+            <node data_index="26" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[3]" storage_index="26" tap_mode="classic" trigger_index="26" type="unknown"/>
+            <node data_index="23" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[2]" storage_index="23" tap_mode="classic" trigger_index="23" type="unknown"/>
+            <node data_index="12" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[1]" storage_index="12" tap_mode="classic" trigger_index="12" type="unknown"/>
+            <node data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[0]" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+          </node>
+          <node data_index="66" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="rst_sync:u_rst_sync|rst_n_sync" storage_index="66" tap_mode="classic" trigger_index="66" type="unknown"/>
+          <node data_index="65" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="periph_bridge:u_periph_bridge|gpio_led_we" storage_index="65" tap_mode="classic" trigger_index="65" type="unknown"/>
+          <node is_selected="false" level-0="alt_or" name="pc[31..0]" order="msb_to_lsb" state="collapse" type="combinatorial">
+            <node data_index="57" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[31]" storage_index="57" tap_mode="classic" trigger_index="57" type="unknown"/>
+            <node data_index="56" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[30]" storage_index="56" tap_mode="classic" trigger_index="56" type="unknown"/>
+            <node data_index="54" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[29]" storage_index="54" tap_mode="classic" trigger_index="54" type="unknown"/>
+            <node data_index="53" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[28]" storage_index="53" tap_mode="classic" trigger_index="53" type="unknown"/>
+            <node data_index="52" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[27]" storage_index="52" tap_mode="classic" trigger_index="52" type="unknown"/>
+            <node data_index="51" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[26]" storage_index="51" tap_mode="classic" trigger_index="51" type="unknown"/>
+            <node data_index="50" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[25]" storage_index="50" tap_mode="classic" trigger_index="50" type="unknown"/>
+            <node data_index="49" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[24]" storage_index="49" tap_mode="classic" trigger_index="49" type="unknown"/>
+            <node data_index="48" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[23]" storage_index="48" tap_mode="classic" trigger_index="48" type="unknown"/>
+            <node data_index="47" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[22]" storage_index="47" tap_mode="classic" trigger_index="47" type="unknown"/>
+            <node data_index="46" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[21]" storage_index="46" tap_mode="classic" trigger_index="46" type="unknown"/>
+            <node data_index="45" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[20]" storage_index="45" tap_mode="classic" trigger_index="45" type="unknown"/>
+            <node data_index="43" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[19]" storage_index="43" tap_mode="classic" trigger_index="43" type="unknown"/>
+            <node data_index="42" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[18]" storage_index="42" tap_mode="classic" trigger_index="42" type="unknown"/>
+            <node data_index="41" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[17]" storage_index="41" tap_mode="classic" trigger_index="41" type="unknown"/>
+            <node data_index="40" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[16]" storage_index="40" tap_mode="classic" trigger_index="40" type="unknown"/>
+            <node data_index="39" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[15]" storage_index="39" tap_mode="classic" trigger_index="39" type="unknown"/>
+            <node data_index="38" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[14]" storage_index="38" tap_mode="classic" trigger_index="38" type="unknown"/>
+            <node data_index="37" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[13]" storage_index="37" tap_mode="classic" trigger_index="37" type="unknown"/>
+            <node data_index="36" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[12]" storage_index="36" tap_mode="classic" trigger_index="36" type="unknown"/>
+            <node data_index="35" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[11]" storage_index="35" tap_mode="classic" trigger_index="35" type="unknown"/>
+            <node data_index="34" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[10]" storage_index="34" tap_mode="classic" trigger_index="34" type="unknown"/>
+            <node data_index="64" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[9]" storage_index="64" tap_mode="classic" trigger_index="64" type="unknown"/>
+            <node data_index="63" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[8]" storage_index="63" tap_mode="classic" trigger_index="63" type="unknown"/>
+            <node data_index="62" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[7]" storage_index="62" tap_mode="classic" trigger_index="62" type="unknown"/>
+            <node data_index="61" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[6]" storage_index="61" tap_mode="classic" trigger_index="61" type="unknown"/>
+            <node data_index="60" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[5]" storage_index="60" tap_mode="classic" trigger_index="60" type="unknown"/>
+            <node data_index="59" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[4]" storage_index="59" tap_mode="classic" trigger_index="59" type="unknown"/>
+            <node data_index="58" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[3]" storage_index="58" tap_mode="classic" trigger_index="58" type="unknown"/>
+            <node data_index="55" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[2]" storage_index="55" tap_mode="classic" trigger_index="55" type="unknown"/>
+            <node data_index="44" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[1]" storage_index="44" tap_mode="classic" trigger_index="44" type="unknown"/>
+            <node data_index="33" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[0]" storage_index="33" tap_mode="classic" trigger_index="33" type="unknown"/>
+          </node>
+          <node data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+        </unified_setup_data_view>
+        <data_view>
+          <net data_index="67" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" storage_index="67" tap_mode="probeonly" trigger_index="67" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="instruction[31..0]" order="msb_to_lsb" type="combinatorial">
+            <net data_index="25" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[31]" storage_index="25" tap_mode="classic" trigger_index="25" type="unknown"/>
+            <net data_index="24" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[30]" storage_index="24" tap_mode="classic" trigger_index="24" type="unknown"/>
+            <net data_index="22" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[29]" storage_index="22" tap_mode="classic" trigger_index="22" type="unknown"/>
+            <net data_index="21" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[28]" storage_index="21" tap_mode="classic" trigger_index="21" type="unknown"/>
+            <net data_index="20" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[27]" storage_index="20" tap_mode="classic" trigger_index="20" type="unknown"/>
+            <net data_index="19" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[26]" storage_index="19" tap_mode="classic" trigger_index="19" type="unknown"/>
+            <net data_index="18" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[25]" storage_index="18" tap_mode="classic" trigger_index="18" type="unknown"/>
+            <net data_index="17" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[24]" storage_index="17" tap_mode="classic" trigger_index="17" type="unknown"/>
+            <net data_index="16" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[23]" storage_index="16" tap_mode="classic" trigger_index="16" type="unknown"/>
+            <net data_index="15" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[22]" storage_index="15" tap_mode="classic" trigger_index="15" type="unknown"/>
+            <net data_index="14" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[21]" storage_index="14" tap_mode="classic" trigger_index="14" type="unknown"/>
+            <net data_index="13" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[20]" storage_index="13" tap_mode="classic" trigger_index="13" type="unknown"/>
+            <net data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[19]" storage_index="11" tap_mode="classic" trigger_index="11" type="unknown"/>
+            <net data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[18]" storage_index="10" tap_mode="classic" trigger_index="10" type="unknown"/>
+            <net data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[17]" storage_index="9" tap_mode="classic" trigger_index="9" type="unknown"/>
+            <net data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[16]" storage_index="8" tap_mode="classic" trigger_index="8" type="unknown"/>
+            <net data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[15]" storage_index="7" tap_mode="classic" trigger_index="7" type="unknown"/>
+            <net data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[14]" storage_index="6" tap_mode="classic" trigger_index="6" type="unknown"/>
+            <net data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[13]" storage_index="5" tap_mode="classic" trigger_index="5" type="unknown"/>
+            <net data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[12]" storage_index="4" tap_mode="classic" trigger_index="4" type="unknown"/>
+            <net data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[11]" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+            <net data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[10]" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+            <net data_index="32" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[9]" storage_index="32" tap_mode="classic" trigger_index="32" type="unknown"/>
+            <net data_index="31" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[8]" storage_index="31" tap_mode="classic" trigger_index="31" type="unknown"/>
+            <net data_index="30" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[7]" storage_index="30" tap_mode="classic" trigger_index="30" type="unknown"/>
+            <net data_index="29" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[6]" storage_index="29" tap_mode="classic" trigger_index="29" type="unknown"/>
+            <net data_index="28" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[5]" storage_index="28" tap_mode="classic" trigger_index="28" type="unknown"/>
+            <net data_index="27" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[4]" storage_index="27" tap_mode="classic" trigger_index="27" type="unknown"/>
+            <net data_index="26" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[3]" storage_index="26" tap_mode="classic" trigger_index="26" type="unknown"/>
+            <net data_index="23" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[2]" storage_index="23" tap_mode="classic" trigger_index="23" type="unknown"/>
+            <net data_index="12" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[1]" storage_index="12" tap_mode="classic" trigger_index="12" type="unknown"/>
+            <net data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[0]" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+          </bus>
+          <net data_index="66" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="rst_sync:u_rst_sync|rst_n_sync" storage_index="66" tap_mode="classic" trigger_index="66" type="unknown"/>
+          <net data_index="65" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="periph_bridge:u_periph_bridge|gpio_led_we" storage_index="65" tap_mode="classic" trigger_index="65" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="pc[31..0]" order="msb_to_lsb" state="collapse" type="combinatorial">
+            <net data_index="57" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[31]" storage_index="57" tap_mode="classic" trigger_index="57" type="unknown"/>
+            <net data_index="56" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[30]" storage_index="56" tap_mode="classic" trigger_index="56" type="unknown"/>
+            <net data_index="54" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[29]" storage_index="54" tap_mode="classic" trigger_index="54" type="unknown"/>
+            <net data_index="53" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[28]" storage_index="53" tap_mode="classic" trigger_index="53" type="unknown"/>
+            <net data_index="52" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[27]" storage_index="52" tap_mode="classic" trigger_index="52" type="unknown"/>
+            <net data_index="51" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[26]" storage_index="51" tap_mode="classic" trigger_index="51" type="unknown"/>
+            <net data_index="50" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[25]" storage_index="50" tap_mode="classic" trigger_index="50" type="unknown"/>
+            <net data_index="49" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[24]" storage_index="49" tap_mode="classic" trigger_index="49" type="unknown"/>
+            <net data_index="48" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[23]" storage_index="48" tap_mode="classic" trigger_index="48" type="unknown"/>
+            <net data_index="47" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[22]" storage_index="47" tap_mode="classic" trigger_index="47" type="unknown"/>
+            <net data_index="46" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[21]" storage_index="46" tap_mode="classic" trigger_index="46" type="unknown"/>
+            <net data_index="45" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[20]" storage_index="45" tap_mode="classic" trigger_index="45" type="unknown"/>
+            <net data_index="43" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[19]" storage_index="43" tap_mode="classic" trigger_index="43" type="unknown"/>
+            <net data_index="42" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[18]" storage_index="42" tap_mode="classic" trigger_index="42" type="unknown"/>
+            <net data_index="41" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[17]" storage_index="41" tap_mode="classic" trigger_index="41" type="unknown"/>
+            <net data_index="40" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[16]" storage_index="40" tap_mode="classic" trigger_index="40" type="unknown"/>
+            <net data_index="39" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[15]" storage_index="39" tap_mode="classic" trigger_index="39" type="unknown"/>
+            <net data_index="38" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[14]" storage_index="38" tap_mode="classic" trigger_index="38" type="unknown"/>
+            <net data_index="37" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[13]" storage_index="37" tap_mode="classic" trigger_index="37" type="unknown"/>
+            <net data_index="36" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[12]" storage_index="36" tap_mode="classic" trigger_index="36" type="unknown"/>
+            <net data_index="35" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[11]" storage_index="35" tap_mode="classic" trigger_index="35" type="unknown"/>
+            <net data_index="34" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[10]" storage_index="34" tap_mode="classic" trigger_index="34" type="unknown"/>
+            <net data_index="64" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[9]" storage_index="64" tap_mode="classic" trigger_index="64" type="unknown"/>
+            <net data_index="63" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[8]" storage_index="63" tap_mode="classic" trigger_index="63" type="unknown"/>
+            <net data_index="62" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[7]" storage_index="62" tap_mode="classic" trigger_index="62" type="unknown"/>
+            <net data_index="61" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[6]" storage_index="61" tap_mode="classic" trigger_index="61" type="unknown"/>
+            <net data_index="60" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[5]" storage_index="60" tap_mode="classic" trigger_index="60" type="unknown"/>
+            <net data_index="59" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[4]" storage_index="59" tap_mode="classic" trigger_index="59" type="unknown"/>
+            <net data_index="58" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[3]" storage_index="58" tap_mode="classic" trigger_index="58" type="unknown"/>
+            <net data_index="55" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[2]" storage_index="55" tap_mode="classic" trigger_index="55" type="unknown"/>
+            <net data_index="44" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[1]" storage_index="44" tap_mode="classic" trigger_index="44" type="unknown"/>
+            <net data_index="33" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[0]" storage_index="33" tap_mode="classic" trigger_index="33" type="unknown"/>
+          </bus>
+          <net data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+        </data_view>
+        <setup_view>
+          <net data_index="67" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|branch_pending" storage_index="67" tap_mode="probeonly" trigger_index="67" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="instruction[31..0]" order="msb_to_lsb" type="combinatorial">
+            <net data_index="25" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[31]" storage_index="25" tap_mode="classic" trigger_index="25" type="unknown"/>
+            <net data_index="24" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[30]" storage_index="24" tap_mode="classic" trigger_index="24" type="unknown"/>
+            <net data_index="22" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[29]" storage_index="22" tap_mode="classic" trigger_index="22" type="unknown"/>
+            <net data_index="21" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[28]" storage_index="21" tap_mode="classic" trigger_index="21" type="unknown"/>
+            <net data_index="20" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[27]" storage_index="20" tap_mode="classic" trigger_index="20" type="unknown"/>
+            <net data_index="19" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[26]" storage_index="19" tap_mode="classic" trigger_index="19" type="unknown"/>
+            <net data_index="18" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[25]" storage_index="18" tap_mode="classic" trigger_index="18" type="unknown"/>
+            <net data_index="17" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[24]" storage_index="17" tap_mode="classic" trigger_index="17" type="unknown"/>
+            <net data_index="16" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[23]" storage_index="16" tap_mode="classic" trigger_index="16" type="unknown"/>
+            <net data_index="15" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[22]" storage_index="15" tap_mode="classic" trigger_index="15" type="unknown"/>
+            <net data_index="14" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[21]" storage_index="14" tap_mode="classic" trigger_index="14" type="unknown"/>
+            <net data_index="13" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[20]" storage_index="13" tap_mode="classic" trigger_index="13" type="unknown"/>
+            <net data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[19]" storage_index="11" tap_mode="classic" trigger_index="11" type="unknown"/>
+            <net data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[18]" storage_index="10" tap_mode="classic" trigger_index="10" type="unknown"/>
+            <net data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[17]" storage_index="9" tap_mode="classic" trigger_index="9" type="unknown"/>
+            <net data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[16]" storage_index="8" tap_mode="classic" trigger_index="8" type="unknown"/>
+            <net data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[15]" storage_index="7" tap_mode="classic" trigger_index="7" type="unknown"/>
+            <net data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[14]" storage_index="6" tap_mode="classic" trigger_index="6" type="unknown"/>
+            <net data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[13]" storage_index="5" tap_mode="classic" trigger_index="5" type="unknown"/>
+            <net data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[12]" storage_index="4" tap_mode="classic" trigger_index="4" type="unknown"/>
+            <net data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[11]" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+            <net data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[10]" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+            <net data_index="32" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[9]" storage_index="32" tap_mode="classic" trigger_index="32" type="unknown"/>
+            <net data_index="31" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[8]" storage_index="31" tap_mode="classic" trigger_index="31" type="unknown"/>
+            <net data_index="30" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[7]" storage_index="30" tap_mode="classic" trigger_index="30" type="unknown"/>
+            <net data_index="29" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[6]" storage_index="29" tap_mode="classic" trigger_index="29" type="unknown"/>
+            <net data_index="28" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[5]" storage_index="28" tap_mode="classic" trigger_index="28" type="unknown"/>
+            <net data_index="27" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[4]" storage_index="27" tap_mode="classic" trigger_index="27" type="unknown"/>
+            <net data_index="26" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[3]" storage_index="26" tap_mode="classic" trigger_index="26" type="unknown"/>
+            <net data_index="23" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[2]" storage_index="23" tap_mode="classic" trigger_index="23" type="unknown"/>
+            <net data_index="12" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[1]" storage_index="12" tap_mode="classic" trigger_index="12" type="unknown"/>
+            <net data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" level-0="rising edge" name="instruction[0]" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+          </bus>
+          <net data_index="66" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="rst_sync:u_rst_sync|rst_n_sync" storage_index="66" tap_mode="classic" trigger_index="66" type="unknown"/>
+          <net data_index="65" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="periph_bridge:u_periph_bridge|gpio_led_we" storage_index="65" tap_mode="classic" trigger_index="65" type="unknown"/>
+          <bus is_selected="false" level-0="alt_or" name="pc[31..0]" order="msb_to_lsb" state="collapse" type="combinatorial">
+            <net data_index="57" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[31]" storage_index="57" tap_mode="classic" trigger_index="57" type="unknown"/>
+            <net data_index="56" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[30]" storage_index="56" tap_mode="classic" trigger_index="56" type="unknown"/>
+            <net data_index="54" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[29]" storage_index="54" tap_mode="classic" trigger_index="54" type="unknown"/>
+            <net data_index="53" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[28]" storage_index="53" tap_mode="classic" trigger_index="53" type="unknown"/>
+            <net data_index="52" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[27]" storage_index="52" tap_mode="classic" trigger_index="52" type="unknown"/>
+            <net data_index="51" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[26]" storage_index="51" tap_mode="classic" trigger_index="51" type="unknown"/>
+            <net data_index="50" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[25]" storage_index="50" tap_mode="classic" trigger_index="50" type="unknown"/>
+            <net data_index="49" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[24]" storage_index="49" tap_mode="classic" trigger_index="49" type="unknown"/>
+            <net data_index="48" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[23]" storage_index="48" tap_mode="classic" trigger_index="48" type="unknown"/>
+            <net data_index="47" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[22]" storage_index="47" tap_mode="classic" trigger_index="47" type="unknown"/>
+            <net data_index="46" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[21]" storage_index="46" tap_mode="classic" trigger_index="46" type="unknown"/>
+            <net data_index="45" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[20]" storage_index="45" tap_mode="classic" trigger_index="45" type="unknown"/>
+            <net data_index="43" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[19]" storage_index="43" tap_mode="classic" trigger_index="43" type="unknown"/>
+            <net data_index="42" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[18]" storage_index="42" tap_mode="classic" trigger_index="42" type="unknown"/>
+            <net data_index="41" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[17]" storage_index="41" tap_mode="classic" trigger_index="41" type="unknown"/>
+            <net data_index="40" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[16]" storage_index="40" tap_mode="classic" trigger_index="40" type="unknown"/>
+            <net data_index="39" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[15]" storage_index="39" tap_mode="classic" trigger_index="39" type="unknown"/>
+            <net data_index="38" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[14]" storage_index="38" tap_mode="classic" trigger_index="38" type="unknown"/>
+            <net data_index="37" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[13]" storage_index="37" tap_mode="classic" trigger_index="37" type="unknown"/>
+            <net data_index="36" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[12]" storage_index="36" tap_mode="classic" trigger_index="36" type="unknown"/>
+            <net data_index="35" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[11]" storage_index="35" tap_mode="classic" trigger_index="35" type="unknown"/>
+            <net data_index="34" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[10]" storage_index="34" tap_mode="classic" trigger_index="34" type="unknown"/>
+            <net data_index="64" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[9]" storage_index="64" tap_mode="classic" trigger_index="64" type="unknown"/>
+            <net data_index="63" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[8]" storage_index="63" tap_mode="classic" trigger_index="63" type="unknown"/>
+            <net data_index="62" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[7]" storage_index="62" tap_mode="classic" trigger_index="62" type="unknown"/>
+            <net data_index="61" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[6]" storage_index="61" tap_mode="classic" trigger_index="61" type="unknown"/>
+            <net data_index="60" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[5]" storage_index="60" tap_mode="classic" trigger_index="60" type="unknown"/>
+            <net data_index="59" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[4]" storage_index="59" tap_mode="classic" trigger_index="59" type="unknown"/>
+            <net data_index="58" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[3]" storage_index="58" tap_mode="classic" trigger_index="58" type="unknown"/>
+            <net data_index="55" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[2]" storage_index="55" tap_mode="classic" trigger_index="55" type="unknown"/>
+            <net data_index="44" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[1]" storage_index="44" tap_mode="classic" trigger_index="44" type="unknown"/>
+            <net data_index="33" duplicate_name_allowed="false" is_data_input="true" is_node_valid="false" is_selected="false" is_storage_input="true" is_trigger_input="true" name="pc[0]" storage_index="33" tap_mode="classic" trigger_index="33" type="unknown"/>
+          </bus>
+          <net data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_selected="false" is_storage_input="true" is_trigger_input="true" name="CPU_FPGA:u_cpu|Hazard_Unit:U_HAZARD|take_branch" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+        </setup_view>
+        <trigger_in_editor/>
+        <trigger_out_editor/>
+      </presentation>
+      <trigger attribute_mem_mode="false" gap_record="true" global_temp="1" name="trigger: 2026/08/23 02:39:51  #1" position="pre" power_up_trigger_mode="false" record_data_gap="true" segment_size="64" storage_mode="off" storage_qualifier_disabled="no" storage_qualifier_port_is_pin="true" storage_qualifier_port_name="auto_stp_external_storage_qualifier" storage_qualifier_port_tap_mode="classic" trigger_type="circular">
+        <power_up_trigger position="pre" storage_qualifier_disabled="no"/>
+        <events use_custom_flow_control="no">
+          <level enabled="yes" name="condition1" type="basic">'instruction[0]' == rising edge &amp;&amp; 'instruction[10]' == rising edge &amp;&amp; 'instruction[11]' == rising edge &amp;&amp; 'instruction[12]' == rising edge &amp;&amp; 'instruction[13]' == rising edge &amp;&amp; 'instruction[14]' == rising edge &amp;&amp; 'instruction[15]' == rising edge &amp;&amp; 'instruction[16]' == rising edge &amp;&amp; 'instruction[17]' == rising edge &amp;&amp; 'instruction[18]' == rising edge &amp;&amp; 'instruction[19]' == rising edge &amp;&amp; 'instruction[1]' == rising edge &amp;&amp; 'instruction[20]' == rising edge &amp;&amp; 'instruction[21]' == rising edge &amp;&amp; 'instruction[22]' == rising edge &amp;&amp; 'instruction[23]' == rising edge &amp;&amp; 'instruction[24]' == rising edge &amp;&amp; 'instruction[25]' == rising edge &amp;&amp; 'instruction[26]' == rising edge &amp;&amp; 'instruction[27]' == rising edge &amp;&amp; 'instruction[28]' == rising edge &amp;&amp; 'instruction[29]' == rising edge &amp;&amp; 'instruction[2]' == rising edge &amp;&amp; 'instruction[30]' == rising edge &amp;&amp; 'instruction[31]' == rising edge &amp;&amp; 'instruction[3]' == rising edge &amp;&amp; 'instruction[4]' == rising edge &amp;&amp; 'instruction[5]' == rising edge &amp;&amp; 'instruction[6]' == rising edge &amp;&amp; 'instruction[7]' == rising edge &amp;&amp; 'instruction[8]' == rising edge &amp;&amp; 'instruction[9]' == rising edge
+            <power_up enabled="yes">
+            </power_up>
+            <op_node/>
+          </level>
+        </events>
+        <storage_qualifier_events>
+          <transitional>11111111111111111111111111111111111111111111111111111111111111111111
+            <pwr_up_transitional>11111111111111111111111111111111111111111111111111111111111111111111</pwr_up_transitional>
+          </transitional>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+        </storage_qualifier_events>
+      </trigger>
+    </signal_set>
+  </instance>
+  <mnemonics/>
+  <static_plugin_mnemonics/>
+</session>

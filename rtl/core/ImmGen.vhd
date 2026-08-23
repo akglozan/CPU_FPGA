@@ -17,13 +17,21 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- Immediate generator / sign-extension unit. Extracts the immediate
+-- field from the raw instruction word and sign- (or zero-) extends it
+-- to 32 bits, per the RISC-V instruction format selected by imm_src
+-- (I/S/B/U/J).
 entity ImmGen is 
 
 	port(
 	
+		-- Raw 32-bit instruction word.
 		inst		: in		std_logic_vector(31 downto 0);
+		-- Selects the immediate encoding: 000=I-Type, 001=S-Type,
+		-- 010=B-Type, 011=U-Type, 100=J-Type.
 		imm_src	: in		std_logic_vector(2 downto 0);
 		
+		-- Sign-extended 32-bit immediate value.
 		imm_ext 	: out 	std_logic_vector(31 downto 0)
 	);
 

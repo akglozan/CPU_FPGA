@@ -19,13 +19,24 @@ use IEEE.NUMERIC_STD.all;
 use IEEE.STD_LOGIC_TEXTIO.all;
 use STD.textio.all;
 
+-- Bootloader instruction memory. 1024 x 32-bit words, initialized at
+-- elaboration time from a hex-format file (HEX_FILE) rather than
+-- loaded at runtime. The read path is purely combinational so its
+-- output aligns with IF_ID_Register in a single cycle, with no extra
+-- registered read latency to account for.
 entity Instruction_Memory is
     generic (
+        -- Path to the hex-format memory image loaded at elaboration.
         HEX_FILE : string := "boot_bram.hex"
     );
     port (
+        -- Present for interface consistency; the read path below is
+        -- combinational and does not use clk.
         clk         : in  std_logic;
+        -- Byte address; the word index is derived from addr(11 downto 2).
         addr        : in  std_logic_vector(31 downto 0);
+        -- Combinationally read instruction word at addr, or zero if the
+        -- address falls outside the 1024-word range.
         instruction : out std_logic_vector(31 downto 0)
     );
 end entity Instruction_Memory;

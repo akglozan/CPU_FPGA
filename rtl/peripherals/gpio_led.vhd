@@ -17,10 +17,13 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- 4-bit GPIO output peripheral. Latches the low 4 bits of an MMIO
+-- write into a register that drives the board's LEDs directly.
 entity gpio_led is
 
 	port(
 		clk 	:	in std_logic;
+		-- Active-low synchronous reset.
 		rst_n	:	in std_logic;
 		--Write Enable Strobe
 		we		:	in std_logic;

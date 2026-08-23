@@ -17,17 +17,29 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
+-- UART transmitter: 8 data bits, no parity, 1 stop bit, driven by a
+-- 4-state FSM (IDLE -> START -> DATA -> STOP) with a per-bit clock
+-- divider derived from CLK_FREQ / BAUD_RATE. tx_start latches tx_data
+-- and begins transmission; tx_busy stays asserted for the whole frame.
 entity uart_tx is
     generic (
+        -- System clock frequency in Hz, used to derive the per-bit
+        -- clock divider (CLKS_PER_BIT).
         CLK_FREQ  : positive := 50000000;
+        -- Target UART baud rate.
         BAUD_RATE : positive := 115200
     );
     port (
         clk      : in  std_logic;
+        -- Active-low synchronous reset.
         rst_n    : in  std_logic;
+        -- Byte to transmit; latched when tx_start is asserted in IDLE.
         tx_data  : in  std_logic_vector(7 downto 0);
+        -- Pulse to begin transmitting tx_data; ignored while busy.
         tx_start : in  std_logic;
+        -- Asserted for the duration of a frame (start/data/stop bits).
         tx_busy  : out std_logic;
+        -- Serial output line (idles high).
         tx_out   : out std_logic
     );
 end entity uart_tx;
