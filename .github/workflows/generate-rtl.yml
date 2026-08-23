@@ -36,7 +36,7 @@ jobs:
             # set -- it's analyzed separately into its own "altera_mf" library
             # below, since it needs to be visible under that library name (not
             # "work") to satisfy bram_4kb.vhd's "library altera_mf;" clause.
-            FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" ! -path "./.github/schematic/*" | paste -sd " " -)
+            FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" ! -path "./.github/schematic/*" ! -path "./sim/*" | paste -sd " " -)
 
             mkdir -p altera_mf_lib
 
@@ -86,14 +86,10 @@ jobs:
 
       - name: Convert JSON to SVG Schematics & Bake Light Background
         run: |
-          netlistsvg rtl_cpu.json -o rtl_schematic.svg
-          netlistsvg rtl_soc.json -o rtl_schematic_soc.svg
+          netlistsvg rtl_cpu.json -o docs/rtl_schematic.svg
+          netlistsvg rtl_soc.json -o docs/rtl_schematic_soc.svg
           # Embed a white background rectangle directly into the SVG canvas so it renders on both dark and light themes
-          sed -i 's/<svg /<svg style="background-color: white;" /g' rtl_schematic.svg rtl_schematic_soc.svg
-          # docs/README.md (rendered as the repo's GitHub homepage) displays
-          # both copies from docs/, not the root copies -- keep them in sync.
-          cp rtl_schematic.svg docs/rtl_schematic.svg
-          cp rtl_schematic_soc.svg docs/rtl_schematic_soc.svg
+          sed -i 's/<svg /<svg style="background-color: white;" /g' docs/rtl_schematic.svg docs/rtl_schematic_soc.svg
 
       - name: Commit and Push Schematics
         # No branch protection rule is active on main/master, so the default
@@ -102,5 +98,5 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add rtl_schematic.svg rtl_schematic_soc.svg docs/rtl_schematic.svg docs/rtl_schematic_soc.svg
+          git add docs/rtl_schematic.svg docs/rtl_schematic_soc.svg
           git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update RTL schematics" && git push)
