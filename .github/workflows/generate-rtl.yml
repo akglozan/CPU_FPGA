@@ -46,10 +46,14 @@ jobs:
           netlistsvg rtl.json -o rtl_schematic.svg
           # Embed a white background rectangle directly into the SVG canvas so it renders on both dark and light themes
           sed -i 's/<svg /<svg style="background-color: white;" /g' rtl_schematic.svg
+          # docs/README.md (rendered as the repo's GitHub homepage) displays
+          # docs/rtl_schematic.svg, not the root copy -- keep both in sync so
+          # the homepage never shows a stale schematic again.
+          cp rtl_schematic.svg docs/rtl_schematic.svg
 
       - name: Commit and Push Schematic
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add rtl_schematic.svg
+          git add rtl_schematic.svg docs/rtl_schematic.svg
           git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update RTL schematic" && git push)
