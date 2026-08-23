@@ -73,7 +73,25 @@ architecture Structural of IF_Stage is
 begin
 
     pc_current_out <= pc_wire;
-    pc_fetch_out   <= pc_wire;
+
+    -- A stall drops an instruction unless the fetch address is rewound.
+    --
+    -- On the cycle a stall begins (bus wait-state or load-use hazard),
+    -- instr_fetch_in is carrying the instruction for pc_delayed -- and
+    -- IF_ID_Register is frozen, so it does NOT capture it. Meanwhile
+    -- pc_write is also low, so pc_wire holds the NEXT address, whose
+    -- data lands on instr_fetch_in the following cycle and overwrites
+    -- the one that was never consumed. That instruction is then gone
+    -- from the stream forever: the CPU silently skips one instruction
+    -- per stall cycle, and pc_delayed no longer matches the instruction
+    -- IF_ID_Register eventually latches.
+    --
+    -- Re-presenting pc_delayed while stalled re-fetches the un-consumed
+    -- instruction, so it is still on instr_fetch_in when the stall lifts
+    -- and IF_ID_Register finally captures it -- paired with the frozen
+    -- pc_delayed that produced it. pc_wire is unchanged during the stall,
+    -- so normal fetch resumes from the right place on the next cycle.
+    pc_fetch_out   <= pc_delayed when if_id_stall = '1' else pc_wire;
 
     process(clk)
     begin

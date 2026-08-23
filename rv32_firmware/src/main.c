@@ -1,8 +1,18 @@
 #include <stdint.h>
 #include "../bsp/soc_regs.h"
 
+/* uart_tx.vhd ignores tx_start while a frame is in flight, and one frame
+ * at 115200 takes 4340 clocks. Without this poll the five calls below
+ * issue their stores about 8 clocks apart, so only the FIRST byte is ever
+ * transmitted and 'B', 'C', '\r', '\n' are silently dropped -- which is
+ * exactly the "one 'A' per reset" seen on hardware. Bit 0 of UART_ST is
+ * uart_tx's tx_busy (see uart_status in rv32im_soc.vhd), so spin until
+ * the transmitter is idle before handing it the next byte. */
 static void uart_putc(uint8_t c)
 {
+    while (UART_ST & 1u) {
+        /* transmitter still busy with the previous frame */
+    }
     UART_TX = (uint32_t)c;
 }
 

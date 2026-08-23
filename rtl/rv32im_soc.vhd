@@ -75,6 +75,7 @@ architecture structural of rv32im_soc is
     signal s0_stb         : std_logic;
     signal s0_cyc         : std_logic;
     signal s0_ack         : std_logic;
+    signal s0_ack_r       : std_logic := '0';
     signal bram_web       : std_logic_vector(3 downto 0);
 
     signal s1_addr        : std_logic_vector(31 downto 0);
@@ -202,15 +203,53 @@ begin
         s3_ack_i => s3_ack
     );
 
+    -- Belt-and-braces: never let a write reach the BRAM while reset is
+    -- asserted. A stray write here is uniquely expensive -- BRAM holds
+    -- the firmware, its contents survive every reset, and only
+    -- reconfiguring the FPGA restores them, so one bad write bricks the
+    -- board until it is reprogrammed. rst_sync.vhd now guarantees a
+    -- clean synchronous reset, which is the real fix; this qualifier
+    -- just makes the failure mode structurally impossible rather than
+    -- merely unlikely, for the cost of one gate.
     bram_web <= s0_sel
         when s0_we = '1' and s0_stb = '1' and s0_cyc = '1'
+             and rst_n_sync = '1'
         else (others => '0');
 
-    s0_ack <= s0_stb and s0_cyc;
+    -- bram_4kb (altsyncram) needs one full clock between the address
+    -- being presented and rdata_b being valid. The previous
+    -- combinational ack (s0_ack <= s0_stb and s0_cyc) acknowledged in
+    -- the same cycle the request was issued, so mem_stage saw no bus
+    -- stall and MEM_WB_Register latched wb_data_i before the BRAM had
+    -- produced it -- every load from BRAM returned the word left over
+    -- from the PREVIOUS access. main()'s delay loop is built entirely
+    -- on lw/bltu/bgeu against a stack slot, so its loop condition was
+    -- garbage.
+    --
+    -- Delaying the ack by one cycle makes mem_stage assert bus_stall_o
+    -- for exactly that one cycle (bus_access and not wb_ack_i), which
+    -- freezes the pipeline and holds addr_b stable, so rdata_b is valid
+    -- in the cycle the ack finally arrives and MEM_WB_Register latches
+    -- the right word. The "and not s0_ack_r" term keeps it a
+    -- single-cycle pulse, so back-to-back memory instructions each get
+    -- their own ack instead of the second one being acknowledged early
+    -- by a still-high ack left over from the first.
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n_sync = '0' then
+                s0_ack_r <= '0';
+            else
+                s0_ack_r <= s0_stb and s0_cyc and not s0_ack_r;
+            end if;
+        end if;
+    end process;
+
+    s0_ack <= s0_ack_r;
 
     u_bram : entity work.bram_4kb
         generic map (
-            hex_file => "boot_bram.mif"
+            hex_file => "sw/boot_bram.mif"
         )
         port map (
             clk    => clk,

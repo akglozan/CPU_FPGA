@@ -1,0 +1,567 @@
+================================================================================
+RV32IM SoC -- HARDWARE BRING-UP BUG REPORT
+Date:     2026-08-23
+Target:   Cyclone IV EP4CE6E22C8N, RZ-EasyFPGA A2.2
+Tools:    Quartus Prime 25.1std.0 Build 1129 SC Lite
+Firmware: rv32_firmware (crt0.s + main.c), loaded via boot_bram.mif
+================================================================================
+
+STARTING SYMPTOM
+--------------------------------------------------------------------------------
+The bitstream compiled and programmed cleanly, but the board showed no sign of
+the firmware running:
+
+  - All four LEDs solidly on, permanently.
+  - Pressing reset changed nothing visible.
+  - No UART output at all (expected "ABC\r\n" at 115200).
+
+The LED state turned out to be an important clue rather than noise. gpio_led.vhd
+resets led_reg to "0000", and the board's LEDs are active-low, so all four lit
+IS the untouched reset state of the LED register. "LEDs solid on" therefore did
+not mean the firmware was writing a wrong value -- it meant gpio_led_we had never
+fired at all, and the CPU had never successfully reached the first store in
+main().
+
+Three separate bugs had to be fixed before the firmware ran at all (Bugs 1-3),
+plus two more before serial output worked (Bug 4). A fifth (Bug 5, signed
+division) was found by inspection along the way; it is not exercised by this
+firmware but would have bitten the first time anything divided.
+
+Final state: LEDs blink continuously, reset restarts cleanly and recovers every
+time, and "ABC\r\n" appears once per reset at 115200.
+
+
+================================================================================
+BUG 1 -- BRAM READ LATENCY WAS 2 CYCLES, NOT 1
+================================================================================
+
+ROOT CAUSE
+--------------------------------------------------------------------------------
+bram_4kb.vhd instantiated altsyncram with:
+
+    outdata_reg_a => "CLOCK0",
+    outdata_reg_b => "CLOCK0",
+
+An altsyncram ALWAYS registers the read address. Setting outdata_reg_* to
+"CLOCK0" adds a SECOND register stage on the data output. Real latency from
+address to valid data is therefore two clock cycles, not one.
+
+The whole fetch pipeline had previously been retimed on the assumption of one
+cycle. The header comment in bram_4kb.vhd stated it explicitly and incorrectly:
+"data for the address presented in cycle N is valid in cycle N+1."
+
+EVIDENCE
+--------------------------------------------------------------------------------
+Quartus's own parameter dump, output_files/CPU_FPGA.map.rpt:
+
+    OUTDATA_REG_A ; CLOCK0
+    OUTDATA_REG_B ; CLOCK0
+    ADDRESS_REG_B ; CLOCK0
+
+CONSEQUENCES
+--------------------------------------------------------------------------------
+1a. IF_Stage.vhd's pc_delayed compensates for exactly one cycle. With two, in
+    the cycle where instr_fetch_in holds mem[P(N)], pc_delayed already held
+    P(N+1) -- the NEXT PC. The instruction STREAM still arrived in order, so the
+    CPU appeared to execute, but id_pc / ex_pc were 4 too high for every
+    sequentially fetched instruction. Every PC-relative value was wrong:
+
+        0x00: auipc sp,0x1      -> sp = 0x1004 instead of 0x1000
+        0x10: bge t0,t1,+0x10   -> jumped to 0x24 (trap_loop) instead of 0x20
+        every jal / jalr link value and every branch target off by 4
+
+1b. Hazard_Unit.vhd's branch_pending forces exactly one extra if_id_flush cycle,
+    discarding one stale in-flight fetch. With two cycles of latency there were
+    two stale pre-branch fetches in the pipe, so one wrong-path instruction
+    executed after EVERY taken branch.
+
+1c. rv32im_soc.vhd acknowledged BRAM data accesses combinationally:
+
+        s0_ack <= s0_stb and s0_cyc;
+
+    That acks in the same cycle the request is presented, so MEM_WB_Register
+    latched wb_data_i two cycles before rdata_b was valid -- it captured whatever
+    the PREVIOUS BRAM access had left there. Every load from BRAM returned a
+    stale word. main()'s delay loop is built entirely on lw / bltu / bgeu against
+    a stack slot, so its loop condition was garbage.
+
+    (Peripheral reads were unaffected: periph_bridge is purely combinational.)
+
+FIX
+--------------------------------------------------------------------------------
+rtl/memory/bram_4kb.vhd
+    outdata_reg_a => "UNREGISTERED"
+    outdata_reg_b => "UNREGISTERED"
+
+    Makes hardware latency exactly one cycle, matching what IF_Stage's
+    pc_delayed and Hazard_Unit's branch_pending were already retimed for. Fixes
+    1a and 1b with no CPU changes.
+
+rtl/rv32im_soc.vhd
+    Replaced the combinational ack with a registered single-cycle pulse:
+
+        process (clk)
+        begin
+            if rising_edge(clk) then
+                if rst_n_sync = '0' then
+                    s0_ack_r <= '0';
+                else
+                    s0_ack_r <= s0_stb and s0_cyc and not s0_ack_r;
+                end if;
+            end if;
+        end process;
+
+        s0_ack <= s0_ack_r;
+
+    mem_stage now asserts bus_stall_o (bus_access and not wb_ack_i) for exactly
+    one cycle, freezing the pipeline and holding addr_b stable, so rdata_b is
+    valid in the cycle the ack arrives. The "and not s0_ack_r" term keeps the ack
+    a single-cycle pulse so back-to-back memory instructions each get their own,
+    instead of the second being acknowledged early by a still-high ack from the
+    first.
+
+SIDE EFFECT
+--------------------------------------------------------------------------------
+Removing the port-A output register lengthens the fetch path, but timing
+improved rather than degraded: setup slack went from 1.078 ns to 1.362 ns.
+
+
+================================================================================
+BUG 2 -- A STALL SILENTLY DROPPED ONE INSTRUCTION
+================================================================================
+
+ROOT CAUSE
+--------------------------------------------------------------------------------
+Hazard_Unit freezes IF_ID_Register and the PC together on any stall (bus
+wait-state, load-use hazard, M-extension). The BRAM's INTERNAL address register
+kept clocking regardless, because addr_a was driven unconditionally from
+pc_wire.
+
+Walk the cycle a stall begins, call it K:
+
+  - During K, instr_fetch_in carries the instruction for pc_delayed.
+    IF_ID_Register is frozen, so it does NOT capture it.
+  - pc_write is also low, so pc_wire sits at the NEXT address -- and addr_a was
+    still pc_wire, so at the end of K the BRAM latched that next address.
+  - During K+1, instr_fetch_in is the NEXT instruction. The one from cycle K was
+    never consumed and is gone from the stream permanently.
+
+Net effect: the CPU silently skipped one instruction per stall cycle, and
+pc_delayed desynchronized from whatever IF_ID_Register eventually latched.
+
+WHY IT GOT WORSE BEFORE IT GOT BETTER
+--------------------------------------------------------------------------------
+This bug pre-dated the Bug 1 fix -- the firmware's "lw a5,12(sp); bltu a4,a5"
+load-use hazard already triggered it. But before the Bug 1c fix, BRAM loads
+acked combinationally and produced no BUS stall, so it fired comparatively
+rarely. Adding the correct delayed ack introduced a stall cycle on EVERY BRAM
+load and store, so instead of dropping an instruction occasionally it dropped
+one on every memory access. The board showed no improvement after the Bug 1 fix
+for exactly this reason.
+
+FIX
+--------------------------------------------------------------------------------
+rtl/core/IF_Stage.vhd -- one line:
+
+    pc_fetch_out <= pc_delayed when if_id_stall = '1' else pc_wire;
+
+While stalled the fetch address rewinds to pc_delayed, re-fetching the
+instruction that was about to be dropped, so it is still on instr_fetch_in when
+the stall lifts and IF_ID_Register finally captures it -- paired with the frozen
+pc_delayed that produced it. pc_wire is untouched, so normal fetch resumes from
+the right place on the next cycle. Works for multi-cycle stalls, and a
+wrong-path instruction held across a stall is still killed by the existing
+branch_pending flush (IF_ID_Register gives stall priority over flush, and
+Hazard_Unit never asserts if_id_flush during a stall).
+
+RESULT
+--------------------------------------------------------------------------------
+After this fix the firmware ran on hardware for the first time -- LEDs blinked.
+
+
+================================================================================
+BUG 3 -- ASYNCHRONOUS RESET ASSERT CORRUPTED BRAM WORD 0
+================================================================================
+
+SYMPTOM
+--------------------------------------------------------------------------------
+With Bugs 1 and 2 fixed the firmware blinked, but pressing reset would sometimes
+leave the board stuck with all LEDs on, permanently. Further resets did nothing.
+Only re-uploading the bitstream brought it back.
+
+That asymmetry is the whole diagnosis: the ONLY state in this SoC that survives
+a reset but not a reconfiguration is the BRAM contents. Something was writing
+into the code region.
+
+CONFIRMED FAILURE CHAIN
+--------------------------------------------------------------------------------
+Reproduced in simulation by clobbering exactly one word -- BRAM word 0, holding
+"auipc sp,0x1":
+
+  word 0 destroyed
+    -> sp never initialized, sp = 0
+    -> "addi sp,sp,-16" gives 0xFFFFFFF0
+    -> every stack access lands in the unmapped range, where
+       bus_interconnect's slave_none acks with data 0
+    -> "lw a5,12(sp)" always reads 0
+    -> "bgeu a4,a5" always true
+    -> main() spins forever in the inner delay loop
+
+The simulated LED trace with word 0 clobbered is exactly the observed board
+behaviour: 1111, then 0000, then hang with all LEDs on. Note the store order in
+main() -- GPIO_LED = 0 (all ON) happens immediately before the delay loop is
+entered, which is why the stuck state is always "on".
+
+ROOT CAUSE
+--------------------------------------------------------------------------------
+rst_sync.vhd was the textbook async-assert / sync-release synchronizer:
+rst_n_sync dropped combinationally the instant the pin went low, and only the
+RELEASE was registered.
+
+That pattern is correct ONLY for consumers using an ASYNCHRONOUS reset, i.e.
+"process (clk, rst_n) ... if rst_n = '0' then". Every register in this design
+uses a SYNCHRONOUS reset instead:
+
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n = '0' then ...
+
+For those flops rst_n_sync is not a reset pin at all -- it is an ordinary DATA
+input, sampled at the clock edge like any other, and it must meet setup and
+hold. An asynchronously-asserted rst_n_sync does not: it changes at whatever
+instant the button bounces, which lands inside some clock edge's setup/hold
+window on a random fraction of presses. When that happens, different flops on
+this high-fanout net capture DIFFERENT values on the same edge.
+
+The fatal case is in EX_MEM_Register. If the mem_addr flops capture the reset --
+going to 0x00000000, which bus_interconnect decodes as slave_bram -- while the
+mem_write flop misses it and stays '1', then bram_web goes active and the BRAM
+writes mem_write_data into word 0. The M9K's own wren_b register has no reset at
+all; it simply samples whatever bram_web is at that edge.
+
+This is the one mechanism simulation cannot demonstrate -- ideal zero-delay
+signals never violate setup -- which is why every testbench passed while the
+board failed intermittently.
+
+FIX
+--------------------------------------------------------------------------------
+rtl/rst_sync.vhd -- rewritten as a fully synchronous reset generator:
+
+  - Two-flop synchronizer on the raw pin, NO asynchronous path at all.
+    rst_n_sync is now driven by an ordinary flop, so it changes only just after
+    a clock edge and every downstream synchronous-reset flop gets a full clock
+    period of setup.
+  - Debounce / stretch counter: reset is held until rst_n_async has been
+    continuously high for 2**stretch_bits clocks (default 16, about 1.3 ms at
+    50 MHz). Any low sample restarts it, so an entire bounce burst -- press and
+    release -- collapses into one clean reset pulse with exactly one release
+    edge, instead of the dozens of partial restarts a raw button produces.
+  - All state powers up at '0', so FPGA configuration is followed by a clean
+    ~1.3 ms power-on reset before the CPU is released.
+
+Losing the async assert costs nothing here: no consumer uses an asynchronous
+reset, and the 50 MHz clock is a free-running oscillator that is always present.
+A further benefit is that the reset net becomes a normal register-to-register
+path the Timing Analyzer actually constrains, instead of an unconstrained
+asynchronous input.
+
+rtl/rv32im_soc.vhd -- defensive qualifier on the BRAM write enable:
+
+    bram_web <= s0_sel
+        when s0_we = '1' and s0_stb = '1' and s0_cyc = '1'
+             and rst_n_sync = '1'
+        else (others => '0');
+
+The synchronous rst_sync is the real fix; this one gate makes the failure mode
+structurally impossible rather than merely unlikely. Justified because a stray
+BRAM write is uniquely expensive: BRAM holds the firmware, its contents survive
+every reset, and only reconfiguration restores them, so one bad write bricks the
+board until it is reprogrammed.
+
+
+================================================================================
+BUG 4 -- NO UART OUTPUT (two independent causes)
+================================================================================
+
+SYMPTOM
+--------------------------------------------------------------------------------
+With the CPU running correctly, nothing at all appeared on the serial monitor at
+115200 (checked on both the Arduino IDE monitor and PuTTY, correct COM port).
+
+4a. WIRING -- WRONG ARDUINO PIN
+--------------------------------------------------------------------------------
+The Arduino Uno was being used as a USB-serial bridge with RESET tied to GND, so
+the ATmega328P is held in reset and the ATmega16U2 does the USB work. On the Uno:
+
+  - The 16U2's TRANSMITTER drives the RX net, through a 1 kohm resistor, to
+    header pin 0. That is the path FROM the PC INTO the board.
+  - The 16U2's RECEIVER listens on the TX net, at header pin 1. That is the path
+    TO the PC.
+
+The FPGA's uart_tx (PIN_114) was wired to Arduino pin 0, which is an OUTPUT of
+the bridge -- driving it accomplishes nothing except fighting the 16U2 through
+that 1 kohm resistor. It must be wired to Arduino pin 1 instead. Moving the wire
+produced output immediately.
+
+Counterintuitive but correct: when the Uno is a pass-through, an external
+transmitter connects to the Uno's TX pin, not its RX pin.
+
+Note on levels: the FPGA drives 3.3 V into a 5 V AVR input whose logic-high
+threshold is 0.6 * Vcc = 3.0 V. It works, but with only ~0.3 V of margin. A
+dedicated 3.3 V USB-TTL adapter wired straight to PIN_114 removes the ambiguity
+if this is ever flaky.
+
+4b. FIRMWARE -- MISSING BUSY POLL, ONLY ONE BYTE SENT
+--------------------------------------------------------------------------------
+Once wired correctly, exactly one 'A' appeared per reset instead of "ABC\r\n".
+
+uart_tx.vhd ignores tx_start while busy_reg is high, and one frame at 115200
+takes CLK_FREQ/BAUD_RATE * 10 = 4340 clocks. main()'s five uart_putc() calls
+issued their stores about 8 clocks apart, so bytes 2..5 arrived while the
+transmitter was still busy and were silently dropped.
+
+Confirmed by simulation before and after: decoding the uart_tx pin at real
+115200 8N1 yielded exactly one byte (0x41 'A') with a valid stop bit, matching
+the hardware exactly.
+
+FIX -- rv32_firmware/src/main.c:
+
+    static void uart_putc(uint8_t c)
+    {
+        while (UART_ST & 1u) {
+            /* transmitter still busy with the previous frame */
+        }
+        UART_TX = (uint32_t)c;
+    }
+
+Bit 0 of UART_ST (0xE000000C) is uart_tx's tx_busy; see the uart_status
+assignment in rv32im_soc.vhd. The status register already existed and was simply
+never read.
+
+After rebuilding the firmware and regenerating boot_bram.mif, simulation decodes
+all five bytes: 'A', 'B', 'C', CR, LF.
+
+Note this is a polled, blocking transmitter with no FIFO. Anything that needs to
+emit a meaningful volume of text will stall the CPU for 4340 clocks per byte;
+add a TX FIFO to uart_tx.vhd before relying on it for real logging.
+
+
+================================================================================
+BUG 5 -- SIGNED DIVISION RETURNED THE WRONG SIGN
+================================================================================
+
+Found by code inspection while reading M_Extension_Unit.vhd during the Bug 1-3
+hunt. Not exercised by the current firmware, so it never showed up on hardware --
+but it would have bitten the first time anything divided.
+
+ROOT CAUSE
+--------------------------------------------------------------------------------
+The divider FSM ran IDLE -> COMPUTE (32 restoring-division iterations) -> DONE.
+The DONE state is where the sign correction and the divide-by-zero / overflow
+substitutions are applied, and it writes them to quotient_reg / accumulator as
+ordinary clocked assignments -- so they only become visible in the FOLLOWING
+cycle.
+
+But stall_m was written as
+
+    stall_m <= '1' when (is_m_ext = '1' and funct3(2) = '1'
+                         and current_state /= DONE) else '0';
+
+so the stall released DURING DONE. EX_Stage feeds m_result into
+EX_MEM_Register, whose enable is (stall_m or stall_ex_mem_in), so the pipeline
+latched the result at the end of the DONE cycle -- one cycle before the
+corrected values existed. It captured the raw unsigned magnitude produced by the
+restoring-division loop.
+
+The restoring-division algorithm itself was verified correct. The bug was purely
+the one-cycle handoff.
+
+WHAT WAS AND WAS NOT BROKEN (measured, not assumed)
+--------------------------------------------------------------------------------
+Only cases needing an actual sign flip were wrong -- 4 of 16 test vectors:
+
+    div  -100 /  7    gave  +14  should be  -14
+    div   100 / -7    gave  +14  should be  -14
+    rem  -100 %  7    gave   +2  should be   -2
+    rem  -100 % -7    gave   +2  should be   -2
+
+Everything else already passed, some of it by luck:
+
+  - DIVU / REMU: sign_quotient and sign_remainder are always 0, so the
+    correction is a no-op and the uncorrected register already held the answer.
+  - DIV / REM with both operands positive: same reason.
+  - div -100 / -7: signs cancel (sign_quotient = 1 xor 1 = 0), no flip needed.
+  - Divide by zero: with divisor 0 every trial subtraction succeeds, so the loop
+    coincidentally produces 0xFFFFFFFF in quotient_reg and leaves the dividend in
+    the accumulator -- exactly what the RISC-V spec requires. The DONE state's
+    explicit substitution was redundant.
+  - INT_MIN / -1: abs(0x80000000) is 0x80000000 and abs(-1) is 1, so the loop
+    yields 0x80000000 directly, and sign_quotient is again 1 xor 1 = 0.
+
+FIX
+--------------------------------------------------------------------------------
+rtl/core/M_Extension_Unit.vhd -- added a HOLD state:
+
+    IDLE -> COMPUTE (x32) -> DONE (calculate correction) -> HOLD (present)
+
+  - state_type gains HOLD; next_state goes DONE -> HOLD -> IDLE.
+  - The sequential process does nothing in HOLD, so quotient_reg and accumulator
+    stay stable while the pipeline samples them.
+  - stall_m now releases on HOLD instead of DONE:
+
+        stall_m <= '1' when (is_m_ext = '1' and funct3(2) = '1'
+                             and current_state /= HOLD) else '0';
+
+Cost is one extra clock on a 34-clock operation (stall goes 33 -> 34 cycles).
+
+The obvious alternative -- applying the sign correction combinationally in the
+output mux -- was rejected: it puts a 32-bit negate directly in the
+ex_final_result path, and with 1.36 ns of setup slack this design has no room
+for it.
+
+VERIFICATION
+--------------------------------------------------------------------------------
+A dedicated unit testbench (tb_mdiv) drives M_Extension_Unit directly and samples
+m_result on exactly the cycle EX_MEM_Register would latch it -- the first cycle
+stall_m is low. 16 vectors covering unsigned, signed with every sign combination,
+divide by zero for all four opcodes, and INT_MIN/-1, plus three back-to-back
+divides with is_m_ext never deasserted (the case a newly added FSM state is most
+likely to break).
+
+  Before the fix: 4 failures.
+  After the fix:  0 failures, back-to-back included.
+
+Full-SoC regression re-run afterwards: LEDs blink, all five UART bytes still
+transmit correctly.
+
+
+================================================================================
+WHY THE EARLIER ISOLATION TESTS ALL PASSED
+================================================================================
+Before the root causes were found, a series of synthetic top levels
+(cpu_debug_top7 .. cpu_debug_top11) was built to isolate the fault. Every one of
+them passed, which pointed away from the real bugs for a long time. In
+retrospect the reasons are clear and worth recording:
+
+  - top7 .. top10 fed the CPU a COMBINATIONAL instruction source with no
+    altsyncram in the loop at all, so Bug 1 was simply not present in those
+    tests, and Bug 2 (which needs a registered fetch) could not occur either.
+
+  - top11 did use the real BRAM, but ran a 2-instruction loop. A branch target
+    with a +4 PC error still lands inside a 2-instruction loop, and its "lw"
+    only needed a nonzero value, which stale data happened to satisfy.
+
+  - The pass criterion in all of them was "LEDs solid", derived from
+    pc_debug(24) not toggling. A PC that is mis-targeting but still BOUNDED
+    satisfies that just as well as a correct one. None of those tests were
+    sensitive to PC alignment.
+
+Lesson: a synthetic reproduction must exercise the actual mechanism under
+suspicion (here: registered memory latency and PC-relative addressing), and its
+pass/fail criterion must be able to distinguish "correct" from "wrong but
+bounded".
+
+A related trap: an early SignalTap capture showed pc and instruction frozen at
+0x00000000, which looked like a hard hang. It was an artifact. The compile log
+carried
+
+    Critical Warning (35025): Partially connected in-system debug instance
+    "auto_signaltap_0" to 39 of its 169 required data inputs ... 130 missing
+    sources or connections
+
+Those nodes were unconnected after a Rapid Recompile and read as all-zero.
+Always check for warning 35025 before trusting a SignalTap waveform.
+
+
+================================================================================
+VERIFICATION METHOD
+================================================================================
+Bugs 2 and 3 were found and confirmed by full-design simulation under GHDL 4.1
+(--std=08), not by inspection alone. Setup:
+
+  - A behavioural stand-in for altsyncram, written to match exactly what
+    CPU_FPGA.map.rpt reports for u_bram (address register always present on both
+    ports, selectable output register, BIDIR_DUAL_PORT, byte enables, read-old-
+    data), including a MIF loader so the real firmware image is executed.
+  - A write monitor inside that model reporting ANY port-B write outside words
+    1022/1023 (0xFF8/0xFFC), the only legitimate stack slots.
+  - tb_soc      -- plain run, reports every LED register change.
+  - tb_rst      -- 40 resets asserted at deliberately clock-misaligned offsets,
+                   asserting failure if the LEDs stop moving afterwards.
+  - tb_bounce   -- mechanical bounce model, several chatter bursts on both press
+                   and release, 25 presses.
+  - tb_uart     -- decodes the uart_tx pin at real 115200 8N1 (simulation =>
+                   false) and reports every byte with its stop bit.
+  - tb_mdiv     -- unit test for M_Extension_Unit's divide path, 16 vectors plus
+                   back-to-back divides (Bug 5).
+  - A shortened-delay MIF (patching the "lui a4,0x1e8 / addi a4,a4,1151"
+    constant down to 20) so a full blink period is a few hundred cycles and many
+    can be simulated.
+
+Results after all three fixes: continuous blinking, 40/40 resets survived, 25/25
+bouncy presses survived, zero unexpected BRAM writes. The healthy run and the
+word-0-clobbered run are trivially distinguishable, which is what made the Bug 3
+diagnosis conclusive.
+
+Recommendation: keep these testbenches in the repository as a regression test.
+Bugs 1 and 2 in particular are the kind that reappear the moment anyone touches
+memory latency or the stall logic again.
+
+
+================================================================================
+HYPOTHESES CHECKED AND RULED OUT
+================================================================================
+Recorded so they are not re-investigated later.
+
+  - Floating or broken reset pin. Disproved by direct multimeter measurement:
+    3.3 V idle, 0 V pressed. The pull-up circuit is healthy.
+
+  - Wrong pin assignment. Verified against output_files/CPU_FPGA.pin --
+    rst_n = PIN_25, clk = PIN_23, gpio_leds[0..3] = PIN_87/86/85/84.
+
+  - Firmware not actually in BRAM. Verified via the Analysis & Synthesis RAM
+    Summary ("MIF: boot_bram.mif") and CPU_FPGA.mif_update.rpt.
+
+  - Marginal hold-time violation. A 0.138 / 0.178 ns fast-corner hold slack was
+    briefly suspected, but detailed inspection of CPU_FPGA.sta.rpt showed the
+    identical value repeated across dozens of unrelated registers throughout the
+    design (sdram_controller, uart_tx, regfile, mem_stage). It is the generic
+    same-clock hold-margin floor for the device, not a specific defect. TNS is
+    0.000 in every corner.
+
+  - Button bounce alone as the cause of the Bug 3 corruption. Simulated
+    explicitly (tb_bounce): 25 bouncy presses produced zero stray BRAM writes
+    and always recovered. Bounce is a real nuisance and is now debounced, but it
+    was not the corrupting mechanism -- the setup/hold violation was.
+
+
+================================================================================
+FILES CHANGED
+================================================================================
+  rtl/memory/bram_4kb.vhd   outdata_reg_a/b -> "UNREGISTERED"  (Bug 1a, 1b)
+  rtl/rv32im_soc.vhd        registered single-pulse s0_ack     (Bug 1c)
+                            bram_web qualified with rst_n_sync (Bug 3, defensive)
+  rtl/core/IF_Stage.vhd     pc_fetch_out rewinds on stall      (Bug 2)
+  rtl/rst_sync.vhd          fully synchronous reset + debounce (Bug 3)
+  rv32_firmware/src/main.c  uart_putc polls UART_ST busy bit   (Bug 4b)
+                            (boot_bram.mif / .hex regenerated)
+  rtl/core/M_Extension_Unit.vhd
+                            HOLD state; stall_m releases on HOLD (Bug 5)
+
+Each change carries an in-file comment explaining the reasoning, so the code is
+self-documenting without reference to this report.
+
+
+================================================================================
+OPEN ITEMS
+================================================================================
+  - SignalTap instrumentation was still enabled at the end of this session,
+    costing about 1275 LEs and 139264 memory bits (90% total logic utilization).
+    Disable it under Assignments -> Settings -> SignalTap Logic Analyzer and do a
+    full compile to recover roughly 66% utilization.
+
+  - The cpu_debug_top*.vhd scratch top levels and loaduse_bram.mif in the project
+    root are debugging leftovers and can be removed or moved out of the build.
+
+================================================================================

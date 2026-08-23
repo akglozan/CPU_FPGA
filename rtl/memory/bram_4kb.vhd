@@ -37,7 +37,9 @@ entity bram_4kb is
     generic (
         -- Path to the .mif memory-init file loaded directly by the
         -- altsyncram primitive's init_file parameter.
-        hex_file : string := "boot_bram.mif"
+        -- Path is relative to the Quartus project directory (the folder
+        -- holding CPU_FPGA.qpf). All generated memory images live in sw/.
+        hex_file : string := "sw/boot_bram.mif"
     );
     port (
         clk     : in  std_logic;
@@ -81,7 +83,20 @@ begin
             width_a                  => 32,
             widthad_a                => 10,
             numwords_a               => 1024,
-            outdata_reg_a            => "CLOCK0",
+            -- UNREGISTERED, not CLOCK0. altsyncram ALWAYS registers the
+            -- read address; outdata_reg_a => "CLOCK0" adds a SECOND
+            -- register stage on the data output, making the real
+            -- address-to-data latency two clock cycles, not one.
+            -- IF_Stage.vhd's pc_delayed compensates for exactly one
+            -- cycle and Hazard_Unit.vhd's branch_pending discards
+            -- exactly one stale in-flight fetch, so with two cycles of
+            -- latency id_pc/ex_pc ran one fetch step ahead of the
+            -- instruction it was paired with (every PC-relative target
+            -- -- AUIPC, JAL, JALR link, every branch -- off by 4) and
+            -- one wrong-path instruction survived every taken branch.
+            -- Dropping the output register makes the hardware match the
+            -- one-cycle latency the pipeline was retimed for.
+            outdata_reg_a            => "UNREGISTERED",
             width_byteena_a          => 4,
 
             width_b                  => 32,
@@ -99,7 +114,14 @@ begin
             rdcontrol_reg_b           => "CLOCK0",
             wrcontrol_wraddress_reg_b => "CLOCK0",
             byteena_reg_b             => "CLOCK0",
-            outdata_reg_b            => "CLOCK0",
+            -- UNREGISTERED for the same reason as outdata_reg_a: port B
+            -- is the CPU's data port, and a second output register put
+            -- rdata_b two cycles behind addr_b while rv32im_soc.vhd
+            -- acknowledged the access in the same cycle it was
+            -- presented, so every load latched a stale word into
+            -- MEM_WB_Register. Now one cycle, matched by the registered
+            -- s0_ack in rv32im_soc.vhd.
+            outdata_reg_b            => "UNREGISTERED",
             width_byteena_b          => 4,
 
             read_during_write_mode_mixed_ports => "OLD_DATA"

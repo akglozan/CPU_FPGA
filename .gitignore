@@ -115,3 +115,7 @@ cpu_debug_top3.vhd
 cpu_debug_top7.vhd
 cpu_debug_top4.vhd
 blinky_top.vhd
+
+# Simulation dumps and simulator libraries (regenerable)
+*.vcd
+sim/work/

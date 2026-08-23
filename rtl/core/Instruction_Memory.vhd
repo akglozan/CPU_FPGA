@@ -26,8 +26,10 @@ use STD.textio.all;
 -- registered read latency to account for.
 entity Instruction_Memory is
     generic (
-        -- Path to the hex-format memory image loaded at elaboration.
-        HEX_FILE : string := "boot_bram.hex"
+        -- Path to the hex-format memory image loaded at elaboration,
+        -- relative to the Quartus project directory (the folder holding
+        -- CPU_FPGA.qpf). All generated memory images live in sw/.
+        HEX_FILE : string := "sw/boot_bram.hex"
     );
     port (
         -- Present for interface consistency; the read path below is

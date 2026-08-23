@@ -63,7 +63,30 @@ end entity;
 architecture Behavioral of M_Extension_Unit is
 
     -- FSM States
-    type state_type is (IDLE, COMPUTE, DONE);
+    --
+    -- HOLD exists purely to give the DONE state's register writes a cycle
+    -- to land before the pipeline samples the result.
+    --
+    -- DONE is where the sign correction and the divide-by-zero / overflow
+    -- substitutions are applied, and it writes them to quotient_reg /
+    -- accumulator like any clocked assignment: they become visible in the
+    -- FOLLOWING cycle. But stall_m used to deassert during DONE itself, so
+    -- EX_MEM_Register latched m_result at the end of that same cycle --
+    -- one cycle too early, capturing the UNCORRECTED magnitude. Every
+    -- signed divide or remainder whose result should have been negative
+    -- returned the positive value instead (verified in simulation:
+    -- -100 / 7 produced +14 rather than -14, and -100 % 7 produced +2
+    -- rather than -2). Divide-by-zero and INT_MIN/-1 happened to survive,
+    -- because for those the raw algorithm already produces the required
+    -- bits and no sign flip is needed.
+    --
+    -- HOLD is a single idle cycle after DONE in which nothing is written
+    -- and stall_m finally drops, so the pipeline samples the corrected
+    -- registers. Cost is one clock on a 34-clock operation. The obvious
+    -- alternative -- applying the correction combinationally in the
+    -- output mux -- would put a 32-bit negate directly in the
+    -- ex_final_result path, which this design has no timing margin for.
+    type state_type is (IDLE, COMPUTE, DONE, HOLD);
     signal current_state, next_state : state_type;
     
     -- Datapath Registers
@@ -204,10 +227,18 @@ begin
                         end if;
                     end if;
                     
-                    -- Update registers for holding
+                    -- Update registers for holding. These land in the
+                    -- NEXT cycle, which is HOLD -- that is the cycle the
+                    -- pipeline is allowed to sample.
                     quotient_reg             <= v_final_quot;
                     accumulator(31 downto 0) <= v_final_rem;
-                
+
+                when HOLD =>
+                    -- Result presentation cycle: hold quotient_reg and
+                    -- accumulator untouched while stall_m drops and
+                    -- EX_MEM_Register latches m_result.
+                    null;
+
                 when others =>
                     null;
             end case;   
@@ -235,8 +266,11 @@ begin
             end if;
                 
         when DONE =>
+            next_state <= HOLD;
+
+        when HOLD =>
             next_state <= IDLE;
-        
+
         when others =>
             next_state <= IDLE;
     end case;
@@ -244,7 +278,11 @@ end process;
 
 
 -- Stall Assignment
-stall_m <= '1' when (is_m_ext = '1' and funct3(2) = '1' and current_state /= DONE) else '0';
+--
+-- Releases in HOLD, not in DONE. DONE is the cycle that CALCULATES the
+-- sign-corrected result; its register writes are not visible until HOLD.
+-- Releasing in DONE let EX_MEM_Register latch the uncorrected magnitude.
+stall_m <= '1' when (is_m_ext = '1' and funct3(2) = '1' and current_state /= HOLD) else '0';
 
 
 -- Output Mux Assignment

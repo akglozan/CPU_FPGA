@@ -28,22 +28,35 @@ SRC_DIR   = src
 SRCS      = $(BSP_DIR)/crt0.s $(SRC_DIR)/main.c
 TARGET    = $(BUILD_DIR)/firmware
 
-# Output hex/mif destinations for root and ModelSim simulation
-HEX_ROOT  = ../boot_bram.hex
-HEX_SIM   = ../sim/boot_bram.hex
-MIF_ROOT  = ../boot_bram.mif
+# Memory images. Every generated .hex/.mif in this project lives in sw/,
+# and each one is written exactly once -- there is deliberately no copy
+# left behind in build/ or sim/. The VHDL refers to these by the paths
+# below, relative to the Quartus project directory:
+#
+#   rtl/memory/bram_4kb.vhd      hex_file default "sw/boot_bram.mif"
+#   rtl/rv32im_soc.vhd           hex_file => "sw/boot_bram.mif"
+#   rtl/core/Instruction_Memory.vhd  HEX_FILE default "sw/boot_bram.hex"
+#
+# So renaming or relocating anything here means updating those too.
+SW_DIR    = ../sw
+MIF_OUT   = $(SW_DIR)/boot_bram.mif
+HEX_OUT   = $(SW_DIR)/boot_bram.hex
 MIF_DEPTH = 1024
 
 .PHONY: all clean
 
-all: $(BUILD_DIR) $(TARGET).hex $(TARGET).mif $(TARGET).bin $(TARGET).dis
+all: $(BUILD_DIR) $(SW_DIR) $(HEX_OUT) $(MIF_OUT) $(TARGET).bin $(TARGET).dis
 	@echo "=========================================="
 	@echo "Firmware build successful."
-	@echo "Generated 32-bit raw hex and Quartus MIF for BRAM."
+	@echo "Wrote $(HEX_OUT)"
+	@echo "Wrote $(MIF_OUT)"
 	@echo "=========================================="
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
+
+$(SW_DIR):
+	mkdir -p $(SW_DIR)
 
 $(TARGET).elf: $(SRCS) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(SRCS) -o $@
@@ -54,16 +67,16 @@ $(TARGET).dis: $(TARGET).elf
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 
-# Convert binary to 32-bit little-endian hex words (1 word per line)
-$(TARGET).hex: $(TARGET).bin
+# Convert binary to 32-bit little-endian hex words (1 word per line),
+# written straight into sw/ -- no intermediate copy in build/.
+$(HEX_OUT): $(TARGET).bin | $(SW_DIR)
 	python3 -c "import binascii; f=open('$<','rb').read(); [print(binascii.hexlify(f[i:i+4][::-1]).decode('ascii')) for i in range(0, len(f), 4)]" > $@
-	cp $@ $(HEX_ROOT)
-	cp $@ $(HEX_SIM)
 
 # Convert binary to a Quartus Memory Initialization File (.mif). Any bytes
 # beyond the program image are zero-padded out to MIF_DEPTH words, and any
 # words beyond the raw file length default to zero (i.e. NOP / addi x0,x0,0).
-$(TARGET).mif: $(TARGET).bin
+# Written straight into sw/ -- no intermediate copy in build/.
+$(MIF_OUT): $(TARGET).bin | $(SW_DIR)
 	python3 -c "\
 import struct; \
 f = open('$<', 'rb').read(); \
@@ -74,7 +87,6 @@ lines = ['WIDTH = 32;', 'DEPTH = %d;' % depth, 'ADDRESS_RADIX = HEX;', 'DATA_RAD
 lines += ['%03X : %08x;' % (i, w) for i, w in enumerate(words)]; \
 lines.append('END;'); \
 open('$@', 'w').write('\\n'.join(lines) + '\\n')"
-	cp $@ $(MIF_ROOT)
 
 clean:
-	rm -rf $(BUILD_DIR) $(HEX_ROOT) $(HEX_SIM) $(MIF_ROOT)
+	rm -rf $(BUILD_DIR) $(HEX_OUT) $(MIF_OUT)
