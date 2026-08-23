@@ -63,6 +63,10 @@ do
     $GA "$f"
 done
 
+# Behavioural SDRAM chip model, used only by tb_sdram. Lives in sim/
+# rather than sim/ghdl/ because the ModelSim flow uses it too.
+$GA sim/sdram_model.vhd
+
 for tb in "$here"/tb_*.vhd; do
     $GA "$tb"
 done
@@ -70,7 +74,7 @@ done
 if [ -n "$1" ]; then
     list="$*"
 else
-    list="tb_mdiv tb_uart tb_soc tb_rst tb_bounce"
+    list="tb_mdiv tb_buserr tb_sdram tb_uart tb_soc tb_rst tb_bounce"
 fi
 
 status=0

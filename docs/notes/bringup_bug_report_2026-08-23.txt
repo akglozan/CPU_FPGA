@@ -437,6 +437,101 @@ transmit correctly.
 
 
 ================================================================================
+BUG 6 -- SDRAM: MODEL ADDRESS DECODE, AND A SKIPPED tMRD
+================================================================================
+
+Found while bringing up the SDRAM path, which had never executed a single
+transaction -- the firmware only touches BRAM and the peripheral bridge, so
+everything at 0x8000_0000 was unproven. sim/ghdl/tb_sdram.vhd drives the
+controller's Wishbone port against sim/sdram_model.vhd.
+
+6a. THE MODEL'S ADDRESS DECODE WAS WRONG (test infrastructure)
+--------------------------------------------------------------------------------
+The first run failed in a structured, diagnostic way: write 0xDEADBEEF to
+0x8000_0000, write 0xCAFEBABE to 0x8000_0004, read the first back -- and get
+0xBABEBEEF. Low half intact, high half replaced by the neighbour's low half.
+
+sdram_model.vhd decoded the column as addr(8 downto 1) and indexed storage as
+row(5 downto 0)*256 + col, with the bank absent from the index entirely:
+
+  - Dropping addr(0) halved column resolution. The controller drives a full
+    9-bit column, adr(9 downto 1), so consecutive 32-bit words landed one
+    16-bit cell apart instead of two, and overlapped.
+  - The bank was ignored, so all four banks aliased onto the same storage.
+    Writing 0x8040_0000 (bank 1) destroyed 0x8000_0000 (bank 0).
+  - Only 6 row bits were used against a 12-bit row address.
+
+The controller was correct throughout: bank = adr(23:22), row = adr(21:10),
+col = adr(9:1) is self-consistent and covers 16 MB with no overlap. The model
+was rewritten to decode bank, row and column independently and to implement the
+BL=2 sequential burst properly -- the second beat is the column with bit 0
+flipped, which can never cross a row boundary.
+
+6b. tMRD WAS NOT ENFORCED (real controller bug)
+--------------------------------------------------------------------------------
+Two states set wait_cnt and then transitioned to ST_IDLE, which never read it:
+
+    when ST_BOOT_LMR =>  ... wait_cnt <= 2;  state <= ST_IDLE;   -- tMRD
+    when ST_PRECHARGE => ... wait_cnt <= 2;  state <= ST_IDLE;   -- tRP
+
+Both delays were silently skipped. Timing assertions were added to the model
+(tRP, tRCD, tRAS, tRC, tMRD, tWR as generics, defaulting to a -7 grade part at
+50 MHz) and the testbench gained two stress cases: back-to-back accesses that
+never release the bus, and a request already pending when boot completes.
+
+Result: no tRP or tRC violation -- at 50 MHz the single cycle the state
+transition provides already satisfies tRP (~20 ns against a 20 ns period). But
+tMRD, which the datasheet specifies in clocks rather than nanoseconds, fired:
+
+    TIMING VIOLATION tMRD (LOAD_MR->command) on bank 0
+    -- 1 clocks elapsed, minimum is 2
+
+FIX -- rtl/memory/sdram_controller.vhd: ST_IDLE now honours wait_cnt before
+considering a refresh or a new request, so both intended delays take effect.
+Cost is two extra cycles on a back-to-back transaction (9 -> 11); an isolated
+access is unchanged at 9.
+
+Note the severity difference. 6a was simulation-only and would never have
+reached hardware, but it would have sent someone hunting a controller bug that
+did not exist. 6b is real silicon behaviour this design would have exhibited on
+the board, and it is exactly the kind of marginal violation that works at room
+temperature and fails later.
+
+WHAT IS STILL UNPROVEN
+--------------------------------------------------------------------------------
+The controller now passes reads, writes, consecutive words, multiple rows and
+banks, back-to-back bursts and a post-boot access. It has NOT run on hardware,
+and these remain untested: auto-refresh under sustained traffic (ST_REFRESH is
+entered from ST_IDLE only, so a refresh cannot pre-empt a long access),
+byte-enables via wb_sel (every test uses "1111"), and any access issued by the
+CPU itself rather than a synthetic Wishbone master.
+
+BUS WATCHDOG (added 2026-08-23)
+--------------------------------------------------------------------------------
+bus_interconnect previously had no timeout: a slave that never asserted ack left
+mem_stage's bus_stall_o high forever and froze the CPU with no outward sign --
+the same silent-hang signature as Bug 3. Three live routes into that state: the
+VGA slave is hard-tied s2_ack_i <= '0' so any access to 0xC000_0000 hangs, the
+SDRAM controller is unproven on hardware, and any future slave can regress.
+
+bus_interconnect now takes clk and rst_n plus a TIMEOUT_CYCLES generic. If a
+transaction goes unacknowledged for that long the watchdog synthesises a
+single-cycle ack, returns zero rather than whatever the slave bus held, and sets
+a sticky bus_error flag held until reset. Software reads it at BUS_ERR
+(0xE000_0014) bit 0, added to periph_bridge and soc_regs.h -- any load that
+returned 0 while that bit is set should be treated as invalid.
+
+TIMEOUT_CYCLES defaults to 65536 (~1.3 ms at 50 MHz). That is deliberately
+generous: the SDRAM controller's power-on init is CLK_FREQ_MHZ*150 = 7500 cycles
+(~150 us), and a CPU access issued during it legitimately waits the whole time,
+so a tighter limit would fire on healthy traffic.
+
+Covered by sim/ghdl/tb_buserr.vhd: healthy slaves and unmapped addresses are
+untouched, tied-low and mute slaves both time out and return zero, the flag is
+sticky, and the bus still works afterwards.
+
+
+================================================================================
 WHY THE EARLIER ISOLATION TESTS ALL PASSED
 ================================================================================
 Before the root causes were found, a series of synthetic top levels
@@ -548,6 +643,16 @@ FILES CHANGED
                             (boot_bram.mif / .hex regenerated)
   rtl/core/M_Extension_Unit.vhd
                             HOLD state; stall_m releases on HOLD (Bug 5)
+  rtl/memory/sdram_controller.vhd
+                            ST_IDLE honours wait_cnt (tMRD)      (Bug 6b)
+  sim/sdram_model.vhd       bank/row/column decoded independently,
+                            BL=2 burst wrap, timing assertions   (Bug 6a)
+  rtl/memory/bus_interconnect.vhd
+                            transaction watchdog + sticky bus_error
+  rtl/peripherals/periph_bridge.vhd
+                            BUS_ERR readable at offset 0x14
+  rv32_firmware/bsp/soc_regs.h
+                            BUS_ERR_ADDR / BUS_ERR
 
 Each change carries an in-file comment explaining the reasoning, so the code is
 self-documenting without reference to this report.

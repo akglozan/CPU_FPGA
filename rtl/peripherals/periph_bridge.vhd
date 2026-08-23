@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 -- Wishbone B4 slave bridging the system bus to the individual MMIO
 -- peripherals (LED at offset 0x00, key input at 0x04, UART TX/busy at
--- 0x08/0x0C, timer at 0x10). Every access acknowledges combinationally
+-- 0x08/0x0C, timer at 0x10, bus-error flag at 0x14). Every access acknowledges combinationally
 -- in the same cycle it is presented (single-cycle peripheral latency),
 -- unlike the multi-cycle SDRAM slave.
 entity periph_bridge is
@@ -34,7 +34,13 @@ entity periph_bridge is
         gpio_key_data : in  std_logic_vector(31 downto 0);
 
         -- Free-running counter value, read at offset 0x10.
-        timer_data : in std_logic_vector(31 downto 0)
+        timer_data : in std_logic_vector(31 downto 0);
+
+        -- Sticky bus-timeout flag from bus_interconnect, read at offset
+        -- 0x14 in bit 0. Set when a slave failed to acknowledge and the
+        -- watchdog had to synthesise an ack; any read that returned zero
+        -- while this is set should be treated as invalid.
+        bus_error  : in std_logic
     );
 end entity periph_bridge;
 
@@ -79,7 +85,8 @@ begin
         wb_addr_i,
         gpio_key_data,
         uart_status,
-        timer_data
+        timer_data,
+        bus_error
     )
     begin
         wb_data_o <= (others => '0');
@@ -93,6 +100,9 @@ begin
 
             when x"10" =>
                 wb_data_o <= timer_data;
+
+            when x"14" =>
+                wb_data_o <= (0 => bus_error, others => '0');
 
             when others =>
                 wb_data_o <= (others => '0');

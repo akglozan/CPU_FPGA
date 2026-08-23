@@ -13,7 +13,21 @@ use ieee.numeric_std.all;
 -- an address matching no slave still generates a synchronous-looking
 -- ack so the CPU doesn't hang on a stray access.
 entity bus_interconnect is
+    generic (
+        -- Cycles a transaction may go unacknowledged before the watchdog
+        -- forces an ack. Must comfortably exceed the slowest legitimate
+        -- response: the SDRAM controller's power-on init is
+        -- CLK_FREQ_MHZ*150 = 7500 cycles at 50 MHz (~150 us), and a CPU
+        -- access issued during it waits the whole time. 65536 cycles is
+        -- ~1.3 ms, well clear of that, and still far below human
+        -- perception.
+        TIMEOUT_CYCLES : natural := 65536
+    );
     port (
+        clk   : in std_logic;
+        -- Active-low synchronous reset; also clears the sticky error.
+        rst_n : in std_logic;
+
         -- Wishbone master interface
         -- Byte address from the CPU.
         m_adr_i : in  std_logic_vector(31 downto 0);
@@ -29,8 +43,12 @@ entity bus_interconnect is
         m_stb_i : in  std_logic;
         -- Cycle indicator from the CPU.
         m_cyc_i : in  std_logic;
-        -- Acknowledge returned to the CPU from the selected slave.
+        -- Acknowledge returned to the CPU from the selected slave, or
+        -- synthesised by the watchdog when a slave fails to respond.
         m_ack_o : out std_logic;
+        -- Sticky: set the first time any access times out, held until
+        -- reset. Readable by software at BUS_ERR (0xE000_0014).
+        bus_error_o : out std_logic;
 
         -- Slave 0: internal BRAM
         s0_adr_o : out std_logic_vector(31 downto 0);
@@ -93,6 +111,21 @@ architecture rtl of bus_interconnect is
     );
 
     signal active_slave : slave_select_t;
+
+    -- Response from the decoded slave, before the watchdog is applied.
+    signal slave_dat   : std_logic_vector(31 downto 0);
+    signal slave_ack   : std_logic;
+
+    -- Watchdog. Without this a slave that never asserts ack leaves
+    -- mem_stage's bus_stall_o high forever and the CPU freezes with no
+    -- outward sign -- the same silent-hang signature as the reset bug
+    -- that corrupted BRAM word 0. Three ways that can happen today: the
+    -- VGA slave is hard-tied s2_ack <= '0', so any access to
+    -- 0xC000_0000 hangs; the SDRAM controller is newly brought up and
+    -- unproven on hardware; and any future slave can regress into it.
+    signal to_cnt      : natural range 0 to TIMEOUT_CYCLES := 0;
+    signal timeout_ack : std_logic := '0';
+    signal bus_error_r : std_logic := '0';
 
 begin
 
@@ -165,30 +198,67 @@ begin
         m_cyc_i
     )
     begin
-        m_dat_o <= (others => '0');
-        m_ack_o <= '0';
+        slave_dat <= (others => '0');
+        slave_ack <= '0';
 
         case active_slave is
             when slave_bram =>
-                m_dat_o <= s0_dat_i;
-                m_ack_o <= s0_ack_i;
+                slave_dat <= s0_dat_i;
+                slave_ack <= s0_ack_i;
 
             when slave_sdram =>
-                m_dat_o <= s1_dat_i;
-                m_ack_o <= s1_ack_i;
+                slave_dat <= s1_dat_i;
+                slave_ack <= s1_ack_i;
 
             when slave_vga =>
-                m_dat_o <= s2_dat_i;
-                m_ack_o <= s2_ack_i;
+                slave_dat <= s2_dat_i;
+                slave_ack <= s2_ack_i;
 
             when slave_peripheral =>
-                m_dat_o <= s3_dat_i;
-                m_ack_o <= s3_ack_i;
+                slave_dat <= s3_dat_i;
+                slave_ack <= s3_ack_i;
 
             when slave_none =>
-                m_dat_o <= (others => '0');
-                m_ack_o <= m_stb_i and m_cyc_i;
+                slave_dat <= (others => '0');
+                slave_ack <= m_stb_i and m_cyc_i;
         end case;
     end process;
+
+    -- Watchdog: count cycles a transaction stays unacknowledged.
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n = '0' then
+                to_cnt      <= 0;
+                timeout_ack <= '0';
+                bus_error_r <= '0';
+            else
+                timeout_ack <= '0';   -- single-cycle pulse
+
+                if m_cyc_i = '1' and m_stb_i = '1' then
+                    if slave_ack = '1' or timeout_ack = '1' then
+                        to_cnt <= 0;
+                    elsif to_cnt >= TIMEOUT_CYCLES - 1 then
+                        -- Give up: unblock the CPU and remember why.
+                        to_cnt      <= 0;
+                        timeout_ack <= '1';
+                        bus_error_r <= '1';
+                    else
+                        to_cnt <= to_cnt + 1;
+                    end if;
+                else
+                    to_cnt <= 0;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- A timed-out read returns zero rather than whatever the floating
+    -- slave bus happened to hold, so the failure is at least
+    -- deterministic. Software detects it by reading bus_error_o.
+    m_ack_o <= slave_ack or timeout_ack;
+    m_dat_o <= (others => '0') when timeout_ack = '1' else slave_dat;
+
+    bus_error_o <= bus_error_r;
 
 end architecture rtl;

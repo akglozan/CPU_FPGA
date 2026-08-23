@@ -12,3 +12,20 @@ Bus interconnect: Wishbone B4
 Program counter <= Done
 
 finished phase 1
+
+Peripheral registers as actually implemented (rtl/peripherals/periph_bridge.vhd).
+Note these differ from the planned map above: UART, keys and timer all sit inside
+the single 0xE000_00xx page decoded by periph_bridge, not the wider ranges
+originally sketched.
+
+  0xE0000000  GPIO_LED   write  low 4 bits; LEDs are ACTIVE-LOW (0 = lit)
+  0xE0000004  GPIO_KEY   read   synchronized key inputs
+  0xE0000008  UART_TX    write  byte to transmit
+  0xE000000C  UART_ST    read   bit 0 = tx_busy; poll before writing UART_TX,
+                                the transmitter drops bytes sent while busy
+  0xE0000010  TIMER      read   free-running counter
+  0xE0000014  BUS_ERR    read   bit 0 = sticky bus-timeout flag, set when a
+                                slave failed to ack and the interconnect
+                                watchdog synthesised one. A load that returned
+                                0 while this is set is invalid. Cleared only by
+                                reset.

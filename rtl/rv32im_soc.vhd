@@ -109,6 +109,10 @@ architecture structural of rv32im_soc is
 
     signal timer_data     : std_logic_vector(31 downto 0);
 
+    -- Sticky bus-timeout flag from the interconnect watchdog, surfaced to
+    -- software at BUS_ERR (0xE000_0014).
+    signal bus_error      : std_logic;
+
     function get_baud_rate(
         fast_simulation : boolean
     ) return positive is
@@ -157,6 +161,9 @@ begin
 
     u_interconnect : entity work.bus_interconnect
     port map (
+        clk   => clk,
+        rst_n => rst_n_sync,
+
         m_adr_i => wb_cpu_addr,
         m_dat_i => wb_cpu_wdata,
         m_dat_o => wb_cpu_rdata,
@@ -165,6 +172,7 @@ begin
         m_stb_i => wb_cpu_stb,
         m_cyc_i => wb_cpu_cyc,
         m_ack_o => wb_cpu_ack,
+        bus_error_o => bus_error,
 
         s0_adr_o => s0_addr,
         s0_dat_o => s0_wdata,
@@ -312,7 +320,8 @@ begin
             gpio_led_we   => gpio_led_we,
             gpio_key_data => gpio_key_data,
 
-            timer_data    => timer_data
+            timer_data    => timer_data,
+            bus_error     => bus_error
         );
 
     u_uart_tx : entity work.uart_tx
