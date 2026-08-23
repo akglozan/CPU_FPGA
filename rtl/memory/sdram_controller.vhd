@@ -1,12 +1,11 @@
 -- SPDX-License-Identifier: Apache-2.0
 -- Copyright 2026 Ozan Akgul
 --
--- REVERTED: wait_cnt in ST_READ_CMD restored to 1 (original value).
--- The actual bug was NOT a wait-count mismatch -- it was in sdram_model.vhd,
--- where dq_oe was registered one cycle behind dq_out, causing Word 0 to
--- never actually appear on the sdram_dq bus (see corrected sdram_model.vhd).
--- With that model fix applied, this controller's original CAS-latency
--- timing (wait_cnt <= 1) is correct and should NOT be changed to 2.
+-- NOTE ON READ TIMING: wait_cnt in ST_READ_CMD is 1, and that is
+-- correct -- do not "fix" it to 2. CAS latency 2 is satisfied because
+-- the command outputs are registered, so the READ reaches the chip one
+-- cycle after the ST_READ_CMD state. Verified end to end by
+-- sim/ghdl/tb_sdram.vhd against sim/sdram_model.vhd.
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -200,7 +199,20 @@ begin
                 ----------------------------------------------------------------
                 when ST_IDLE =>
                     dq_oe <= '0';
-                    if refresh_req = '1' then
+                    -- Honour any delay the previous state asked for.
+                    -- ST_PRECHARGE (tRP) and ST_BOOT_LMR (tMRD) both set
+                    -- wait_cnt and then fell straight through to here,
+                    -- where nothing consumed it -- so both delays were
+                    -- silently skipped. At 50 MHz tRP still happened to
+                    -- be met by the one cycle the state transition
+                    -- provides, but tMRD (2 clocks, specified in clocks
+                    -- rather than nanoseconds) was not: a request already
+                    -- pending when boot finished issued ACTIVE one clock
+                    -- after LOAD MODE REGISTER. Confirmed by the timing
+                    -- assertions in sim/sdram_model.vhd.
+                    if wait_cnt /= 0 then
+                        wait_cnt <= wait_cnt - 1;
+                    elsif refresh_req = '1' then
                         send_cmd(CMD_REFRESH);
                         wait_cnt <= 4;
                         state    <= ST_REFRESH;
