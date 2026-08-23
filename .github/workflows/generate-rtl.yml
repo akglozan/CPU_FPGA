@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.SCHEMATIC_PUSH_TOKEN }}
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -98,11 +96,9 @@ jobs:
           cp rtl_schematic_soc.svg docs/rtl_schematic_soc.svg
 
       - name: Commit and Push Schematics
-        # Pushes using SCHEMATIC_PUSH_TOKEN (a fine-grained PAT from the repo
-        # owner's account, set via the checkout step above) instead of the
-        # default GITHUB_TOKEN/bot identity -- this lets the push bypass the
-        # "Require a pull request" branch protection rule as an admin push,
-        # while outside contributors still need to open a PR.
+        # No branch protection rule is active on main/master, so the default
+        # GITHUB_TOKEN (job has "permissions: contents: write" above) is
+        # enough to push directly here.
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
