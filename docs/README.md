@@ -1,3 +1,14 @@
+## 📚 Documentation
+
+Full VHDL API documentation (entities, ports, generics) is generated with
+Sphinx + sphinx-vhdl and published at:
+**[akglozan.github.io/CPU_FPGA](https://akglozan.github.io/CPU_FPGA/)**
+
+The site rebuilds automatically on every push that touches `docs/`, via
+[`.github/workflows/docs.yml`](../.github/workflows/docs.yml). To build it
+locally: `cd docs && pip install sphinx sphinx-vhdl && make html`, then open
+`docs/_build/html/index.html`.
+
 ## 📋 Detailed Progress Checklist
 
 ### Phase 1: Core CPU Pipeline & Microarchitecture
