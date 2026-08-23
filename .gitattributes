@@ -1,4 +1,19 @@
+# Normalise text in the repo, check out with the platform convention.
 * text=auto
-*.sh  text eol=lf
+
+# Shell scripts MUST keep LF. With core.autocrlf=true a CRLF checkout
+# breaks them: sh fails with "command not found" on a stray CR.
+*.sh text eol=lf
+
+# Memory images are consumed by Quartus and by the GHDL testbenches;
+# keep them stable and diffable.
+*.mif text eol=lf
+*.hex text eol=lf
+
+# Layout data: never line-ending-convert. GDSII is binary; the DEF is
+# 24 MB of text that gains nothing from conversion and can be corrupted
+# by it.
 *.gds binary
 *.def -text
+*.png binary
+*.svg -text

@@ -35,7 +35,11 @@ TARGET    = $(BUILD_DIR)/firmware
 #
 #   rtl/memory/bram_4kb.vhd      hex_file default "sw/boot_bram.mif"
 #   rtl/rv32im_soc.vhd           hex_file => "sw/boot_bram.mif"
-#   rtl/core/Instruction_Memory.vhd  HEX_FILE default "sw/boot_bram.hex"
+#
+# boot_bram.hex currently has no consumer in the design -- it was read
+# by rtl/core/Instruction_Memory.vhd, which was dead code and has been
+# removed. It is still generated because it is a useful human-readable
+# dump of the image for eyeballing and diffing, and costs 693 bytes.
 #
 # So renaming or relocating anything here means updating those too.
 SW_DIR    = ../sw

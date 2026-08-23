@@ -26,7 +26,7 @@ script cd's itself, so it can be invoked from anywhere.
 | `tb_uart.vhd` | Decodes the `uart_tx` pin as a real 115200 8N1 receiver and prints each byte with its stop bit. Runs with `simulation => false` so the true baud divider is exercised. |
 | `tb_rst.vhd` | Asserts reset at deliberately clock-misaligned offsets and fails if the LEDs stop moving afterwards. |
 | `tb_bounce.vhd` | Models a real bouncing pushbutton — several chatter bursts on both press and release — and checks the SoC still runs. |
-| `tb_mdiv.vhd` | Unit test for `M_Extension_Unit`'s divide path. 16 vectors covering unsigned, every signed sign combination, divide-by-zero for all four opcodes and `INT_MIN / -1`, plus back-to-back divides. Samples `m_result` on exactly the cycle `EX_MEM_Register` would latch it. |
+| `tb_mdiv.vhd` | Unit test for `M_Extension_Unit`. 24 vectors. Multiply: all four of `MUL`/`MULH`/`MULHSU`/`MULHU`, including one operand pair (`rs1 = rs2 = 0xFFFFFFFF`) whose three high-word answers are all different, so a unit that extends its operands wrongly cannot pass all three — plus a check that multiplies never stall. Divide: unsigned, every signed sign combination, divide-by-zero for all four opcodes, `INT_MIN / -1`, and back-to-back divides. Samples `m_result` on exactly the cycle `EX_MEM_Register` would latch it. |
 
 ## Why it exists
 
@@ -45,8 +45,14 @@ latency, the stall logic or the divider FSM:
 - **Divider sign correction** — `M_Extension_Unit.vhd` releases `stall_m`
   in `HOLD`, not `DONE`, so the pipeline samples the corrected result.
 
-`tb_mdiv` catches the third directly. The first two show up as the
-firmware failing to blink or to emit `ABC\r\n`.
+`tb_mdiv` catches the third directly; the first two show up as the firmware
+failing to blink or to emit `ABC\r\n`.
+
+`tb_mdiv` also supersedes the older `sim/M_Extension_Unit_tb.vhd`, which
+asserts reset with inverted polarity — it drives `rst_n` low and never
+releases it, so the unit sits in reset for the whole run, its `MUL`/`MULH`
+checks pass only because `mult_prod` is combinational, and it then hangs
+forever on the first divide.
 
 ## Caveat on run length
 

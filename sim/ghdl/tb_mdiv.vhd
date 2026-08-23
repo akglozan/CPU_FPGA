@@ -1,4 +1,4 @@
--- Unit test for M_Extension_Unit's divide path.
+-- Unit test for M_Extension_Unit: both the multiply and the divide path.
 --
 -- Sampling matches the real datapath exactly: EX_Stage feeds
 -- ex_final_result into EX_MEM_Register, whose enable is
@@ -58,7 +58,10 @@ begin
             name : string;
             f3   : std_logic_vector(2 downto 0);
             a, b : std_logic_vector(31 downto 0);
-            expect : std_logic_vector(31 downto 0)
+            expect : std_logic_vector(31 downto 0);
+            -- Expected stall length. Multiplies are combinational and must
+            -- not stall at all; -1 means "do not check".
+            expect_cycles : integer := -1
         ) is
         begin
             -- present the operation
@@ -82,9 +85,16 @@ begin
             -- this is the cycle EX_MEM_Register latches
             got := m_result;
 
-            if got = expect then
+            if got = expect and
+               (expect_cycles < 0 or cycles = expect_cycles) then
                 report "PASS  " & name & "  = 0x" & h(got) &
                        "   (" & integer'image(cycles) & " stall cycles)";
+            elsif got = expect then
+                fails <= fails + 1;
+                report "FAIL  " & name & "  value ok but stalled " &
+                       integer'image(cycles) & " cycles, expected " &
+                       integer'image(expect_cycles)
+                       severity warning;
             else
                 fails <= fails + 1;
                 report "FAIL  " & name & "  got 0x" & h(got) &
@@ -105,6 +115,24 @@ begin
         wait until rising_edge(clk);
         rst_n <= '1';
         wait for 100 ns;
+
+        report "--- multiply (combinational, must not stall) ---";
+        run("mul    10 *  5 ", "000", x"0000000A", x"00000005", x"00000032", 0);
+        run("mul    -3 *  7 ", "000", x"FFFFFFFD", x"00000007", x"FFFFFFEB", 0);
+        run("mul   MAX *  2 ", "000", x"7FFFFFFF", x"00000002", x"FFFFFFFE", 0);
+        run("mulh   -2 *  2 ", "001", x"FFFFFFFE", x"00000002", x"FFFFFFFF", 0);
+        run("mulh  MAX * MAX", "001", x"7FFFFFFF", x"7FFFFFFF", x"3FFFFFFF", 0);
+
+        -- One operand pair, three opcodes. This is the only way to prove
+        -- MULH / MULHSU / MULHU genuinely differ in how they extend their
+        -- operands: with rs1 = rs2 = 0xFFFFFFFF the three answers are all
+        -- different, so a unit that treats them alike cannot pass all three.
+        --   MULH   : -1 * -1          =                  1  -> high 0x00000000
+        --   MULHSU : -1 * 4294967295  =       -4294967295  -> high 0xFFFFFFFF
+        --   MULHU  : 4294967295^2     = 0xFFFFFFFE00000001 -> high 0xFFFFFFFE
+        run("mulh   -1 * -1 ", "001", x"FFFFFFFF", x"FFFFFFFF", x"00000000", 0);
+        run("mulhsu -1 * 4Gu", "010", x"FFFFFFFF", x"FFFFFFFF", x"FFFFFFFF", 0);
+        run("mulhu 4Gu * 4Gu", "011", x"FFFFFFFF", x"FFFFFFFF", x"FFFFFFFE", 0);
 
         report "--- unsigned (expected to already work) ---";
         run("divu  100 /  7 ", "101", x"00000064", x"00000007", x"0000000E");
