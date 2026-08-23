@@ -55,6 +55,14 @@ jobs:
             # (below) relabels any inout ports before rendering.
             yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed -fexplicit --latches -P./altera_mf_lib --work=work $FILES -e rv32im_soc; hierarchy -top rv32im_soc; proc; setundef -zero; write_json -compat-int rtl_soc.json"
 
+      - name: Fix ownership of container-generated files
+        # The hdlc/ghdl:yosys container runs as root, so rtl_cpu.json /
+        # rtl_soc.json / altera_mf_lib come out root-owned on the runner's
+        # filesystem. Later steps run directly on the runner as the
+        # non-root "runner" user, which can read but not write/overwrite
+        # those files without this.
+        run: sudo chown -R "$(whoami)" rtl_cpu.json rtl_soc.json altera_mf_lib
+
       - name: Fix bidirectional ports for netlistsvg compatibility
         run: |
           python3 - <<'PYEOF'
