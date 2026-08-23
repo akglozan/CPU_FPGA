@@ -219,14 +219,14 @@ begin
     -- bram_4kb (altsyncram) needs one full clock between the address
     -- being presented and rdata_b being valid. The previous
     -- combinational ack (s0_ack <= s0_stb and s0_cyc) acknowledged in
-    -- the same cycle the request was issued, so mem_stage saw no bus
+    -- the same cycle the request was issued, so MEM_Stage saw no bus
     -- stall and MEM_WB_Register latched wb_data_i before the BRAM had
     -- produced it -- every load from BRAM returned the word left over
     -- from the PREVIOUS access. main()'s delay loop is built entirely
     -- on lw/bltu/bgeu against a stack slot, so its loop condition was
     -- garbage.
     --
-    -- Delaying the ack by one cycle makes mem_stage assert bus_stall_o
+    -- Delaying the ack by one cycle makes MEM_Stage assert bus_stall_o
     -- for exactly that one cycle (bus_access and not wb_ack_i), which
     -- freezes the pipeline and holds addr_b stable, so rdata_b is valid
     -- in the cycle the ack finally arrives and MEM_WB_Register latches

@@ -18,7 +18,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 -- EX-stage top-level wrapper. Instantiates the Forwarding_Unit, ALU,
--- M_Extension_Unit, and ex_mem_register, resolving forwarded operands,
+-- M_Extension_Unit, and EX_MEM_Register, resolving forwarded operands,
 -- computing the ALU/M-extension result, evaluating branch conditions
 -- and JAL/JALR target addresses, and latching everything into the
 -- EX/MEM pipeline register.
@@ -97,25 +97,25 @@ entity EX_Stage is
         stall_m_out             : out std_logic;
         
         -- Outputs to EX/MEM Pipeline Register
-        -- See ex_mem_register's mem_addr.
+        -- See EX_MEM_Register's mem_addr.
         mem_addr_out            : out std_logic_vector(31 downto 0);
-        -- See ex_mem_register's mem_result.
+        -- See EX_MEM_Register's mem_result.
         mem_result_out          : out std_logic_vector(31 downto 0);
-        -- See ex_mem_register's mem_write_data.
+        -- See EX_MEM_Register's mem_write_data.
         mem_write_data_out      : out std_logic_vector(31 downto 0);
-        -- See ex_mem_register's mem_rd_addr.
+        -- See EX_MEM_Register's mem_rd_addr.
         mem_rd_addr_out         : out std_logic_vector(4 downto 0);
-        -- See ex_mem_register's mem_pc_plus4.
+        -- See EX_MEM_Register's mem_pc_plus4.
         mem_pc_plus4_out        : out std_logic_vector(31 downto 0);
-        -- See ex_mem_register's mem_reg_write.
+        -- See EX_MEM_Register's mem_reg_write.
         mem_reg_write_out       : out std_logic;
-        -- See ex_mem_register's mem_read.
+        -- See EX_MEM_Register's mem_read.
         mem_mem_read_out        : out std_logic;
-        -- See ex_mem_register's mem_write.
+        -- See EX_MEM_Register's mem_write.
         mem_mem_write_out       : out std_logic;
-        -- See ex_mem_register's mem_wb_sel.
+        -- See EX_MEM_Register's mem_wb_sel.
         mem_wb_sel_out          : out std_logic_vector(1 downto 0);
-        -- See ex_mem_register's mem_funct3.
+        -- See EX_MEM_Register's mem_funct3.
         mem_funct3_out          : out std_logic_vector(2 downto 0)
     );
 end entity EX_Stage;
@@ -159,7 +159,7 @@ architecture Structural of EX_Stage is
         );
     end component;
 
-    component ex_mem_register is
+    component EX_MEM_Register is
     port (
         clk   : in std_logic;
         rst_n : in std_logic;
@@ -306,7 +306,7 @@ begin
     target_pc_out <= std_logic_vector(jalr_sum(31 downto 1)) & '0' when (ex_jump_in = '1' and ex_alu_src_in = '1')
                      else std_logic_vector(jal_sum);
 
-    u_ex_mem_register : ex_mem_register
+    u_ex_mem_register : EX_MEM_Register
     port map (
         clk   => clk,
         rst_n => rst_n,

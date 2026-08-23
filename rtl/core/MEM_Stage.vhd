@@ -7,7 +7,7 @@ use ieee.numeric_std.all;
 -- cyc/stb/we, waiting on ack), and latches the result -- memory read
 -- data or the carried-through ALU result -- into the MEM/WB pipeline
 -- register via MEM_WB_Register.
-entity mem_stage is
+entity MEM_Stage is
     port (
         clk   : in std_logic;
         -- Active-low synchronous reset.
@@ -66,9 +66,9 @@ entity mem_stage is
         wb_reg_write_o : out std_logic;
         wb_sel_o       : out std_logic_vector(1 downto 0)
     );
-end entity mem_stage;
+end entity MEM_Stage;
 
-architecture rtl of mem_stage is
+architecture rtl of MEM_Stage is
 
     signal bus_access : std_logic;
     signal byte_sel   : std_logic_vector(3 downto 0);

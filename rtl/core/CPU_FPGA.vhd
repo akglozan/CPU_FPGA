@@ -7,7 +7,7 @@ use IEEE.NUMERIC_STD.all;
 
 -- Top-level 5-stage pipelined RV32IM CPU core (IF/ID/EX/MEM/WB), with
 -- full hazard detection, operand forwarding, and stall/flush control.
--- Composed here from IF_Stage, ID_Stage, EX_Stage, mem_stage, and
+-- Composed here from IF_Stage, ID_Stage, EX_Stage, MEM_Stage, and
 -- Hazard_Unit. Presents a simple synchronous-read port for instruction
 -- fetch (external BRAM) and a Wishbone B4 master interface for the
 -- data side (loads/stores to SDRAM/MMIO via the system bus).
@@ -224,7 +224,7 @@ begin
     mem_result_fwd <= mem_result;
 
     -- 4. Memory Stage (Wishbone Master)
-    u_mem_stage : entity work.mem_stage
+    u_mem_stage : entity work.MEM_Stage
     port map (
         clk   => clk,
         rst_n => rst_n,

@@ -6,7 +6,7 @@ use ieee.std_logic_1164.all;
 -- the store data, and the associated control signals, so the MEM
 -- stage sees a stable snapshot for exactly one cycle. Cleared to a
 -- bubble on reset or flush; held unchanged on stall.
-entity ex_mem_register is
+entity EX_MEM_Register is
     port (
         clk   : in std_logic;
         -- Active-low synchronous reset.
@@ -58,9 +58,9 @@ entity ex_mem_register is
         -- Registered ex_funct3, presented to the MEM stage.
         mem_funct3      : out std_logic_vector(2 downto 0)
     );
-end entity ex_mem_register;
+end entity EX_MEM_Register;
 
-architecture rtl of ex_mem_register is
+architecture rtl of EX_MEM_Register is
 begin
 
     process (clk)

@@ -113,7 +113,7 @@ rtl/rv32im_soc.vhd
 
         s0_ack <= s0_ack_r;
 
-    mem_stage now asserts bus_stall_o (bus_access and not wb_ack_i) for exactly
+    MEM_Stage now asserts bus_stall_o (bus_access and not wb_ack_i) for exactly
     one cycle, freezing the pipeline and holding addr_b stable, so rdata_b is
     valid in the cycle the ack arrives. The "and not s0_ack_r" term keeps the ack
     a single-cycle pulse so back-to-back memory instructions each get their own,
@@ -526,7 +526,7 @@ Recorded so they are not re-investigated later.
   - Marginal hold-time violation. A 0.138 / 0.178 ns fast-corner hold slack was
     briefly suspected, but detailed inspection of CPU_FPGA.sta.rpt showed the
     identical value repeated across dozens of unrelated registers throughout the
-    design (sdram_controller, uart_tx, regfile, mem_stage). It is the generic
+    design (sdram_controller, uart_tx, regfile, MEM_Stage). It is the generic
     same-clock hold-margin floor for the device, not a specific defect. TNS is
     0.000 in every corner.
 
