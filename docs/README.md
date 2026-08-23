@@ -98,9 +98,20 @@ locally: `cd docs && pip install sphinx sphinx-vhdl && make html`, then open
 
 ## Hardware Schematic
 
-<div align="center">
- <img src="./rtl_schematic.svg?v=2" alt="RTL Schematic" width="100%" style="background-color: white; padding: 10px; border-radius: 8px;">
-</div>
+<table width="100%">
+  <tr>
+    <td align="center" width="50%">
+      <strong>CPU_FPGA</strong> &mdash; 5-stage RV32IM pipeline core
+      <br>
+      <img src="./rtl_schematic.svg?v=3" alt="CPU_FPGA RTL Schematic" width="100%" style="background-color: white; padding: 10px; border-radius: 8px;">
+    </td>
+    <td align="center" width="50%">
+      <strong>rv32im_soc</strong> &mdash; top-level SoC (CPU + memory + peripherals)
+      <br>
+      <img src="./rtl_schematic_soc.svg?v=1" alt="rv32im_soc RTL Schematic" width="100%" style="background-color: white; padding: 10px; border-radius: 8px;">
+    </td>
+  </tr>
+</table>
 
 
 

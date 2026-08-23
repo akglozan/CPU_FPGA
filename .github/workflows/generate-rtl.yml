@@ -26,34 +26,70 @@ jobs:
       - name: Install netlistsvg
         run: npm install -g netlistsvg
 
-      - name: Prepare Memory Initialization Files
-        run: |
-          cp sw/boot_bram.hex ./boot_bram.hex
-
-      - name: Generate RTL Schematic using Yosys & GHDL Container
+      - name: Generate RTL Schematics using Yosys & GHDL Container
         uses: addnab/docker-run-action@v3
         with:
           image: hdlc/ghdl:yosys
           options: -v ${{ github.workspace }}:/work -w /work
           run: |
-            FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" | paste -sd " " -)
+            # Excludes .github/schematic/altera_mf_stub.vhd from the main file
+            # set -- it's analyzed separately into its own "altera_mf" library
+            # below, since it needs to be visible under that library name (not
+            # "work") to satisfy bram_4kb.vhd's "library altera_mf;" clause.
+            FILES=$(find . -type f \( -name "*.vhd" -o -name "*.vhdl" \) ! -name "*tb*" ! -name "*testbench*" ! -path "./.github/schematic/*" | paste -sd " " -)
+
+            mkdir -p altera_mf_lib
+
+            # Stub library for the Altera altsyncram megafunction (see
+            # .github/schematic/altera_mf_stub.vhd) -- lets the open-source
+            # GHDL/Yosys flow elaborate designs that instantiate it (e.g.
+            # rv32im_soc, via bram_4kb) without Intel's proprietary IP.
+            ghdl -a --std=08 --ieee=synopsys -frelaxed --work=altera_mf --workdir=altera_mf_lib .github/schematic/altera_mf_stub.vhd
 
             # Added 'setundef -zero' to sanitize undefined/high-Z bit enum values for netlistsvg
-            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed -fexplicit --latches --work=work $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; setundef -zero; write_json -compat-int rtl.json"
+            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed -fexplicit --latches -P./altera_mf_lib --work=work $FILES -e CPU_FPGA; hierarchy -top CPU_FPGA; proc; setundef -zero; write_json -compat-int rtl_cpu.json"
 
-      - name: Convert JSON to SVG Schematic & Bake Light Background
+            # Top-level SoC schematic. sdram_dq is a genuinely bidirectional
+            # (inout) physical pin at this level -- netlistsvg's JSON schema
+            # doesn't accept "inout" as a port direction, so fix_inout.py
+            # (below) relabels any inout ports before rendering.
+            yosys -m ghdl -p "ghdl --std=08 --ieee=synopsys -frelaxed -fexplicit --latches -P./altera_mf_lib --work=work $FILES -e rv32im_soc; hierarchy -top rv32im_soc; proc; setundef -zero; write_json -compat-int rtl_soc.json"
+
+      - name: Fix bidirectional ports for netlistsvg compatibility
         run: |
-          netlistsvg rtl.json -o rtl_schematic.svg
-          # Embed a white background rectangle directly into the SVG canvas so it renders on both dark and light themes
-          sed -i 's/<svg /<svg style="background-color: white;" /g' rtl_schematic.svg
-          # docs/README.md (rendered as the repo's GitHub homepage) displays
-          # docs/rtl_schematic.svg, not the root copy -- keep both in sync so
-          # the homepage never shows a stale schematic again.
-          cp rtl_schematic.svg docs/rtl_schematic.svg
+          python3 - <<'PYEOF'
+          import json
 
-      - name: Commit and Push Schematic
+          for path in ("rtl_soc.json",):
+              with open(path) as f:
+                  data = json.load(f)
+              for mod in data.get("modules", {}).values():
+                  for port in mod.get("ports", {}).values():
+                      if port.get("direction") == "inout":
+                          port["direction"] = "output"
+                  for cell in mod.get("cells", {}).values():
+                      pdirs = cell.get("port_directions", {})
+                      for pname, pdir in list(pdirs.items()):
+                          if pdir == "inout":
+                              pdirs[pname] = "output"
+              with open(path, "w") as f:
+                  json.dump(data, f)
+          PYEOF
+
+      - name: Convert JSON to SVG Schematics & Bake Light Background
+        run: |
+          netlistsvg rtl_cpu.json -o rtl_schematic.svg
+          netlistsvg rtl_soc.json -o rtl_schematic_soc.svg
+          # Embed a white background rectangle directly into the SVG canvas so it renders on both dark and light themes
+          sed -i 's/<svg /<svg style="background-color: white;" /g' rtl_schematic.svg rtl_schematic_soc.svg
+          # docs/README.md (rendered as the repo's GitHub homepage) displays
+          # both copies from docs/, not the root copies -- keep them in sync.
+          cp rtl_schematic.svg docs/rtl_schematic.svg
+          cp rtl_schematic_soc.svg docs/rtl_schematic_soc.svg
+
+      - name: Commit and Push Schematics
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add rtl_schematic.svg docs/rtl_schematic.svg
-          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update RTL schematic" && git push)
+          git add rtl_schematic.svg rtl_schematic_soc.svg docs/rtl_schematic.svg docs/rtl_schematic_soc.svg
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update RTL schematics" && git push)
