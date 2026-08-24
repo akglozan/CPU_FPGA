@@ -43,7 +43,17 @@ entity rv32im_soc is
         sdram_dqm   : out   std_logic_vector(1 downto 0);
         sdram_dq    : inout std_logic_vector(15 downto 0);
         -- Clock to the physical SDRAM chip. See sdram_controller.vhd.
-        sdram_clk   : out   std_logic
+        sdram_clk   : out   std_logic;
+
+        -- ESP32 boot-loader SPI slave link (see spi_slave.vhd,
+        -- boot_loader.vhd). Physically separate from the SD card link
+        -- on the ESP32 side -- these are dedicated free GPIOs there,
+        -- not the SDMMC pins. Defaulted so existing instantiations
+        -- (e.g. tb_rv32im_soc.vhd) that don't connect these ports
+        -- keep compiling unchanged; spi_cs_n defaults idle-high.
+        spi_sclk    : in    std_logic := '0';
+        spi_mosi    : in    std_logic := '0';
+        spi_cs_n    : in    std_logic := '1'
     );
 end entity rv32im_soc;
 
@@ -68,6 +78,40 @@ architecture structural of rv32im_soc is
     signal wb_cpu_stb     : std_logic;
     signal wb_cpu_cyc     : std_logic;
     signal wb_cpu_ack     : std_logic;
+
+    -- spi_slave/boot_loader: assembles the ESP32's SPI byte stream and
+    -- drives its own Wishbone master to DMA it into SDRAM.
+    signal spi_rx_byte    : std_logic_vector(7 downto 0);
+    signal spi_rx_valid   : std_logic;
+
+    signal bl_adr         : std_logic_vector(31 downto 0);
+    signal bl_dat         : std_logic_vector(31 downto 0);
+    signal bl_sel         : std_logic_vector(3 downto 0);
+    signal bl_we          : std_logic;
+    signal bl_stb         : std_logic;
+    signal bl_cyc         : std_logic;
+    signal bl_ack         : std_logic;
+
+    -- Selects which master drives bus_interconnect: '0' = CPU (normal
+    -- operation), '1' = boot_loader (DMA-loading SDRAM at boot).
+    -- Hardcoded to '0' for now, i.e. boot_loader is wired in but
+    -- inert -- Phase 3.3 will drive this from the real ESP32
+    -- BOOT_DONE handshake (starting '1' out of reset, going '0' once
+    -- BOOT_DONE is asserted, alongside holding the CPU itself in
+    -- reset until then). Left hardcoded here so existing CPU/SDRAM
+    -- operation, already verified on hardware, is unaffected until
+    -- that handshake lands.
+    signal boot_active    : std_logic := '0';
+
+    -- Muxed master signals actually presented to bus_interconnect.
+    signal mux_adr         : std_logic_vector(31 downto 0);
+    signal mux_dat_wr      : std_logic_vector(31 downto 0);
+    signal mux_dat_rd      : std_logic_vector(31 downto 0);
+    signal mux_sel         : std_logic_vector(3 downto 0);
+    signal mux_we          : std_logic;
+    signal mux_stb         : std_logic;
+    signal mux_cyc         : std_logic;
+    signal mux_ack         : std_logic;
 
     signal s0_addr        : std_logic_vector(31 downto 0);
     signal s0_wdata       : std_logic_vector(31 downto 0);
@@ -161,19 +205,64 @@ begin
             wb_ack_i     => wb_cpu_ack
         );
 
+    u_spi_slave : entity work.spi_slave
+        port map (
+            clk      => clk,
+            rst_n    => rst_n_sync,
+            spi_sclk => spi_sclk,
+            spi_mosi => spi_mosi,
+            spi_cs_n => spi_cs_n,
+            rx_byte  => spi_rx_byte,
+            rx_valid => spi_rx_valid
+        );
+
+    u_boot_loader : entity work.boot_loader
+        port map (
+            clk      => clk,
+            rst_n    => rst_n_sync,
+            rx_byte  => spi_rx_byte,
+            rx_valid => spi_rx_valid,
+            wb_adr_o => bl_adr,
+            wb_dat_o => bl_dat,
+            wb_sel_o => bl_sel,
+            wb_we_o  => bl_we,
+            wb_stb_o => bl_stb,
+            wb_cyc_o => bl_cyc,
+            wb_ack_i => bl_ack
+        );
+
+    -- Bus master mux: routes either the CPU or boot_loader onto
+    -- bus_interconnect's single master port, selected by boot_active.
+    -- The two are never active at the same time by construction (once
+    -- Phase 3.3 holds the CPU in reset while boot_active = '1'), so a
+    -- plain mux is sufficient here -- no arbiter needed.
+    mux_adr    <= bl_adr    when boot_active = '1' else wb_cpu_addr;
+    mux_dat_wr <= bl_dat    when boot_active = '1' else wb_cpu_wdata;
+    mux_sel    <= bl_sel    when boot_active = '1' else wb_cpu_sel;
+    mux_we     <= bl_we     when boot_active = '1' else wb_cpu_we;
+    mux_stb    <= bl_stb    when boot_active = '1' else wb_cpu_stb;
+    mux_cyc    <= bl_cyc    when boot_active = '1' else wb_cpu_cyc;
+
+    -- Route the shared ack/read-data back to whichever master is
+    -- currently selected. boot_loader never reads, so it only needs
+    -- the ack half.
+    bl_ack       <= mux_ack when boot_active = '1' else '0';
+    wb_cpu_ack   <= mux_ack when boot_active = '0' else '0';
+    wb_cpu_rdata <= mux_dat_rd;
+
     u_interconnect : entity work.bus_interconnect
     port map (
         clk   => clk,
         rst_n => rst_n_sync,
 
-        m_adr_i => wb_cpu_addr,
-        m_dat_i => wb_cpu_wdata,
-        m_dat_o => wb_cpu_rdata,
-        m_we_i  => wb_cpu_we,
-        m_sel_i => wb_cpu_sel,
-        m_stb_i => wb_cpu_stb,
-        m_cyc_i => wb_cpu_cyc,
-        m_ack_o => wb_cpu_ack,
+        m_adr_i => mux_adr,
+        m_dat_i => mux_dat_wr,
+        m_dat_o => mux_dat_rd,
+        m_we_i  => mux_we,
+        m_sel_i => mux_sel,
+        m_stb_i => mux_stb,
+        m_cyc_i => mux_cyc,
+        m_ack_o => mux_ack,
         bus_error_o => bus_error,
 
         s0_adr_o => s0_addr,

@@ -122,75 +122,10 @@ end entity EX_Stage;
 
 architecture Structural of EX_Stage is
 
-    component ALU is
-        port (
-            alu_ctrl   : in  std_logic_vector(3 downto 0);
-            operand_a  : in  std_logic_vector(31 downto 0);
-            operand_b  : in  std_logic_vector(31 downto 0);
-            alu_result : out std_logic_vector(31 downto 0);
-            zero_flag  : out std_logic
-        );
-    end component;
-
-    component M_Extension_Unit is
-        port (
-            clk       : in  std_logic;
-            rst_n     : in  std_logic;
-            is_m_ext  : in  std_logic;
-            funct3    : in  std_logic_vector(2 downto 0);
-            operand_a : in  std_logic_vector(31 downto 0);
-            operand_b : in  std_logic_vector(31 downto 0);
-            m_result  : out std_logic_vector(31 downto 0);
-            stall_m   : out std_logic
-        );
-    end component;
-
-    component Forwarding_Unit is
-        port (
-            ex_rs1_addr   : in  std_logic_vector(4 downto 0);
-            ex_rs2_addr   : in  std_logic_vector(4 downto 0);
-            mem_rd_addr   : in  std_logic_vector(4 downto 0);
-            mem_reg_write : in  std_logic;
-            mem_mem_read  : in  std_logic;
-            wb_rd_addr    : in  std_logic_vector(4 downto 0);
-            wb_reg_write  : in  std_logic;
-            forward_a     : out std_logic_vector(1 downto 0);
-            forward_b     : out std_logic_vector(1 downto 0)
-        );
-    end component;
-
-    component EX_MEM_Register is
-    port (
-        clk   : in std_logic;
-        rst_n : in std_logic;
-        flush : in std_logic;
-        stall : in std_logic;
-
-        ex_result       : in std_logic_vector(31 downto 0);
-        ex_operand_b    : in std_logic_vector(31 downto 0);
-        ex_rd_addr      : in std_logic_vector(4 downto 0);
-        ex_pc_plus4     : in std_logic_vector(31 downto 0);
-
-        ex_reg_write    : in std_logic;
-        ex_mem_read     : in std_logic;
-        ex_mem_write    : in std_logic;
-        ex_wb_sel       : in std_logic_vector(1 downto 0);
-        ex_funct3       : in std_logic_vector(2 downto 0);
-
-        mem_addr        : out std_logic_vector(31 downto 0);
-        mem_result      : out std_logic_vector(31 downto 0);
-        mem_write_data  : out std_logic_vector(31 downto 0);
-        mem_rd_addr     : out std_logic_vector(4 downto 0);
-        mem_pc_plus4    : out std_logic_vector(31 downto 0);
-
-        mem_reg_write   : out std_logic;
-        mem_read        : out std_logic;
-        mem_write       : out std_logic;
-        mem_wb_sel      : out std_logic_vector(1 downto 0);
-        mem_funct3      : out std_logic_vector(2 downto 0)
-    );
-end component;
-
+    -- Direct entity instantiation (entity work.X) is used throughout
+    -- this project instead of component declarations: the port list
+    -- lives in exactly one place (the entity itself), so there's
+    -- nothing here to fall out of sync with it.
     signal forward_a              : std_logic_vector(1 downto 0);
     signal forward_b              : std_logic_vector(1 downto 0);
     signal ex_operand_a_forwarded : std_logic_vector(31 downto 0);
@@ -227,7 +162,7 @@ begin
     ex_alu_operand_a <= ex_pc_in when ex_alu_src_a_in = '1' else ex_operand_a_forwarded;
     ex_alu_operand_b <= ex_imm_ext_in when ex_alu_src_in = '1' else ex_operand_b_forwarded;
 
-    U_FWD : Forwarding_Unit
+    U_FWD : entity work.Forwarding_Unit
         port map (
             ex_rs1_addr   => ex_rs1_addr_in,
             ex_rs2_addr   => ex_rs2_addr_in,
@@ -240,7 +175,7 @@ begin
             forward_b     => forward_b
         );
 
-    U_ALU : ALU
+    U_ALU : entity work.ALU
         port map (
             alu_ctrl   => ex_alu_ctrl_in,
             operand_a  => ex_alu_operand_a,
@@ -249,7 +184,7 @@ begin
             zero_flag  => ex_zero_flag
         );
 
-    U_M_EXT : M_Extension_Unit
+    U_M_EXT : entity work.M_Extension_Unit
         port map (
             clk       => clk,
             rst_n     => rst_n,
@@ -306,7 +241,7 @@ begin
     target_pc_out <= std_logic_vector(jalr_sum(31 downto 1)) & '0' when (ex_jump_in = '1' and ex_alu_src_in = '1')
                      else std_logic_vector(jal_sum);
 
-    u_ex_mem_register : EX_MEM_Register
+    u_ex_mem_register : entity work.EX_MEM_Register
     port map (
         clk   => clk,
         rst_n => rst_n,

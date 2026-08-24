@@ -57,6 +57,18 @@ set_location_assignment PIN_84 -to gpio_leds[3]
 set_location_assignment PIN_114 -to uart_tx
 set_location_assignment PIN_115 -to uart_rx
 
+# ESP32 Boot-Loader SPI Slave Link (see rtl/memory/spi_slave.vhd,
+# rtl/memory/boot_loader.vhd). Reassigned from the onboard digital
+# tube's SEG0/SEG1/SEG2 pins -- that display isn't used by this
+# project, and those segments are just passive LEDs behind current-
+# limiting resistors (no active driver IC sharing the line), unlike
+# the onboard I2C EEPROM/temp-sensor pins or the AS_DATA config-flash
+# pins, which were ruled out as unsafe to repurpose. Verified against
+# the EP4CE6 datasheet: plain user I/O, no dedicated function.
+set_location_assignment PIN_128 -to spi_sclk
+set_location_assignment PIN_121 -to spi_mosi
+set_location_assignment PIN_125 -to spi_cs_n
+
 # ==============================================================================
 # SDRAM Physical Pin Assignments (Cyclone IV EP4CE6E22C8)
 # ==============================================================================
@@ -202,4 +214,6 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 
 
+set_global_assignment -name VHDL_FILE rtl/memory/spi_slave.vhd
+set_global_assignment -name VHDL_FILE rtl/memory/boot_loader.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

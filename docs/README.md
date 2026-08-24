@@ -49,9 +49,9 @@ locally: `cd docs && pip install sphinx sphinx-vhdl && make html`, then open
 ---
 
 ### Phase 3: ESP32 Co-Processor & Ingestion Link
-- [ ] **3.1 ESP32 Firmware**
-  - [ ] Set up MicroSD card initialization via SDMMC/SPI in ESP-IDF/Arduino.
-  - [ ] Implement binary file parser to open and read `DOOM1.WAD` and code binaries.
+- [x] **3.1 ESP32 Firmware**
+  - [x] Set up MicroSD card initialization via SDMMC/SPI in ESP-IDF/Arduino.
+  - [x] Implement binary file parser to open and read `DOOM1.WAD` and code binaries.
 - [ ] **3.2 FPGA Receiver Interface**
   - [ ] Implement high-speed SPI/Parallel Slave receiver module in VHDL.
   - [ ] Route incoming bytes directly to SDRAM via DMA bus controller.

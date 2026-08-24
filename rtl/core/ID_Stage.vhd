@@ -107,94 +107,10 @@ end entity ID_Stage;
 
 architecture Structural of ID_Stage is
 
-    component RegFile is
-        port (
-            clk       : in  std_logic;
-            rst_n     : in  std_logic;
-            reg_write : in  std_logic;
-            rd_addr   : in  std_logic_vector(4 downto 0);
-            rs1_addr  : in  std_logic_vector(4 downto 0);
-            rs2_addr  : in  std_logic_vector(4 downto 0);
-            rd_data   : in  std_logic_vector(31 downto 0);
-            rs1_data  : out std_logic_vector(31 downto 0);
-            rs2_data  : out std_logic_vector(31 downto 0)
-        );
-    end component;
-
-    component Control_Unit is
-        port (
-            opcode    : in  std_logic_vector(6 downto 0);
-            funct3    : in  std_logic_vector(2 downto 0);
-            funct7    : in  std_logic_vector(6 downto 0);
-            imm_src   : out std_logic_vector(2 downto 0);
-            alu_src   : out std_logic;
-            alu_src_a : out std_logic;
-            reg_write : out std_logic;
-            mem_read  : out std_logic;
-            mem_write : out std_logic;
-            wb_sel    : out std_logic_vector(1 downto 0);
-            branch    : out std_logic;
-            jump      : out std_logic;
-            alu_ctrl  : out std_logic_vector(3 downto 0);
-            is_m_ext  : out std_logic
-        );
-    end component;
-
-    component ImmGen is
-        port (
-            inst    : in  std_logic_vector(31 downto 0);
-            imm_src : in  std_logic_vector(2 downto 0);
-            imm_ext : out std_logic_vector(31 downto 0)
-        );
-    end component;
-
-    component ID_EX_Register is
-        port (
-            clk           : in  std_logic;
-            rst_n         : in  std_logic;
-            stall         : in  std_logic;
-            flush         : in  std_logic;
-            pc_in         : in  std_logic_vector(31 downto 0);
-            pc_plus4_in   : in  std_logic_vector(31 downto 0);
-            imm_ext_in    : in  std_logic_vector(31 downto 0);
-            reg_data1_in  : in  std_logic_vector(31 downto 0);
-            reg_data2_in  : in  std_logic_vector(31 downto 0);
-            rs1_addr_in   : in  std_logic_vector(4 downto 0);
-            rs2_addr_in   : in  std_logic_vector(4 downto 0);
-            rd_addr_in    : in  std_logic_vector(4 downto 0);
-            funct3_in     : in  std_logic_vector(2 downto 0);
-            alu_src_in    : in  std_logic;
-            alu_src_a_in  : in  std_logic;
-            alu_ctrl_in   : in  std_logic_vector(3 downto 0);
-            is_m_ext_in   : in  std_logic;
-            mem_read_in   : in  std_logic;
-            mem_write_in  : in  std_logic;
-            branch_in     : in  std_logic;
-            jump_in       : in  std_logic;
-            reg_write_in  : in  std_logic;
-            wb_sel_in     : in  std_logic_vector(1 downto 0);
-            pc_out        : out std_logic_vector(31 downto 0);
-            pc_plus4_out  : out std_logic_vector(31 downto 0);
-            imm_ext_out   : out std_logic_vector(31 downto 0);
-            reg_data1_out : out std_logic_vector(31 downto 0);
-            reg_data2_out : out std_logic_vector(31 downto 0);
-            rs1_addr_out  : out std_logic_vector(4 downto 0);
-            rs2_addr_out  : out std_logic_vector(4 downto 0);
-            rd_addr_out   : out std_logic_vector(4 downto 0);
-            funct3_out    : out std_logic_vector(2 downto 0);
-            alu_src_out   : out std_logic;
-            alu_src_a_out : out std_logic;
-            alu_ctrl_out  : out std_logic_vector(3 downto 0);
-            is_m_ext_out  : out std_logic;
-            mem_read_out  : out std_logic;
-            mem_write_out : out std_logic;
-            branch_out    : out std_logic;
-            jump_out      : out std_logic;
-            reg_write_out : out std_logic;
-            wb_sel_out    : out std_logic_vector(1 downto 0)
-        );
-    end component;
-
+    -- Direct entity instantiation (entity work.X) is used throughout
+    -- this project instead of component declarations: the port list
+    -- lives in exactly one place (the entity itself), so there's
+    -- nothing here to fall out of sync with it.
     signal rs1_addr_wire : std_logic_vector(4 downto 0);
     signal rs2_addr_wire : std_logic_vector(4 downto 0);
     signal rd_addr_wire  : std_logic_vector(4 downto 0);
@@ -228,7 +144,7 @@ begin
     id_rs1_data_out <= reg_data1_wire;
     id_rs2_data_out <= reg_data2_wire;
 
-    U_REGFILE : RegFile
+    U_REGFILE : entity work.RegFile
         port map (
             clk       => clk,
             rst_n     => rst_n,
@@ -241,7 +157,7 @@ begin
             rs2_data  => reg_data2_wire
         );
 
-    U_CONTROL : Control_Unit
+    U_CONTROL : entity work.Control_Unit
         port map (
             opcode    => id_instr_in(6 downto 0),
             funct3    => funct3_wire,
@@ -259,14 +175,14 @@ begin
             is_m_ext  => is_m_ext_wire
         );
 
-    U_IMMGEN : ImmGen
+    U_IMMGEN : entity work.ImmGen
         port map (
             inst    => id_instr_in,
             imm_src => imm_src_wire,
             imm_ext => imm_ext_wire
         );
 
-    U_ID_EX : ID_EX_Register
+    U_ID_EX : entity work.ID_EX_Register
         port map (
             clk           => clk,
             rst_n         => rst_n,
