@@ -506,6 +506,145 @@ entered from ST_IDLE only, so a refresh cannot pre-empt a long access),
 byte-enables via wb_sel (every test uses "1111"), and any access issued by the
 CPU itself rather than a synthetic Wishbone master.
 
+SDRAM HARDWARE BRING-UP (2026-08-24): READ TIMING WRONG ON REAL SILICON
+--------------------------------------------------------------------------------
+The line above was true right up until it was tested: no firmware had ever
+touched 0x8000_0000 through the real CPU pipeline. It was, the first time it
+was tried.
+
+First attempt (rv32_firmware writing/reading 5 words across banks/rows,
+mirroring tb_sdram.vhd's addresses) came back "S4" -- 4 of 5 mismatched.
+Suspected the qsf's FAST_INPUT_REGISTER/FAST_OUTPUT_REGISTER/
+FAST_OUTPUT_ENABLE_REGISTER assignments on sdram_dq[*] (they push an extra
+physical register into the I/O cell that the RTL's own clocked capture
+process doesn't know about) and removed them. No change: still 4 of 5 wrong.
+
+Rewrote the firmware to print, per word, "<addr>=<expected> i<actual><P/F>"
+instead of just a count. The result was not noisy -- it was exact and
+consistent across four different patterns:
+
+    80000000=11223344  got 11221122
+    80000000=DEADBEEF  got DEADDEAD
+    80000004=CAFEBABE  got CAFECAFE
+    80000008=12345678  got 12341234
+    80001000=A5A5A5A5  got A5A5A5A5  (passed only because both halves match)
+    80400000=5A5A5A5A  got 5A5A5A5A  (same)
+
+Every failure had BOTH 16-bit halves equal to the correct UPPER half. Never
+once did the lower half's real data appear anywhere. That ruled out a simple
+"read one cycle off" theory immediately: a one-cycle shift would put a real
+beat's data in the WRONG slot, not the SAME slot's value duplicated.
+
+First fix attempt: reduced sdram_controller.vhd's ST_READ_CMD wait_cnt from 1
+to 0, reasoning the capture window was landing one cycle late. Cross-checked
+against sim/sdram_model.vhd before spending a hardware cycle on it: the sim
+result was 0xBEEF0000 for a write of 0xDEADBEEF (low half 0000 -- sampled
+before real data; high half BEEF -- the correct LOW half, landed one slot
+late). That is a DIFFERENT, internally-consistent corruption signature than
+hardware showed, which means "shift the window by one cycle" is not the
+actual mechanism on real hardware. The fix was reverted before ever reaching
+the board.
+
+RESOLUTION IN PROGRESS: rather than guess a second single value and pay
+another full Quartus recompile to test it, sdram_controller.vhd's read-capture
+wait is now a runtime input (read_wait_cfg, defaults to "001" = 1, the
+sim-correct value) instead of a hardcoded constant, driven by a new
+peripheral register:
+
+    rtl/peripherals/sdram_rd_wait_cfg.vhd  -- 3-bit r/w register, resets to 1
+    SDRAM_RD_WAIT at 0xE000_0018 (periph_bridge.vhd, soc_regs.h)
+
+Firmware can now sweep several candidate values in a single boot and report
+which one (if any) round-trips correctly, rather than one recompile per
+guess. See rv32_firmware/src/main.c's sweep loop (W0..W4) for the most recent
+version of this test -- expect it to be pulled back out once the correct
+value (or a real structural bug elsewhere) is found, same as the watchdog
+test was.
+
+Full GHDL suite re-run after adding the register (default config unchanged,
+=1): all 7 testbenches still pass, confirming the new peripheral and its
+wiring didn't disturb anything that was already correct.
+
+STATUS: unresolved. Whether the real bug is read-side timing, write-side
+timing, or something structural (address/bank decode, burst sequencing) that
+happens to look like a timing symptom is not yet known. The clean, exact,
+value-independent nature of the corruption (always exactly the upper half,
+never a mix of both halves' real bits) is the strongest clue so far and
+argues against a marginal analog timing issue.
+
+ROOT CAUSE FOUND (2026-08-24): SDRAM CHIP WAS NEVER CLOCKED
+--------------------------------------------------------------------------------
+The read_wait_cfg sweep (W0..W4, one boot) came back with the EXACT SAME wrong
+value (0x11221122 for a write of 0x11223344) at every single wait setting.
+That was the deciding clue: if read-capture timing were the problem, different
+wait values should sample different points on the bus and return different
+garbage. Getting an IDENTICAL result across five different timings means
+whatever is on the bus during that whole window isn't changing at all --
+consistent with the chip never actively responding to the READ command in the
+first place, and the FPGA just reading back a frozen/floating bus level (the
+last thing it itself drove, during the preceding write).
+
+Checked rtl/memory/sdram_controller.vhd, rtl/rv32im_soc.vhd and CPU_FPGA.qsf
+for an SDRAM clock signal: there was none. No sdram_clk port, no pin
+assignment, not a single mention anywhere in the project's history. The user
+supplied the RZ-EasyFPGA A2.2 vendor's own pin table (SDRAM section). Every
+other SDRAM signal in CPU_FPGA.qsf matched that table exactly -- DQ0-15
+(28,30,31,32,33,34,38,39,54,53,52,51,50,49,46,44), A0-11, BS0/BS1, LDQM/UDQM
+(42,55), CKE (58), CS/RAS/CAS/WE (72,71,70,69) -- except SD_CLK, pin 43, which
+had never been assigned to anything. The SDRAM chip has never had a clock
+connected to it in the entire history of this project. A chip with no clock
+cannot respond to any command, which explains every symptom observed during
+SDRAM bring-up, including the sweep result above.
+
+FIX: sdram_controller.vhd gained a new sdram_clk output port, driven as a
+plain unregistered copy of clk (matching how the rest of the command/address
+lines are already registered off the same clk domain -- SDRAM_CLK just needs
+to be a clean copy of that same clock, not a separately delayed one).
+Deliberately NOT given a FAST_OUTPUT_REGISTER assignment -- unlike the command
+lines, it has no register in its own RTL path, and forcing one via that
+assignment risked adding an extra, unmodelled clock delay relative to the
+already-registered signals, the same class of mismatch flagged for sdram_dq
+above. Wired through rv32im_soc.vhd to a new top-level port, assigned to
+PIN_43 in CPU_FPGA.qsf.
+
+Full GHDL suite re-run after adding the port (sdram_clk left unconnected in
+sim/ghdl/tb_sdram.vhd and sim/sdram_model.vhd, which is legal for an output
+port and doesn't affect simulation, since the behavioural model was never
+missing a clock to begin with -- only real hardware was): all 7 testbenches
+still pass.
+
+STATUS: fix applied, not yet verified on hardware. Next step is a full clean
+recompile (new port on two entities, new pin assignment) and re-running the
+read_wait_cfg sweep (rv32_firmware/src/main.c, W0..W4) to confirm reads now
+round-trip correctly, and to find out whether wait_cnt=1 (the value already
+proven correct in simulation) is also correct now that the chip actually has
+a clock, or whether real trace delay still needs a different value.
+
+CONFIRMED ON HARDWARE (2026-08-24): FIX VERIFIED, SCAFFOLDING REMOVED
+--------------------------------------------------------------------------------
+Re-ran the read_wait_cfg sweep after adding sdram_clk: W1 (=1, the value
+already correct in simulation) came back exact -- 0x11223344 read back as
+0x11223344. W0 showed the two halves cleanly swapped and W2-W4 reverted to
+the old stale-duplicate pattern, both expected side effects of sampling at
+the wrong point in a now-correctly-clocked burst. Confirms wait_cnt=1 was
+never wrong; the missing clock was the entire root cause.
+
+Followed up with the original 5-word, multi-bank/row CPU-driven test
+(0x8000_0000/4/8, 0x8000_1000, 0x8040_0000): all five wrote and read back
+exactly right through the real pipeline.
+
+sdram_rd_wait_cfg.vhd and the SDRAM_RD_WAIT register served their purpose
+(finding wait_cnt=1 was already correct, once the clock existed) and were
+removed afterward -- sdram_controller.vhd is back to a hardcoded wait_cnt <=
+1 with no runtime configurability, periph_bridge.vhd/soc_regs.h/the .qsf/
+sim/ghdl/run.sh all reverted to match, and rv32_firmware/src/main.c is back
+to the plain ABC + blink firmware. Full GHDL suite passes.
+
+SDRAM is now a working, CPU-verified memory: init sequence, single-word
+read/write, multi-bank, multi-row, back-to-back access, byte-enables not
+yet exercised via wb_sel (still flagged, see "REMAINING GAPS" earlier in
+this section), and auto-refresh under sustained traffic still untested.
+
 BUS WATCHDOG (added 2026-08-23)
 --------------------------------------------------------------------------------
 bus_interconnect previously had no timeout: a slave that never asserted ack left

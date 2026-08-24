@@ -62,6 +62,10 @@ set_location_assignment PIN_115 -to uart_rx
 # ==============================================================================
 # SDRAM Control Signals
 set_location_assignment PIN_58 -to sdram_cke
+# SD_CLK per the vendor pin table -- see rtl/memory/sdram_controller.vhd's
+# comment on sdram_clk. Never assigned anywhere in this project before
+# 2026-08-24.
+set_location_assignment PIN_43 -to sdram_clk
 set_location_assignment PIN_72 -to sdram_cs_n
 set_location_assignment PIN_71 -to sdram_ras_n
 set_location_assignment PIN_70 -to sdram_cas_n
@@ -106,8 +110,15 @@ set_location_assignment PIN_44 -to sdram_dq[15]
 # ==============================================================================
 # Fast I/O Registers for Timing Closure
 # ==============================================================================
-set_instance_assignment -name FAST_INPUT_REGISTER ON -to sdram_dq[*]
-set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_dq[*]
+# sdram_dq[*] deliberately has NO FAST_INPUT_REGISTER / FAST_OUTPUT_REGISTER /
+# FAST_OUTPUT_ENABLE_REGISTER assignments. sdram_controller.vhd's read path
+# already samples sdram_dq inside its own clocked process
+# (rdata_reg(15 downto 0) <= sdram_dq; in ST_READ_DATA); FAST_INPUT_REGISTER
+# added a second, physical IOE register in front of that, so the CAS-latency-2
+# read timing GHDL verified (sim/ghdl/tb_sdram.vhd) ran one clock late on real
+# hardware -- every read sampled the wrong beat. Confirmed 2026-08-24: CPU-driven
+# writes/reads through rv32_firmware failed 4 of 5 words with these assignments
+# in place. See docs/notes/bringup_bug_report_2026-08-23.txt.
 set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_addr[*]
 set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_ba[*]
 set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_dqm[*]
@@ -115,7 +126,6 @@ set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_ras_n
 set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_cas_n
 set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_we_n
 set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to sdram_cs_n
-set_instance_assignment -name FAST_OUTPUT_ENABLE_REGISTER ON -to sdram_dq[*]
 
 # I/O Standards & Configuration
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"

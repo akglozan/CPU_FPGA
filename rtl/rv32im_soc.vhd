@@ -41,7 +41,9 @@ entity rv32im_soc is
         sdram_ba    : out   std_logic_vector(1 downto 0);
         sdram_addr  : out   std_logic_vector(11 downto 0);
         sdram_dqm   : out   std_logic_vector(1 downto 0);
-        sdram_dq    : inout std_logic_vector(15 downto 0)
+        sdram_dq    : inout std_logic_vector(15 downto 0);
+        -- Clock to the physical SDRAM chip. See sdram_controller.vhd.
+        sdram_clk   : out   std_logic
     );
 end entity rv32im_soc;
 
@@ -294,7 +296,8 @@ begin
             sdram_ba     => sdram_ba,
             sdram_addr   => sdram_addr,
             sdram_dqm    => sdram_dqm,
-            sdram_dq     => sdram_dq
+            sdram_dq     => sdram_dq,
+            sdram_clk    => sdram_clk
         );
 
     s2_rdata <= (others => '0');

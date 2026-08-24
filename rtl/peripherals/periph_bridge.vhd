@@ -4,9 +4,9 @@ use ieee.numeric_std.all;
 
 -- Wishbone B4 slave bridging the system bus to the individual MMIO
 -- peripherals (LED at offset 0x00, key input at 0x04, UART TX/busy at
--- 0x08/0x0C, timer at 0x10, bus-error flag at 0x14). Every access acknowledges combinationally
--- in the same cycle it is presented (single-cycle peripheral latency),
--- unlike the multi-cycle SDRAM slave.
+-- 0x08/0x0C, timer at 0x10, bus-error flag at 0x14). Every access
+-- acknowledges combinationally in the same cycle it is presented
+-- (single-cycle peripheral latency), unlike the multi-cycle SDRAM slave.
 entity periph_bridge is
     port (
         wb_addr_i : in  std_logic_vector(31 downto 0);

@@ -1,11 +1,26 @@
 -- SPDX-License-Identifier: Apache-2.0
 -- Copyright 2026 Ozan Akgul
 --
--- NOTE ON READ TIMING: wait_cnt in ST_READ_CMD is 1, and that is
--- correct -- do not "fix" it to 2. CAS latency 2 is satisfied because
--- the command outputs are registered, so the READ reaches the chip one
--- cycle after the ST_READ_CMD state. Verified end to end by
--- sim/ghdl/tb_sdram.vhd against sim/sdram_model.vhd.
+-- NOTE ON READ TIMING (resolved 2026-08-24): wait_cnt in ST_READ_CMD is 1.
+-- This was fought over hard during SDRAM hardware bring-up: real CPU-driven
+-- reads kept coming back wrong (both 16-bit halves equal to the correct
+-- upper half, e.g. 0xDEADBEEF read back as 0xDEADDEAD) no matter what this
+-- value was set to -- a runtime-sweepable register briefly existed here to
+-- try every value from 0 to 4, and ALL of them gave the identical wrong
+-- result. That was the tell: if this were really a read-capture-timing
+-- problem, different values would have sampled different (if still wrong)
+-- points on the bus. Getting the exact same answer regardless of timing
+-- meant the bus wasn't changing at all -- the SDRAM chip was never
+-- responding to any command. Root cause: sdram_clk (SD_CLK, board pin 43)
+-- had never been wired to anything in this project's history; every other
+-- SDRAM pin matched the RZ-EasyFPGA A2.2 vendor pin table exactly except
+-- that one. Once sdram_clk was added and pinned, wait_cnt = 1 -- the value
+-- that was already correct against sim/ghdl/tb_sdram.vhd's behavioural
+-- sdram_model.vhd -- turned out to be correct on real hardware too.
+-- Confirmed with a 5-word CPU-driven test spanning three consecutive
+-- words, a different row, and a different bank: all five round-tripped
+-- correctly. See docs/notes/bringup_bug_report_2026-08-23.txt for the full
+-- investigation.
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -57,7 +72,13 @@ entity sdram_controller is
         -- Data mask, one bit per byte lane of the 16-bit data bus.
         sdram_dqm     : out   std_logic_vector(1 downto 0);
         -- Bidirectional 16-bit SDRAM data bus.
-        sdram_dq      : inout std_logic_vector(15 downto 0)
+        sdram_dq      : inout std_logic_vector(15 downto 0);
+        -- Clock forwarded to the physical SDRAM chip (RZ-EasyFPGA A2.2:
+        -- SD_CLK, pin 43). See the NOTE ON READ TIMING above -- this was
+        -- missing entirely until 2026-08-24 and was the real root cause
+        -- of every SDRAM bring-up failure. A plain unregistered copy of
+        -- clk, same as every other design on this class of board.
+        sdram_clk     : out   std_logic
     );
 end entity sdram_controller;
 
@@ -98,6 +119,7 @@ architecture rtl of sdram_controller is
 begin
 
     sdram_cke <= '1';
+    sdram_clk <= clk;
     sdram_dq  <= dq_out when (dq_oe = '1') else (others => 'Z');
     wb_dat_o  <= rdata_reg;
 
@@ -255,7 +277,7 @@ begin
                     sdram_ba       <= latched_adr(23 downto 22);
                     sdram_addr     <= "000" & latched_adr(9 downto 1); -- Fixed 16-bit word alignment
                     sdram_dqm      <= "00";
-                    wait_cnt       <= 1; -- CAS-1 cycles (RESTORED to original value)
+                    wait_cnt       <= 1; -- CAS-1 cycles; see NOTE ON READ TIMING
                     state          <= ST_READ_WAIT;
 
                 when ST_READ_WAIT =>
