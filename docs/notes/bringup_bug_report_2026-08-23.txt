@@ -641,9 +641,35 @@ sim/ghdl/run.sh all reverted to match, and rv32_firmware/src/main.c is back
 to the plain ABC + blink firmware. Full GHDL suite passes.
 
 SDRAM is now a working, CPU-verified memory: init sequence, single-word
-read/write, multi-bank, multi-row, back-to-back access, byte-enables not
-yet exercised via wb_sel (still flagged, see "REMAINING GAPS" earlier in
-this section), and auto-refresh under sustained traffic still untested.
+read/write, multi-bank, multi-row, back-to-back access.
+
+LAST TWO GAPS CLOSED (2026-08-24): wb_sel AND SUSTAINED-TRAFFIC REFRESH
+--------------------------------------------------------------------------------
+Both items "WHAT IS STILL UNPROVEN" above flagged were added to
+sim/ghdl/tb_sdram.vhd and both simply passed -- no bug found, but real
+coverage that did not exist before:
+
+  - Byte-enables: a full-word write to a fresh address, then a wb_sel="0011"
+    write (only byte lanes 0/1), then "1100" (only lanes 2/3), then "0000"
+    (no lanes at all). Checked after each one that only the masked bytes
+    actually changed. wb_xfer gained an optional sel parameter (defaults to
+    "1111") so every earlier test's calls needed no changes.
+
+  - Sustained traffic across a real auto-refresh: REFRESH_PERIOD is
+    CLK_FREQ_MHZ*15 = 750 cycles at 50 MHz, and no prior test ever ran that
+    long -- ST_REFRESH had literally never fired while a real access was in
+    flight in any test in this project. 96 back-to-back word write+read
+    round trips (~9-11 cycles each, so >900 cycles) guarantees at least one
+    lands mid-stream. One access in the run took 15 cycles instead of the
+    usual 9 -- visible confirmation a refresh really did interleave with a
+    pending request -- and every one of the 96 words still read back exactly
+    right afterward.
+
+Both gaps from the original "WHAT IS STILL UNPROVEN" section are now closed.
+SDRAM has been through: init sequence, single-word read/write, multi-bank,
+multi-row, back-to-back access, tMRD-at-boot, byte-enables, and sustained
+traffic through a real refresh -- all via the actual CPU pipeline or a
+faithful synthetic bus master, and all passing.
 
 BUS WATCHDOG (added 2026-08-23)
 --------------------------------------------------------------------------------

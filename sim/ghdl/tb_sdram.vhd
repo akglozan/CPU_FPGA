@@ -100,22 +100,27 @@ begin
         );
 
     stim : process
-        variable cyc : natural;
-        variable got : std_logic_vector(31 downto 0);
+        variable cyc  : natural;
+        variable got  : std_logic_vector(31 downto 0);
         variable hung : boolean;
+        variable i    : natural;
+        variable addr_v : std_logic_vector(31 downto 0);
+        variable pat_v   : std_logic_vector(31 downto 0);
+        constant refresh_base : std_logic_vector(31 downto 0) := x"80003000";
 
         procedure wb_xfer (
             addr    : std_logic_vector(31 downto 0);
             wdata   : std_logic_vector(31 downto 0);
             is_write: boolean;
             rdata   : out std_logic_vector(31 downto 0);
-            timedout: out boolean
+            timedout: out boolean;
+            sel     : std_logic_vector(3 downto 0) := "1111"
         ) is
         begin
             wait until rising_edge(clk);
             wb_adr   <= addr;
             wb_dat_w <= wdata;
-            wb_sel   <= "1111";
+            wb_sel   <= sel;
             wb_we    <= '1' when is_write else '0';
             wb_stb   <= '1';
             wb_cyc   <= '1';
@@ -169,6 +174,28 @@ begin
                 report "FAIL  read 0x" & h(addr) & " = 0x" & h(got) &
                        ", expected 0x" & h(expect)
                        severity warning;
+            end if;
+        end procedure;
+
+        -- Write with an explicit byte-enable mask, for the wb_sel tests.
+        -- No caller has ever driven anything but "1111" before this.
+        procedure wr_sel (
+            addr : std_logic_vector(31 downto 0);
+            data : std_logic_vector(31 downto 0);
+            sel  : std_logic_vector(3 downto 0)
+        ) is
+            variable dummy : std_logic_vector(31 downto 0);
+        begin
+            wb_xfer(addr, data, true, dummy, hung, sel);
+            if hung then
+                fails <= fails + 1;
+                report "FAIL  write 0x" & h(addr) & " sel=" &
+                       h((31 downto 4 => '0') & sel) &
+                       " never acked (bus hung)" severity warning;
+            else
+                report "      write 0x" & h(addr) & " = 0x" & h(data) &
+                       " sel=" & h((31 downto 4 => '0') & sel) &
+                       "  (" & integer'image(cyc) & " cycles)";
             end if;
         end procedure;
     begin
@@ -272,6 +299,51 @@ begin
             report "FAIL  post-boot read 0x80000000 = 0x" & h(got) &
                    ", expected 0xDEADBEEF" severity warning;
         end if;
+
+        report "--- byte-enable (wb_sel): only masked bytes change ---";
+        -- Full-word baseline, then two partial-sel overwrites. Neither
+        -- caller before this test ever drove anything but "1111".
+        wr(x"80002000", x"AABBCCDD");
+        rd_check(x"80002000", x"AABBCCDD");
+
+        -- sel="0011" writes only the low 16 bits (byte lanes 0/1). Upper
+        -- 16 bits (AABB) must survive untouched.
+        wr_sel(x"80002000", x"11223344", "0011");
+        rd_check(x"80002000", x"AABB3344");
+
+        -- sel="1100" writes only the high 16 bits. Low 16 (3344, just
+        -- written above) must survive this one.
+        wr_sel(x"80002000", x"55667788", "1100");
+        rd_check(x"80002000", x"55663344");
+
+        -- sel="0000": a write with no byte lanes enabled must change
+        -- nothing at all.
+        wr_sel(x"80002000", x"00000000", "0000");
+        rd_check(x"80002000", x"55663344");
+
+        report "--- sustained back-to-back traffic spans an auto-refresh ---";
+        -- REFRESH_PERIOD is CLK_FREQ_MHZ*15 = 750 cycles at 50 MHz.
+        -- Every prior test in this file finishes well under that; nothing
+        -- so far has ever run long enough for ST_REFRESH to actually fire
+        -- while a real access is in flight. 96 back-to-back word
+        -- write+read round trips at ~9-11 cycles each comfortably clears
+        -- 750 cycles, so at least one (likely two) auto-refresh cycles
+        -- land somewhere in the middle of this loop -- and unlike every
+        -- earlier test, WHICH access it lands on is not controlled, which
+        -- is the point: any of them could be the one that gets delayed by
+        -- a refresh, and every single one still has to come back right.
+        for i in 0 to 95 loop
+            addr_v := std_logic_vector(unsigned(refresh_base) +
+                                        to_unsigned(i * 4, 32));
+            pat_v  := std_logic_vector(to_unsigned(16#40000000# + i, 32));
+            wr(addr_v, pat_v);
+        end loop;
+        for i in 0 to 95 loop
+            addr_v := std_logic_vector(unsigned(refresh_base) +
+                                        to_unsigned(i * 4, 32));
+            pat_v  := std_logic_vector(to_unsigned(16#40000000# + i, 32));
+            rd_check(addr_v, pat_v);
+        end loop;
 
         report "================ FAILURES: " & integer'image(fails) &
                " ================";

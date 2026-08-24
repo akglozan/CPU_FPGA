@@ -12,39 +12,39 @@ locally: `cd docs && pip install sphinx sphinx-vhdl && make html`, then open
 ## 📋 Detailed Progress Checklist
 
 ### Phase 1: Core CPU Pipeline & Microarchitecture
-- [ ] **1.1 Instruction Set Architecture (ISA)**
-  - [ ] Define opcode maps and instruction formats (R, I, S, B, U, J) for RV32I.
-  - [ ] Specify register layout ($x0$ hardwired to zero, $x1$–$x31$ general-purpose).
-- [ ] **1.2 Program Counter (PC)**
-  - [ ] Implement synchronous PC register logic in VHDL.
-  - [ ] Verify `pc_write` (stall) and `pc_load` (branch/jump) control paths.
-- [ ] **1.3 Instruction Fetch & Decode**
-  - [ ] Implement instruction extraction logic for source/destination registers.
-  - [ ] Add sign-extension logic for all immediate fields.
-- [ ] **1.4 Register File**
-  - [ ] Create 32-word $\times$ 32-bit dual-read, single-write register array.
-  - [ ] Verify asynchronous read and synchronous write operations in simulation.
-- [ ] **1.5 Arithmetic Logic Unit (ALU)**
-  - [ ] Implement core operations (`ADD`, `SUB`, `AND`, `OR`, `XOR`, `SLT`, `SLTU`).
-  - [ ] Implement logical and arithmetic bit shifts (`SLL`, `SRL`, `SRA`).
-- [ ] **1.6 Phase 1 Verification**
-  - [ ] Simulate full execution loop in ModelSim with a test assembly sequence.
-  - [ ] Synthesize in Quartus II targeting `EP4CE6E22C8N` to verify resource usage.
+- [x] **1.1 Instruction Set Architecture (ISA)**
+  - [x] Define opcode maps and instruction formats (R, I, S, B, U, J) for RV32I.
+  - [x] Specify register layout ($x0$ hardwired to zero, $x1$–$x31$ general-purpose).
+- [x] **1.2 Program Counter (PC)**
+  - [x] Implement synchronous PC register logic in VHDL.
+  - [x] Verify `pc_write` (stall) and `pc_load` (branch/jump) control paths.
+- [x] **1.3 Instruction Fetch & Decode**
+  - [x] Implement instruction extraction logic for source/destination registers.
+  - [x] Add sign-extension logic for all immediate fields.
+- [x] **1.4 Register File**
+  - [x] Create 32-word $\times$ 32-bit dual-read, single-write register array.
+  - [x] Verify asynchronous read and synchronous write operations in simulation.
+- [x] **1.5 Arithmetic Logic Unit (ALU)**
+  - [x] Implement core operations (`ADD`, `SUB`, `AND`, `OR`, `XOR`, `SLT`, `SLTU`).
+  - [x] Implement logical and arithmetic bit shifts (`SLL`, `SRL`, `SRA`).
+- [x] **1.6 Phase 1 Verification**
+  - [x] Simulate full execution loop in ModelSim with a test assembly sequence.
+  - [x] Synthesize in Quartus II targeting `EP4CE6E22C8N` to verify resource usage.
 
 ---
 
 ### Phase 2: Memory Hierarchy & SDRAM Controller
-- [ ] **2.1 SDRAM Controller Interface**
-  - [ ] Implement or port a 16-bit SDRAM controller in VHDL for the 64 Mbit chip.
-  - [ ] Handle power-up initialization and auto-refresh timing parameters.
-  - [ ] Verify row activation, read, and write command sequences.
-- [ ] **2.2 System Interconnect & Memory Map**
-  - [ ] Build central bus decoder module in VHDL.
-  - [ ] Map `0x0000_0000`–`0x0000_3FFF` to Internal BRAM (16 KB Bootloader).
-  - [ ] Map `0x8000_0000`–`0x807F_FFFF` to 8 MB External SDRAM.
-  - [ ] Map `0xC000_0000`–`0xC000_00FF` to Memory-Mapped I/O (MMIO).
-- [ ] **2.3 Phase 2 Verification**
-  - [ ] Run physical memory test on hardware to verify SDRAM stability.
+- [x] **2.1 SDRAM Controller Interface**
+  - [x] Implement or port a 16-bit SDRAM controller in VHDL for the 64 Mbit chip.
+  - [x] Handle power-up initialization and auto-refresh timing parameters.
+  - [x] Verify row activation, read, and write command sequences.
+- [x] **2.2 System Interconnect & Memory Map**
+  - [x] Build central bus decoder module in VHDL.
+  - [x] Map `0x0000_0000`–`0x0000_FFFF` to Internal BRAM (4 KB Bootloader, 64 KB decoded window).
+  - [x] Map `0x8000_0000`–`0x87FF_FFFF` to External SDRAM (64 Mbit / 8 MB chip, 128 MB decoded window).
+  - [x] Map `0xE000_0000`–`0xE000_FFFF` to Memory-Mapped I/O (MMIO).
+- [x] **2.3 Phase 2 Verification**
+  - [x] Run physical memory test on hardware to verify SDRAM stability.
 
 ---
 
@@ -63,6 +63,11 @@ locally: `cd docs && pip install sphinx sphinx-vhdl && make html`, then open
 ---
 
 ### Phase 4: VGA Framebuffer Engine
+> **Status:** Not started. The bus already reserves address space for it —
+> `bus_interconnect.vhd` decodes `0xC000_0000`–`0xC007_FFFF` (512 KB window)
+> as slave 2 — but no VGA module exists yet: `rv32im_soc.vhd` ties the slot
+> off (`s2_ack_i <= '0'`, data/address ports left open), so any access to
+> that range currently hangs until the bus watchdog forces a timeout.
 - [ ] **4.1 Timing Generator**
   - [ ] Configure ALTPLL in Quartus II to generate a 25 MHz pixel clock.
   - [ ] Implement 640x480 @ 60 Hz VGA synchronization counters (`HSYNC`, `VSYNC`).
