@@ -46,6 +46,22 @@ int main(void)
     uart_putc('\r');
     uart_putc('\n');
 
+    /* One-shot proof that the bus watchdog in bus_interconnect.vhd fires
+     * on real hardware, not just in GHDL simulation. 0xC0000000 is the
+     * VGA slave, which is hard-tied s2_ack_i <= '0' in rv32im_soc.vhd --
+     * before the watchdog existed, this load would have frozen the CPU
+     * forever with no diagnostic. Now it should stall for TIMEOUT_CYCLES
+     * (~1.3 ms at 50 MHz), read back as 0, and leave BUS_ERR set. */
+    {
+        volatile uint32_t *vga = (volatile uint32_t *)0xC0000000u;
+        uint32_t dead_read = *vga;
+
+        uart_putc((BUS_ERR & 1u) ? 'E' : 'e');
+        uart_putc((dead_read == 0u) ? '0' : '?');
+        uart_putc('\r');
+        uart_putc('\n');
+    }
+
     while (1) {
         GPIO_LED = 0x0u;  /* active-low: all LEDs ON */
         delay();
