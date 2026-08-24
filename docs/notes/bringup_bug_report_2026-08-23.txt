@@ -530,6 +530,23 @@ Covered by sim/ghdl/tb_buserr.vhd: healthy slaves and unmapped addresses are
 untouched, tied-low and mute slaves both time out and return zero, the flag is
 sticky, and the bus still works afterwards.
 
+Confirmed on real hardware 2026-08-24: main.c briefly carried a one-shot test
+right after the "ABC" UART output -- a load from 0xC000_0000 (VGA, the one
+slave known dead on this board) followed by a check of BUS_ERR. Serial output
+was "ABC" then "E0" on the next line: the CPU did not hang (LEDs kept blinking
+throughout), the timed-out read came back as zero, and BUS_ERR read back set.
+That is the first time this path has run anywhere but GHDL. The test block was
+removed from main.c afterwards -- it served its purpose and left every reset
+paying a ~1.3 ms guaranteed-timeout penalty for no ongoing benefit -- but is
+preserved here in case the watchdog ever needs re-proving on hardware:
+
+    volatile uint32_t *vga = (volatile uint32_t *)0xC0000000u;
+    uint32_t dead_read = *vga;
+    uart_putc((BUS_ERR & 1u) ? 'E' : 'e');
+    uart_putc((dead_read == 0u) ? '0' : '?');
+    uart_putc('\r');
+    uart_putc('\n');
+
 
 ================================================================================
 WHY THE EARLIER ISOLATION TESTS ALL PASSED
