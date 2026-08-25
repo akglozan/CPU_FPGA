@@ -119,3 +119,9 @@ blinky_top.vhd
 # Simulation dumps and simulator libraries (regenerable)
 *.vcd
 sim/work/
+sim/uart_log.txt
+sim/uart_log2.txt
+sim/uart_log3.txt
+sim/uart_log4.txt
+sim/tb_boot_path_log.txt
+sim/tb_boot_fail.txt

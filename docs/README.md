@@ -52,13 +52,70 @@ locally: `cd docs && pip install sphinx sphinx-vhdl && make html`, then open
 - [x] **3.1 ESP32 Firmware**
   - [x] Set up MicroSD card initialization via SDMMC/SPI in ESP-IDF/Arduino.
   - [x] Implement binary file parser to open and read `DOOM1.WAD` and code binaries.
-- [ ] **3.2 FPGA Receiver Interface**
-  - [ ] Implement high-speed SPI/Parallel Slave receiver module in VHDL.
-  - [ ] Route incoming bytes directly to SDRAM via DMA bus controller.
-- [ ] **3.3 Boot Handshaking**
-  - [ ] Assert FPGA CPU `RESET` line on initial power-up.
-  - [ ] Stream executable and WAD bytes from ESP32 into FPGA SDRAM.
-  - [ ] Toggle `BOOT_DONE` signal from ESP32 to release FPGA CPU reset.
+- [x] **3.2 FPGA Receiver Interface**
+  - [x] Implement high-speed SPI/Parallel Slave receiver module in VHDL.
+  - [x] Route incoming bytes directly to SDRAM via DMA bus controller.
+- [x] **3.3 Boot Handshaking**
+  - [x] Assert FPGA CPU `RESET` line on initial power-up.
+  - [x] Stream executable and WAD bytes from ESP32 into FPGA SDRAM.
+  - [x] Toggle `BOOT_DONE` signal from ESP32 to release FPGA CPU reset.
+
+---
+
+### Phase 3 Closeout — verified on hardware 2026-08-25
+
+**The link as built.** The ESP32 reads files from the MicroSD card and
+streams them to the FPGA over a dedicated SPI link (Mode 0, MSB-first,
+1 MHz, on GPIOs separate from the SDMMC pins). Each file is one CS-low
+session carrying an 8-byte little-endian header — 4-byte destination
+address, then 4-byte length — followed by its payload.
+`rtl/memory/spi_slave.vhd` turns the bit stream into bytes;
+`rtl/memory/boot_loader.vhd` parses that framing and DMAs the payload
+into SDRAM as its own Wishbone master, while the CPU is held in reset and
+off the bus. When both files are sent the ESP32 raises `BOOT_DONE`, and
+the SoC hands the bus to the CPU and releases it. A full transfer —
+`FIRMWARE.BIN` (288 B) to `0x8000_0000` and `DOOM1.WAD` (4,207,819 B) to
+`0x8010_0000` — takes roughly 30 s.
+
+**Evidence.** The RV32 core reads back `FW[0] = 0x00001117` (matching the
+binary's own first word) and `WAD[0] = 0x44415749` (the `IWAD` magic),
+with `BUS_ERR = 0`. Temporary instrumentation confirmed the transfer was
+byte-exact — all 4,208,123 bytes received and all 1,052,027 word writes
+acknowledged — bit-identical across repeated resets and at both 100 kHz
+and 1 MHz. That instrumentation has since been removed; the four-LED boot
+progress display in `rv32im_soc.vhd` was kept, since it shows how far the
+SPI → `boot_loader` → SDRAM chain got with no instrumentation at all.
+
+**Three real bugs were fixed to get here.**
+
+* `MEM_Stage.vhd` had no load byte/halfword extraction at all — every
+  `LB`/`LBU`/`LH`/`LHU` returned the whole bus word unmodified. Latent
+  since the beginning: this was the first firmware to do sub-word loads.
+* `boot_done` was latched from a 2-cycle synchronizer with no debounce,
+  so a transient released the CPU mid-transfer and the "missing bytes"
+  it produced were really a counter being read while the ESP32 was still
+  sending. It now requires ~1.3 ms continuously high, and the ESP32
+  drives the pin low at the top of `setup()` rather than leaving it
+  floating through SD-card init.
+* `sdram_controller.vhd` drove a 9-bit column address at a 256-column
+  part (Winbond W9864G6KH-6), discarding byte-address bit 9 so that every
+  pair of addresses 512 B apart aliased onto the same cells — corrupting
+  exactly half of every transfer larger than 512 B.
+
+**On that last one.** `sim/sdram_model.vhd` had encoded the *same* wrong
+512-column assumption as the controller, so the simulation reproduced the
+design's own mistake and could never fail on it — `tb_boot_path` passed
+cleanly against genuinely broken RTL. Both halves are now fixed: the
+model decodes 8 column bits like the real part, and `sim/tb_boot_path.vhd`
+writes two files across the 512 B alias stride. That test has been
+observed **failing** on the deliberately reintroduced bug and passing on
+the fix, so its teeth are verified rather than assumed.
+
+**Known limitation, deferred to Phase 5.** Instruction fetch is still
+hardwired to BRAM (`rv32im_soc.vhd` drives `bram_4kb`'s port A from `pc`
+directly), so the CPU cannot yet *execute* the firmware image it has just
+been handed — it can only read it as data. Running code from SDRAM is a
+Phase 5 concern.
 
 ---
 

@@ -21,6 +21,34 @@
 -- words, a different row, and a different bank: all five round-tripped
 -- correctly. See docs/notes/bringup_bug_report_2026-08-23.txt for the full
 -- investigation.
+--
+-- NOTE ON ADDRESS MAPPING (resolved 2026-08-25): the fitted chip is a
+-- Winbond W9864G6KH-6 -- 64 Mbit organised 4M x 16, i.e. 4 banks x 4096
+-- rows x 256 columns. 256 columns means the column address is only 8
+-- bits wide (A0-A7). This controller previously drove NINE column bits
+-- ("000" & latched_adr(9 downto 1)), putting latched_adr(9) onto A8,
+-- which the chip ignores during a READ/WRITE command. That bit was
+-- therefore silently discarded, so every pair of addresses 512 bytes
+-- apart aliased onto the same physical cells: writing offset 512 of a
+-- buffer destroyed offset 0. Invisible during bring-up because the
+-- 5-word test above spans only 20 bytes -- far less than the 512-byte
+-- alias stride -- and only surfaced once the ESP32 boot loader began
+-- DMAing megabyte-scale files in (DOOM1.WAD's first word read back as
+-- its own offset-512 contents rather than the "IWAD" magic).
+--
+-- Correct slicing for this part, in byte-address terms:
+--   adr(0)         byte within the 16-bit word (selected via DQM)
+--   adr(8 downto 1)   column, 8 bits  -> 256 columns
+--   adr(20 downto 9)  row,    12 bits -> 4096 rows
+--   adr(22 downto 21) bank,    2 bits -> 4 banks
+-- Total adr(22 downto 0) = 8 MB, exactly the chip's capacity. The old
+-- mapping claimed adr(23 downto 0) = 16 MB, i.e. twice the real part,
+-- which is the same error stated a different way.
+--
+-- Burst length is 2, so each 32-bit Wishbone word is one command plus
+-- two 16-bit beats at col and col+1. Bus addresses are 32-bit aligned
+-- (adr(1 downto 0) = "00"), so the starting column adr(8 downto 1) is
+-- always even and the burst never wraps into a neighbouring word.
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -243,10 +271,12 @@ begin
                         latched_wdata <= wb_dat_i;
                         latched_sel   <= wb_sel_i;
 
-                        -- Issue ACTIVE command
+                        -- Issue ACTIVE command. See the ADDRESS MAPPING
+                        -- note in the header for why these slices are
+                        -- what they are.
                         send_cmd(CMD_ACTIVE);
-                        sdram_ba   <= wb_adr_i(23 downto 22); -- Bank
-                        sdram_addr <= wb_adr_i(21 downto 10); -- Row
+                        sdram_ba   <= wb_adr_i(22 downto 21); -- Bank
+                        sdram_addr <= wb_adr_i(20 downto 9);  -- Row
                         wait_cnt   <= 2;                      -- tRCD delay
                         state      <= ST_ACTIVE;
                     end if;
@@ -274,8 +304,11 @@ begin
                 ----------------------------------------------------------------
                 when ST_READ_CMD =>
                     send_cmd(CMD_READ);
-                    sdram_ba       <= latched_adr(23 downto 22);
-                    sdram_addr     <= "000" & latched_adr(9 downto 1); -- Fixed 16-bit word alignment
+                    sdram_ba       <= latched_adr(22 downto 21);
+                    -- 8 column bits; bit 10 = '0' suppresses auto-precharge
+                    -- (this controller precharges explicitly). See the
+                    -- ADDRESS MAPPING note in the header.
+                    sdram_addr     <= "0000" & latched_adr(8 downto 1);
                     sdram_dqm      <= "00";
                     wait_cnt       <= 1; -- CAS-1 cycles; see NOTE ON READ TIMING
                     state          <= ST_READ_WAIT;
@@ -301,8 +334,10 @@ begin
                 ----------------------------------------------------------------
                 when ST_WRITE_CMD =>
                     send_cmd(CMD_WRITE);
-                    sdram_ba       <= latched_adr(23 downto 22);
-                    sdram_addr     <= "000" & latched_adr(9 downto 1); -- Fixed 16-bit word alignment
+                    sdram_ba       <= latched_adr(22 downto 21);
+                    -- Same slicing as ST_READ_CMD above -- see the
+                    -- ADDRESS MAPPING note in the header.
+                    sdram_addr     <= "0000" & latched_adr(8 downto 1);
                     sdram_dqm      <= not latched_sel(1 downto 0);
                     dq_out         <= latched_wdata(15 downto 0);
                     dq_oe          <= '1';

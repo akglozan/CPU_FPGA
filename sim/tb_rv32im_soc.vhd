@@ -42,6 +42,16 @@ architecture sim of tb_rv32im_soc is
 
     signal sim_finished : boolean := false;
 
+    -- Drives DUT's boot_done input. This testbench predates the
+    -- Phase 3.2/3.3 boot-loader handshake and doesn't model the ESP32's
+    -- actual SPI file transfer; left unconnected, boot_done defaults to
+    -- '0' (see rv32im_soc.vhd) and the CPU never comes out of reset --
+    -- confirmed by a run showing zero UART activity for the entire
+    -- simulation. Since this testbench's firmware image doesn't depend
+    -- on SDRAM content, there's nothing to gain from simulating a real
+    -- transfer here -- just release the CPU shortly after reset.
+    signal boot_done_stim : std_logic := '0';
+
 begin
 
     -------------------------------------------------------------------
@@ -49,7 +59,8 @@ begin
     -------------------------------------------------------------------
     DUT : entity work.rv32im_soc
         generic map (
-            SIMULATION => true
+            SIMULATION => true,
+            hex_file   => "../sw/boot_bram.mif"
         )
         port map (
             clk         => clk,
@@ -66,7 +77,8 @@ begin
             sdram_ba    => sdram_ba,
             sdram_addr  => sdram_addr,
             sdram_dqm   => sdram_dqm,
-            sdram_dq    => sdram_dq
+            sdram_dq    => sdram_dq,
+            boot_done   => boot_done_stim
         );
 
     -------------------------------------------------------------------
@@ -133,6 +145,14 @@ begin
         
         -- Deassert Reset
         rst_n <= '1';
+
+        -- No real SPI transfer is simulated here -- this testbench
+        -- predates the boot-loader handshake and the firmware under
+        -- test doesn't depend on SDRAM content, so just release the CPU
+        -- shortly after reset instead of modeling the ESP32's actual
+        -- file transfer.
+        wait for 200 ns;
+        boot_done_stim <= '1';
 
         -- Allow memory tests and initial boot reporting to execute
         wait for 100 us;

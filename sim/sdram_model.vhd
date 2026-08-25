@@ -23,12 +23,30 @@
 --      0x8000_0000 (bank 0).
 --   3. Only 6 row bits were used against a 12-bit row address.
 --
--- Bank and column are now decoded in full. A real part is 4 banks x
--- 4096 rows x 512 columns of 16 bits (16 MB); backing all of that with
--- VHDL signals is impractical, so only the low SIM_ROWS rows of each
--- bank are stored. Rows at or above SIM_ROWS fold onto lower ones, which
--- is fine for bring-up tests and is the one deliberate departure from
--- real behaviour.
+-- Bank and column are now decoded in full. Only the low SIM_ROWS rows of
+-- each bank are stored -- backing every row with VHDL signals is
+-- impractical -- so rows at or above SIM_ROWS fold onto lower ones. That
+-- is the one deliberate departure from real behaviour.
+--
+-- COLUMN WIDTH (fixed 2026-08-25)
+--
+-- This model previously declared 512 columns and decoded a 9-bit column
+-- from addr(8 downto 0), described in the comment above as what "a real
+-- part" does. That was wrong for the fitted chip and, worse, it was
+-- wrong in exactly the same way sdram_controller.vhd was wrong: the
+-- controller drove a 9-bit column too. A model that reproduces the
+-- design's own mistake cannot fail on it, which is why sim/tb_boot_path
+-- passed cleanly while real hardware silently corrupted every transfer
+-- larger than 512 bytes.
+--
+-- The board's part is a Winbond W9864G6KH-6: 64 Mbit as 4M x 16, i.e.
+-- 4 banks x 4096 rows x 256 columns. 256 columns is an 8-bit column
+-- address, A7-A0. A8 is NOT a column bit -- a real part ignores it
+-- during READ/WRITE -- so this model now decodes addr(7 downto 0) and
+-- lets addr(8) fall on the floor, precisely as the chip does. Any future
+-- regression to a 9-bit column will now alias here the same way it
+-- aliases on hardware, and tb_boot_path.vhd's two-file test below will
+-- catch it. See the ADDRESS MAPPING note in rtl/memory/sdram_controller.vhd.
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
@@ -65,7 +83,7 @@ end entity sdram_model;
 architecture sim of sdram_model is
 
     constant N_BANKS  : natural := 4;
-    constant N_COLS   : natural := 512;   -- full 9-bit column
+    constant N_COLS   : natural := 256;   -- 8-bit column, A7-A0 (see header)
     constant SIM_ROWS : natural := 64;    -- rows actually backed by storage
 
     type ram_type is array (0 to N_BANKS * SIM_ROWS * N_COLS - 1)
@@ -119,7 +137,7 @@ begin
     process(clk)
         variable cmd       : std_logic_vector(3 downto 0);
         variable bank_idx  : integer range 0 to 3;
-        variable col_v     : std_logic_vector(8 downto 0);
+        variable col_v     : std_logic_vector(7 downto 0);
         variable col0      : integer range 0 to N_COLS - 1;
         variable col1      : integer range 0 to N_COLS - 1;
         variable cell0     : integer range 0 to N_BANKS * SIM_ROWS * N_COLS - 1;
@@ -204,12 +222,16 @@ begin
                         check_gap("tRCD (ACTIVE->READ/WRITE)", t_active(bank_idx), tRCD_CK, bank_idx);
                         check_gap("tMRD (LOAD_MR->command)",   t_lmr,              tMRD_CK, bank_idx);
 
-                        col_v := addr(8 downto 0);
+                        -- addr(8) is deliberately NOT read: on a 256-column
+                        -- part it is not a column bit, and dropping it here
+                        -- is what makes a 9-bit-column controller alias in
+                        -- simulation exactly as it does on hardware.
+                        col_v := addr(7 downto 0);
                         col0  := to_integer(unsigned(col_v));
                         -- BL=2 sequential wraps inside the 2-word block,
                         -- so the second beat is the column with bit 0
                         -- flipped. It can never cross a row boundary.
-                        col1  := to_integer(unsigned(col_v xor "000000001"));
+                        col1  := to_integer(unsigned(col_v xor "00000001"));
 
                         cell0 := cell_index(bank_idx, active_row(bank_idx), col0);
                         cell1 := cell_index(bank_idx, active_row(bank_idx), col1);

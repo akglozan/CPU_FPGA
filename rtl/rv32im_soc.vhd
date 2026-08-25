@@ -13,7 +13,15 @@ entity rv32im_soc is
         -- When true, selects fast simulation-only timing (shorter
         -- SDRAM power-on wait, higher UART baud) so testbenches don't
         -- have to model real-time power-up delays.
-        simulation : boolean := false
+        simulation : boolean := false;
+        -- Path to the BRAM .mif memory-init file, forwarded to
+        -- bram_4kb's hex_file generic. Defaults to the path Quartus
+        -- resolves against the project root at synthesis time.
+        -- Overridden by testbenches whose working directory differs
+        -- (e.g. tb_rv32im_soc.vhd, run from sim/, passes
+        -- "../sw/boot_bram.mif" so the relative path still resolves
+        -- without needing a duplicate copy of the file).
+        hex_file   : string  := "sw/boot_bram.mif"
     );
     port (
         clk         : in    std_logic;
@@ -53,7 +61,17 @@ entity rv32im_soc is
         -- keep compiling unchanged; spi_cs_n defaults idle-high.
         spi_sclk    : in    std_logic := '0';
         spi_mosi    : in    std_logic := '0';
-        spi_cs_n    : in    std_logic := '1'
+        spi_cs_n    : in    std_logic := '1';
+
+        -- Asserted by the ESP32 once it has finished streaming the
+        -- firmware and WAD into SDRAM over the SPI link above, telling
+        -- this SoC it's safe to release the CPU from reset and hand it
+        -- the bus. Async to clk, like the SPI signals; synchronized
+        -- and latched below. Defaults '0' (not done) so existing
+        -- instantiations that don't connect it keep compiling, and the
+        -- CPU simply never comes out of reset if nothing drives it --
+        -- a safe default, not a silent misconfiguration.
+        boot_done   : in    std_logic := '0'
     );
 end entity rv32im_soc;
 
@@ -92,16 +110,69 @@ architecture structural of rv32im_soc is
     signal bl_cyc         : std_logic;
     signal bl_ack         : std_logic;
 
-    -- Selects which master drives bus_interconnect: '0' = CPU (normal
-    -- operation), '1' = boot_loader (DMA-loading SDRAM at boot).
-    -- Hardcoded to '0' for now, i.e. boot_loader is wired in but
-    -- inert -- Phase 3.3 will drive this from the real ESP32
-    -- BOOT_DONE handshake (starting '1' out of reset, going '0' once
-    -- BOOT_DONE is asserted, alongside holding the CPU itself in
-    -- reset until then). Left hardcoded here so existing CPU/SDRAM
-    -- operation, already verified on hardware, is unaffected until
-    -- that handshake lands.
-    signal boot_active    : std_logic := '0';
+    -- Selects which master drives bus_interconnect: '1' = boot_loader
+    -- (DMA-loading SDRAM at boot), '0' = CPU (normal operation).
+    -- Starts '1' out of reset and permanently flips to '0' the first
+    -- time boot_done is observed asserted -- see the boot_done
+    -- synchronizer/latch process below.
+    signal boot_active    : std_logic;
+
+    -- boot_done arrives async (its own oscillator on the ESP32 side,
+    -- same reasoning as spi_sclk/mosi/cs_n), so it's synchronized here
+    -- before any logic acts on it. boot_done_latched is sticky --
+    -- once set it stays set until the next reset, so a brief pulse
+    -- from the ESP32 is enough; it doesn't need to hold the pin high.
+    -- boot_done_latched_d1 delays the CPU's own reset release by one
+    -- extra cycle behind boot_active's flip, so the bus mux has
+    -- already switched to the CPU by the time the CPU can issue its
+    -- first bus request -- otherwise there'd be a one-cycle window
+    -- where the CPU is out of reset but the mux still points at
+    -- boot_loader.
+    --
+    -- boot_done_debounce_cnt guards against a real hardware failure the
+    -- original single-cycle-latch version had no defense against:
+    -- confirmed on hardware during Phase 3.3 bring-up (with a temporary
+    -- SPI byte counter, since removed) that boot_done_latched could trip
+    -- while the ESP32 was still visibly
+    -- mid-transfer -- most likely the pin floating before the ESP32
+    -- actively drove it, or noise/crosstalk from the adjacent
+    -- actively-toggling SPI lines, either way a transient the old
+    -- 2-cycle synchronizer alone couldn't distinguish from a real
+    -- assertion. boot_done_sync(1) must now stay continuously high for
+    -- BOOT_DONE_DEBOUNCE_CYCLES before boot_done_latched sets; any low
+    -- cycle resets the counter to 0. Same debounce duration
+    -- (2**16 =~ 1.3 ms at 50 MHz) already proven reliable against real
+    -- electrical noise for the mechanical reset button in rst_sync.vhd
+    -- -- negligible against the real multi-second/minute boot transfer,
+    -- but far longer than any realistic glitch.
+    constant BOOT_DONE_DEBOUNCE_CYCLES : natural := 65535;
+    signal boot_done_sync      : std_logic_vector(1 downto 0) := (others => '0');
+    signal boot_done_debounce_cnt : natural range 0 to BOOT_DONE_DEBOUNCE_CYCLES := 0;
+    signal boot_done_latched   : std_logic := '0';
+    signal boot_done_latched_d1 : std_logic := '0';
+
+    -- Boot-progress display: sticky latches, set the first time each
+    -- stage of the boot write path is ever observed to complete and
+    -- never cleared until reset, driven onto gpio_leds while the boot
+    -- loader owns the bus (see the mux further down). This makes the
+    -- whole SPI -> boot_loader -> sdram_controller chain observable on
+    -- the board's LEDs during the real multi-second transfer, without
+    -- depending on the CPU or UART -- which is how the Phase 3.3 boot
+    -- bugs were localised, and is cheap enough (four flops and a mux)
+    -- to keep permanently for future bring-up.
+    signal diag_byte_seen   : std_logic := '0';  -- spi_slave produced >=1 byte
+    signal diag_write_seen  : std_logic := '0';  -- boot_loader started >=1 bus write
+    signal diag_write_acked : std_logic := '0';  -- sdram_controller acked >=1 write
+
+    -- u_gpio_led's normal output, muxed with the diagnostic bits above
+    -- onto the physical gpio_leds port -- see the mux below.
+    signal led_out_cpu : std_logic_vector(3 downto 0);
+
+
+    -- Holds the CPU in reset until one cycle after boot_active has
+    -- released the bus back to it. Every other module in this design
+    -- keeps using rst_n_sync directly and is unaffected by this.
+    signal cpu_rst_n      : std_logic;
 
     -- Muxed master signals actually presented to bus_interconnect.
     signal mux_adr         : std_logic_vector(31 downto 0);
@@ -173,9 +244,36 @@ architecture structural of rv32im_soc is
     constant uart_baud_rate : positive :=
         get_baud_rate(simulation);
 
+    -- rst_sync's debounce stretch defaults to 2**16 = 65536 clocks
+    -- (~1.3 ms at 50 MHz), timed for a real mechanical pushbutton.
+    -- tb_rv32im_soc.vhd's whole scripted run is ~640 us -- shorter than
+    -- that stretch -- so without this, rst_n_sync (and everything else
+    -- gated by it, including the boot_done latch) never leaves reset
+    -- and the CPU never executes a single instruction in simulation.
+    -- Confirmed via waveform: rst_n_sync and cpu_rst_n still both '0'
+    -- at 5 us into a run. A fast_simulation testbench doesn't need to
+    -- model real button-bounce timing, so shrink the stretch the same
+    -- way get_baud_rate above shrinks the UART bit time.
+    function get_rst_stretch_bits(
+        fast_simulation : boolean
+    ) return natural is
+    begin
+        if fast_simulation then
+            return 6;   -- 64 clocks, ~1.28 us at 50 MHz
+        else
+            return 16;  -- ~1.3 ms, real debounce timing
+        end if;
+    end function;
+
+    constant rst_stretch_bits : natural :=
+        get_rst_stretch_bits(simulation);
+
 begin
 
     u_rst_sync : entity work.rst_sync
+        generic map (
+            stretch_bits => rst_stretch_bits
+        )
         port map (
             clk         => clk,
             rst_n_async => rst_n,
@@ -185,7 +283,7 @@ begin
     u_cpu : entity work.cpu_fpga
         port map (
             clk          => clk,
-            rst_n        => rst_n_sync,
+            rst_n        => cpu_rst_n,
 
             imem_addr_o  => pc,
             imem_rdata_i => instruction,
@@ -231,11 +329,75 @@ begin
             wb_ack_i => bl_ack
         );
 
+    -- boot_done synchronizer + sticky latch. See the signal comments
+    -- above for why each stage exists.
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n_sync = '0' then
+                boot_done_sync <= (others => '0');
+            else
+                boot_done_sync <= boot_done_sync(0) & boot_done;
+            end if;
+        end if;
+    end process;
+
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n_sync = '0' then
+                boot_done_debounce_cnt <= 0;
+                boot_done_latched      <= '0';
+                boot_done_latched_d1   <= '0';
+            else
+                if boot_done_sync(1) = '1' then
+                    if boot_done_debounce_cnt = BOOT_DONE_DEBOUNCE_CYCLES then
+                        boot_done_latched <= '1';
+                    else
+                        boot_done_debounce_cnt <= boot_done_debounce_cnt + 1;
+                    end if;
+                else
+                    boot_done_debounce_cnt <= 0;
+                end if;
+                boot_done_latched_d1 <= boot_done_latched;
+            end if;
+        end if;
+    end process;
+
+    -- Diagnostic sticky latches (see signal comments above).
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n_sync = '0' then
+                diag_byte_seen   <= '0';
+                diag_write_seen  <= '0';
+                diag_write_acked <= '0';
+            else
+                if spi_rx_valid = '1' then
+                    diag_byte_seen <= '1';
+                end if;
+                if bl_cyc = '1' then
+                    diag_write_seen <= '1';
+                end if;
+                if bl_ack = '1' then
+                    diag_write_acked <= '1';
+                end if;
+            end if;
+        end if;
+    end process;
+
+
+    boot_active <= not boot_done_latched;
+
+    -- The CPU comes out of reset one cycle after boot_active has
+    -- already released the bus (see the signal comment above).
+    cpu_rst_n <= rst_n_sync and boot_done_latched_d1;
+
     -- Bus master mux: routes either the CPU or boot_loader onto
     -- bus_interconnect's single master port, selected by boot_active.
-    -- The two are never active at the same time by construction (once
-    -- Phase 3.3 holds the CPU in reset while boot_active = '1'), so a
-    -- plain mux is sufficient here -- no arbiter needed.
+    -- The two are never active at the same time by construction (the
+    -- CPU is held in reset via cpu_rst_n for as long as boot_active
+    -- = '1'), so a plain mux is sufficient here -- no arbiter needed.
     mux_adr    <= bl_adr    when boot_active = '1' else wb_cpu_addr;
     mux_dat_wr <= bl_dat    when boot_active = '1' else wb_cpu_wdata;
     mux_sel    <= bl_sel    when boot_active = '1' else wb_cpu_sel;
@@ -348,7 +510,7 @@ begin
 
     u_bram : entity work.bram_4kb
         generic map (
-            hex_file => "sw/boot_bram.mif"
+            hex_file => hex_file
         )
         port map (
             clk    => clk,
@@ -436,8 +598,23 @@ begin
             rst_n   => rst_n_sync,
             we      => gpio_led_we,
             wdata   => s3_wdata,
-            led_out => gpio_leds
+            led_out => led_out_cpu
         );
+
+    -- gpio_leds mux: while boot_active='1' (still streaming, CPU not yet
+    -- released), show the boot-progress display above; once
+    -- boot_active='0' the CPU has been running for a cycle and
+    -- led_out_cpu takes over, so software LED control behaves exactly as
+    -- if this mux weren't here. LEDs are active-low (see main.c's
+    -- GPIO_LED comment), so each bit is inverted: '0' (lit) once that
+    -- stage has ever been observed, '1' (off) until then. Bit layout:
+    -- LED0=diag_byte_seen, LED1=diag_write_seen,
+    -- LED2=diag_write_acked, LED3=boot_done_latched. Watching these come
+    -- up in order during a real boot shows how far the
+    -- SPI -> boot_loader -> SDRAM chain got, with no instrumentation.
+    gpio_leds <= (not boot_done_latched) & (not diag_write_acked) &
+                 (not diag_write_seen) & (not diag_byte_seen)
+                 when boot_active = '1' else led_out_cpu;
 
     u_gpio_key : entity work.gpio_key
         port map (

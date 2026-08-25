@@ -72,6 +72,7 @@ architecture rtl of MEM_Stage is
 
     signal bus_access : std_logic;
     signal byte_sel   : std_logic_vector(3 downto 0);
+    signal read_data_extracted : std_logic_vector(31 downto 0);
 
 begin
 
@@ -115,6 +116,57 @@ begin
 
     wb_sel_bus_o <= byte_sel;
 
+    -- Load byte/halfword extraction and sign/zero-extension. Mirrors the
+    -- byte_sel process above but for reads: RV32I funct3 encodes both
+    -- the width (bits 1:0: 00=byte, 01=halfword, 10=word) and
+    -- signedness (bit 2: 0=signed, 1=unsigned) for loads. BRAM/the bus
+    -- are word-addressed (mem_addr's low 2 bits are dropped getting
+    -- there), so wb_data_i always holds the full 4-byte-aligned word
+    -- regardless of load width; this is where the requested byte/
+    -- halfword actually gets picked out and extended before it reaches
+    -- the register file. Previously missing entirely -- wb_data_i was
+    -- forwarded unmodified for every load, so a byte/halfword load
+    -- anywhere but lane 0 of its word silently returned that word's
+    -- byte 0 instead of the requested lane. Found via simulation: a
+    -- loop calling uart_putc(*s++) transmitted the low byte of the same
+    -- 4-byte-aligned word repeatedly instead of advancing through it.
+    process (mem_funct3, mem_addr, wb_data_i)
+        variable byte_lane : std_logic_vector(7 downto 0);
+        variable half_lane : std_logic_vector(15 downto 0);
+    begin
+        read_data_extracted <= wb_data_i;
+
+        case mem_funct3 is
+            when "000" | "100" =>  -- LB / LBU
+                case mem_addr(1 downto 0) is
+                    when "00"   => byte_lane := wb_data_i(7 downto 0);
+                    when "01"   => byte_lane := wb_data_i(15 downto 8);
+                    when "10"   => byte_lane := wb_data_i(23 downto 16);
+                    when others => byte_lane := wb_data_i(31 downto 24);
+                end case;
+                if mem_funct3 = "000" then
+                    read_data_extracted <= (31 downto 8 => byte_lane(7)) & byte_lane;  -- LB
+                else
+                    read_data_extracted <= (31 downto 8 => '0') & byte_lane;             -- LBU
+                end if;
+
+            when "001" | "101" =>  -- LH / LHU
+                if mem_addr(1) = '0' then
+                    half_lane := wb_data_i(15 downto 0);
+                else
+                    half_lane := wb_data_i(31 downto 16);
+                end if;
+                if mem_funct3 = "001" then
+                    read_data_extracted <= (31 downto 16 => half_lane(15)) & half_lane; -- LH
+                else
+                    read_data_extracted <= (31 downto 16 => '0') & half_lane;             -- LHU
+                end if;
+
+            when others =>  -- LW ("010"), and anything else: full word
+                read_data_extracted <= wb_data_i;
+        end case;
+    end process;
+
     process (mem_funct3, mem_write_data)
     begin
         case mem_funct3 is
@@ -141,7 +193,7 @@ begin
             flush             => '0',
 
             mem_result_in     => mem_result,
-            mem_read_data_in  => wb_data_i,
+            mem_read_data_in  => read_data_extracted,
             mem_pc_plus4_in   => mem_pc_plus4,
             rd_addr_in        => mem_rd_addr,
 

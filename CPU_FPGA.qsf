@@ -69,6 +69,34 @@ set_location_assignment PIN_128 -to spi_sclk
 set_location_assignment PIN_121 -to spi_mosi
 set_location_assignment PIN_125 -to spi_cs_n
 
+# spi_cs_n idles high (deasserted) but is an INPUT here, and the ESP32
+# does not drive it until a few hundred ms into its own boot -- by which
+# time the FPGA is long out of reset and already sampling the pin. A
+# floating input in that window is what produced one spurious CS falling
+# edge per boot (the FPGA counted 3 assertions for a 2-file transfer).
+# Harmless in itself -- spi_slave only resets an already-empty bit
+# counter while CS is high, and the edge lands before any data -- but a
+# floating input beside actively switching SPI lines is worth
+# terminating. The firmware now also drives this pin at the very top of
+# setup(), which narrows the window but cannot cover the ESP32's own
+# power-up.
+#
+# Honest caveat: this pin also drives a digital-tube segment LED (see
+# the note above), so the internal weak pull-up (~25 kOhm) is working
+# against an LED that clamps at its forward voltage, and may not reach a
+# valid logic high on its own. It costs nothing and cannot hurt -- once
+# the ESP32 drives the pin the pull-up sinks ~130 uA and is irrelevant
+# -- but if this edge ever needs to be genuinely eliminated rather than
+# just made less likely, the real fix is an external pull-up sized
+# against that LED load, not this line.
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to spi_cs_n
+
+# Same reasoning as above (SEG3, passive LED load, verified plain I/O).
+# ESP32 asserts this once done streaming the firmware/WAD over SPI,
+# releasing the FPGA CPU from reset. See rv32im_soc.vhd's boot_done
+# synchronizer/latch and cpu_rst_n.
+set_location_assignment PIN_129 -to boot_done
+
 # ==============================================================================
 # SDRAM Physical Pin Assignments (Cyclone IV EP4CE6E22C8)
 # ==============================================================================
