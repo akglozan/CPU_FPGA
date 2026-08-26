@@ -173,10 +173,46 @@ architecture structural of rv32im_soc is
     -- released the bus back to it. Every other module in this design
     -- keeps using rst_n_sync directly and is unaffected by this.
     signal cpu_rst_n      : std_logic;
-	 
-	 signal pix_clk        : std_logic;   -- 25 MHz, from vga_pll's c0
-	 signal vga_pll_locked : std_logic;   -- unused for now, available once
-														 -- vga_timing_gen's reset needs it
+
+    -- --------------------------------------------------------------
+    -- VGA clock/reset infrastructure (Phase 4.1).
+    --
+    -- vga_pll (ALTPLL) derives a 25 MHz pix_clk from the board's
+    -- 50 MHz clk. pix_clk is a separate clock domain from clk, so its
+    -- reset can't just reuse rst_n_sync directly -- that would be an
+    -- un-synchronized clock-domain crossing, the same class of bug
+    -- this project has already hit (and fixed) for spi_sclk/mosi/
+    -- cs_n/boot_done. Instead, a second rst_sync instance (the same
+    -- reusable synchronizer already used for clk/rst_n_sync above)
+    -- re-synchronizes into the pix_clk domain, fed from rst_n_sync
+    -- ANDed with vga_pll_locked -- so vga_timing_gen stays in reset
+    -- until BOTH the system reset has cleared AND the PLL has
+    -- actually achieved lock (c0 can be unstable/glitchy before
+    -- lock). stretch_bits is much smaller here than the default 16:
+    -- the input is already clean/debounced upstream, so this instance
+    -- only needs to perform the domain crossing itself, not another
+    -- ~1.3 ms mechanical-debounce stretch.
+    -- --------------------------------------------------------------
+    signal pix_clk         : std_logic;  -- 25 MHz, from vga_pll's c0
+    signal vga_pll_locked  : std_logic;
+    signal pix_rst_n_async : std_logic;  -- rst_n_sync AND vga_pll_locked
+    signal pix_rst_n_sync  : std_logic;  -- clean reset, in the pix_clk domain
+
+    -- vga_timing_gen outputs. Not yet consumed by anything -- the
+    -- framebuffer/palette/pixel-output stage (Phase 4.2) and the
+    -- SDRAM line-fetch bus master are what will read these; for now
+    -- the module is instantiated and clocked, but sits unconnected
+    -- to the rest of the design, same as the reserved-but-unwired
+    -- s2_* VGA bus slot below.
+    signal vga_hsync         : std_logic;
+    signal vga_vsync         : std_logic;
+    signal vga_hblank        : std_logic;
+    signal vga_vblank        : std_logic;
+    signal vga_active_region : std_logic;
+    signal vga_pixel_x       : unsigned(9 downto 0);
+    signal vga_pixel_y       : unsigned(9 downto 0);
+    signal vga_line_num      : unsigned(7 downto 0);
+    signal vga_start_fetch   : std_logic;
 
     -- Muxed master signals actually presented to bus_interconnect.
     signal mux_adr         : std_logic_vector(31 downto 0);
@@ -271,9 +307,6 @@ architecture structural of rv32im_soc is
 
     constant rst_stretch_bits : natural :=
         get_rst_stretch_bits(simulation);
-		  
-		  
-		
 
 begin
 
@@ -637,13 +670,58 @@ begin
             rst_n       => rst_n_sync,
             timer_rdata => timer_data
         );
-		  
-		u_vga_pll : entity work.vga_pll
-		 port map (
-			  inclk0 => clk,
-			  areset => not rst_n_sync,
-			  c0     => pix_clk,
-			  locked => vga_pll_locked
-		 );
+
+    -- ------------------------------------------------------------------
+    -- VGA (Phase 4.1): PLL, pix_clk-domain reset, and the timing
+    -- generator itself. See the signal declarations above for the
+    -- reasoning behind the reset synchronization.
+    -- ------------------------------------------------------------------
+
+    -- 50 MHz clk -> 25 MHz pix_clk (CLK0_MULTIPLY_BY=1, CLK0_DIVIDE_BY=2).
+    -- areset is ALTPLL's own reset pin, active-HIGH -- the inverse of
+    -- this project's active-low rst_n_sync convention.
+    u_vga_pll : entity work.vga_pll
+        port map (
+            inclk0 => clk,
+            areset => not rst_n_sync,
+            c0     => pix_clk,
+            locked => vga_pll_locked
+        );
+
+    -- Domain-crossing reset for pix_clk, held until rst_n_sync has
+    -- cleared AND vga_pll has locked. stretch_bits is small: this
+    -- instance only needs to perform the clk -> pix_clk synchronizer
+    -- crossing, not another full mechanical-debounce stretch.
+    pix_rst_n_async <= rst_n_sync and vga_pll_locked;
+
+    u_vga_rst_sync : entity work.rst_sync
+        generic map (
+            stretch_bits => 4
+        )
+        port map (
+            clk         => pix_clk,
+            rst_n_async => pix_rst_n_async,
+            rst_n_sync  => pix_rst_n_sync
+        );
+
+    -- 640x480@60 sync/blanking/letterbox timing generator. Verified
+    -- standalone in sim/tb_vga_timing_gen.vhd; see docs/README.md
+    -- Phase 4 for what's been checked. Outputs are not yet connected
+    -- to anything -- Phase 4.2 (framebuffer, line fetch, pixel output)
+    -- is what will consume them.
+    u_vga_timing_gen : entity work.vga_timing_gen
+        port map (
+            pix_clk       => pix_clk,
+            rst_n         => pix_rst_n_sync,
+            hsync         => vga_hsync,
+            vsync         => vga_vsync,
+            hblank        => vga_hblank,
+            vblank        => vga_vblank,
+            active_region => vga_active_region,
+            pixel_x       => vga_pixel_x,
+            pixel_y       => vga_pixel_y,
+            line_num      => vga_line_num,
+            start_fetch   => vga_start_fetch
+        );
 
 end architecture structural;

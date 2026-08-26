@@ -127,10 +127,15 @@ Phase 5 concern.
 > open), so any access to that range currently hangs until the bus
 > watchdog forces a timeout. 4.1 is done: `vga_pll` (ALTPLL, 50→25 MHz)
 > and `rtl/video/vga_timing_gen.vhd` both exist and compile clean, and
-> `rv32im_soc.vhd` instantiates `vga_pll` and drives an internal
-> `pix_clk` signal from it — but `vga_timing_gen` itself isn't
-> instantiated in `rv32im_soc.vhd` yet, so `pix_clk` currently has no
-> consumer.
+> `rv32im_soc.vhd` instantiates both — `vga_pll` driving `pix_clk`, a
+> second `rst_sync` instance synchronizing reset into that clock
+> domain (held until `vga_pll_locked`), and `vga_timing_gen` clocked
+> from `pix_clk` — but its nine outputs (`vga_hsync`, `vga_line_num`,
+> `vga_start_fetch`, etc.) aren't connected to anything downstream
+> yet. That's 4.2: the line buffer, SDRAM line-fetch bus master, and
+> palette/pixel-output stage sketched out in design discussion still
+> need to be built and wired to these signals and to the `s2_*` slot
+> above.
 - [x] **4.1 Timing Generator**
   - [x] Configure ALTPLL in Quartus II to generate a 25 MHz pixel clock.
     - `vga_pll` (Quartus MegaWizard/IP Catalog, `INTENDED_DEVICE_FAMILY
