@@ -125,12 +125,29 @@ Phase 5 concern.
 > as slave 2 — but no VGA module is wired up to it yet: `rv32im_soc.vhd`
 > still ties the slot off (`s2_ack_i <= '0'`, data/address ports left
 > open), so any access to that range currently hangs until the bus
-> watchdog forces a timeout. `rtl/video/vga_timing_gen.vhd` (640x480@60
-> sync/blanking/letterbox counters) is built and verified standalone in
-> simulation; it isn't instantiated in `rv32im_soc.vhd` yet, and a real
-> 25 MHz pixel clock (ALTPLL) hasn't been generated for it to run from.
-- [ ] **4.1 Timing Generator**
-  - [ ] Configure ALTPLL in Quartus II to generate a 25 MHz pixel clock.
+> watchdog forces a timeout. 4.1 is done: `vga_pll` (ALTPLL, 50→25 MHz)
+> and `rtl/video/vga_timing_gen.vhd` both exist and compile clean, and
+> `rv32im_soc.vhd` instantiates `vga_pll` and drives an internal
+> `pix_clk` signal from it — but `vga_timing_gen` itself isn't
+> instantiated in `rv32im_soc.vhd` yet, so `pix_clk` currently has no
+> consumer.
+- [x] **4.1 Timing Generator**
+  - [x] Configure ALTPLL in Quartus II to generate a 25 MHz pixel clock.
+    - `vga_pll` (Quartus MegaWizard/IP Catalog, `INTENDED_DEVICE_FAMILY
+      = "Cyclone IV E"`): `inclk0` 50 MHz → `c0` 25 MHz
+      (`CLK0_MULTIPLY_BY=1`, `CLK0_DIVIDE_BY=2`), `areset` input and
+      `locked` output both enabled. Instantiated in `rv32im_soc.vhd`
+      as `u_vga_pll`, fed from the existing 50 MHz `clk` and
+      `not rst_n_sync` (converting the project's active-low system
+      reset to ALTPLL's active-high `areset`), driving a new internal
+      `pix_clk` signal. `pix_clk`/`vga_pll_locked` are both currently
+      unused past that point, same as the reserved-but-unconnected
+      `s2_*` bus slot — pending `vga_timing_gen`'s own instantiation.
+    - Hit (and worked around) a confirmed Quartus Prime Lite 25.1
+      bug where the ALTPLL parameter editor renders with overlapping,
+      unreadable text on Windows — documented by Altera at
+      [community.altera.com KB 349903](https://community.altera.com/kb/knowledge-base/why-does-the-text-overlap-in-the-altpll-ip-parameter-editor/349903)
+      with an official patch.
   - [x] Implement 640x480 @ 60 Hz VGA synchronization counters (`HSYNC`, `VSYNC`).
     - `rtl/video/vga_timing_gen.vhd`: single clocked process generating
       `hcnt`/`vcnt`, `hsync`/`vsync` (VESA active-low), `hblank`/`vblank`,

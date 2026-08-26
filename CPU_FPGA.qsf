@@ -7,7 +7,7 @@ set_global_assignment -name FAMILY "Cyclone IV E"
 set_global_assignment -name DEVICE EP4CE6E22C8
 set_global_assignment -name TOP_LEVEL_ENTITY rv32im_soc
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
-set_global_assignment -name LAST_QUARTUS_VERSION "25.1STD.0 LITE EDITION"
+set_global_assignment -name LAST_QUARTUS_VERSION "25.1std.0 SP0.02std Lite Edition"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
@@ -245,4 +245,6 @@ set_global_assignment -name VHDL_FILE rtl/memory/spi_slave.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/boot_loader.vhd
 set_global_assignment -name VHDL_FILE rtl/video/vga_timing_gen.vhd
 set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_vga_timing_gen.vhd
+
+set_global_assignment -name QIP_FILE vga_pll.qip
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

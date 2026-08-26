@@ -79,3 +79,5 @@ vsim -c -l tb_vga_timing_gen_log.txt -do "run -all" tb_vga_timing_gen
 # run -all
 # ** Note: Simulation timeout reached.
 #    Time: 33600110 ns  Iteration: 0  Instance: /tb_vga_timing_gen
+# End time: 06:31:35 on Aug 26,2026, Elapsed time: 0:15:27
+# Errors: 0, Warnings: 0

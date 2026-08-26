@@ -173,6 +173,10 @@ architecture structural of rv32im_soc is
     -- released the bus back to it. Every other module in this design
     -- keeps using rst_n_sync directly and is unaffected by this.
     signal cpu_rst_n      : std_logic;
+	 
+	 signal pix_clk        : std_logic;   -- 25 MHz, from vga_pll's c0
+	 signal vga_pll_locked : std_logic;   -- unused for now, available once
+														 -- vga_timing_gen's reset needs it
 
     -- Muxed master signals actually presented to bus_interconnect.
     signal mux_adr         : std_logic_vector(31 downto 0);
@@ -267,6 +271,9 @@ architecture structural of rv32im_soc is
 
     constant rst_stretch_bits : natural :=
         get_rst_stretch_bits(simulation);
+		  
+		  
+		
 
 begin
 
@@ -630,5 +637,13 @@ begin
             rst_n       => rst_n_sync,
             timer_rdata => timer_data
         );
+		  
+		u_vga_pll : entity work.vga_pll
+		 port map (
+			  inclk0 => clk,
+			  areset => not rst_n_sync,
+			  c0     => pix_clk,
+			  locked => vga_pll_locked
+		 );
 
 end architecture structural;
