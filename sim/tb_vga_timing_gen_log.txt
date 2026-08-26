@@ -1,0 +1,81 @@
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -c -l tb_vga_timing_gen_log.txt -do "run -all" tb_vga_timing_gen 
+# Start time: 06:03:55 on Aug 26,2026
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Note: (vopt-220) 'modelsim.ini' is used as the ini file.
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_vga_timing_gen(sim)#1
+# run -all
+# ** Note: Simulation timeout reached.
+#    Time: 33600100 ns  Iteration: 0  Instance: /tb_vga_timing_gen
+# ** Error: active_region_count error
+#    Time: 33600100 ns  Iteration: 1  Instance: /tb_vga_timing_gen
+# ** Error: total_cycle_count error: got 839999, expected 840000
+#    Time: 33600100 ns  Iteration: 1  Instance: /tb_vga_timing_gen
+vcom -2008 tb_vga_timing_gen.vhd
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 06:09:21 on Aug 26,2026
+# vcom -reportprogress 300 -2008 tb_vga_timing_gen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_vga_timing_gen
+# -- Compiling architecture sim of tb_vga_timing_gen
+# -- Loading entity vga_timing_gen
+# End time: 06:09:21 on Aug 26,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vsim -c -l tb_vga_timing_gen_log.txt -do "run -all" tb_vga_timing_gen
+# End time: 06:09:30 on Aug 26,2026, Elapsed time: 0:05:35
+# Errors: 2, Warnings: 0
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -c -l tb_vga_timing_gen_log.txt -do "run -all" tb_vga_timing_gen 
+# Start time: 06:09:31 on Aug 26,2026
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Note: (vopt-220) 'modelsim.ini' is used as the ini file.
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_vga_timing_gen(sim)#1
+# run -all
+# ** Note: Simulation timeout reached.
+#    Time: 33600100 ns  Iteration: 0  Instance: /tb_vga_timing_gen
+# ** Error: active_region_count error: got 640000, expected 800
+#    Time: 33600100 ns  Iteration: 1  Instance: /tb_vga_timing_gen
+# ** Error: total_cycle_count error: got 839999, expected 840000
+#    Time: 33600100 ns  Iteration: 1  Instance: /tb_vga_timing_gen
+vcom -2008 tb_vga_timing_gen.vhd
+# Questa Altera Starter FPGA Edition-64 vcom 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 06:16:02 on Aug 26,2026
+# vcom -reportprogress 300 -2008 tb_vga_timing_gen.vhd 
+# ** Note: (vcom-220) 'modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_vga_timing_gen
+# -- Compiling architecture sim of tb_vga_timing_gen
+# -- Loading entity vga_timing_gen
+# End time: 06:16:03 on Aug 26,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+vsim -c -l tb_vga_timing_gen_log.txt -do "run -all" tb_vga_timing_gen
+# End time: 06:16:07 on Aug 26,2026, Elapsed time: 0:06:36
+# Errors: 2, Warnings: 0
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -c -l tb_vga_timing_gen_log.txt -do "run -all" tb_vga_timing_gen 
+# Start time: 06:16:08 on Aug 26,2026
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Note: (vopt-220) 'modelsim.ini' is used as the ini file.
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_vga_timing_gen(sim)#1
+# run -all
+# ** Note: Simulation timeout reached.
+#    Time: 33600110 ns  Iteration: 0  Instance: /tb_vga_timing_gen

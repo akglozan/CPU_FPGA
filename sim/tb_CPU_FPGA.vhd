@@ -94,12 +94,12 @@ begin
     -------------------------------------------------------------------
     stim_process : process
     begin
-        -- Assert Active-High Reset
-        rst_n <= '1';
+        -- Assert Active-Low Reset
+        rst_n <= '0';
         wait for 100 ns;
         
         -- De-assert Reset
-        rst_n <= '0';
+        rst_n <= '1';
         
         -- Execution timeout threshold
         wait for 10000 ns;

@@ -214,7 +214,6 @@ set_global_assignment -name VHDL_FILE rtl/peripherals/timer.vhd
 set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_CPU_FPGA.vhd
 set_global_assignment -name VHDL_TEST_BENCH_FILE sim/ImmGen_tb.vhd
 set_global_assignment -name VHDL_TEST_BENCH_FILE sim/ALU_tb.vhd
-set_global_assignment -name VHDL_TEST_BENCH_FILE sim/M_Extension_Unit_tb.vhd
 set_global_assignment -name SDC_FILE CPU_FPGA.sdc
 set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_rv32im_soc.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/sdram_controller.vhd
@@ -244,4 +243,6 @@ set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 
 set_global_assignment -name VHDL_FILE rtl/memory/spi_slave.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/boot_loader.vhd
+set_global_assignment -name VHDL_FILE rtl/video/vga_timing_gen.vhd
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_vga_timing_gen.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

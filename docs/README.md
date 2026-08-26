@@ -120,14 +120,32 @@ Phase 5 concern.
 ---
 
 ### Phase 4: VGA Framebuffer Engine
-> **Status:** Not started. The bus already reserves address space for it —
+> **Status:** In progress. The bus already reserves address space for it —
 > `bus_interconnect.vhd` decodes `0xC000_0000`–`0xC007_FFFF` (512 KB window)
-> as slave 2 — but no VGA module exists yet: `rv32im_soc.vhd` ties the slot
-> off (`s2_ack_i <= '0'`, data/address ports left open), so any access to
-> that range currently hangs until the bus watchdog forces a timeout.
+> as slave 2 — but no VGA module is wired up to it yet: `rv32im_soc.vhd`
+> still ties the slot off (`s2_ack_i <= '0'`, data/address ports left
+> open), so any access to that range currently hangs until the bus
+> watchdog forces a timeout. `rtl/video/vga_timing_gen.vhd` (640x480@60
+> sync/blanking/letterbox counters) is built and verified standalone in
+> simulation; it isn't instantiated in `rv32im_soc.vhd` yet, and a real
+> 25 MHz pixel clock (ALTPLL) hasn't been generated for it to run from.
 - [ ] **4.1 Timing Generator**
   - [ ] Configure ALTPLL in Quartus II to generate a 25 MHz pixel clock.
-  - [ ] Implement 640x480 @ 60 Hz VGA synchronization counters (`HSYNC`, `VSYNC`).
+  - [x] Implement 640x480 @ 60 Hz VGA synchronization counters (`HSYNC`, `VSYNC`).
+    - `rtl/video/vga_timing_gen.vhd`: single clocked process generating
+      `hcnt`/`vcnt`, `hsync`/`vsync` (VESA active-low), `hblank`/`vblank`,
+      `pixel_x`/`pixel_y`, and the 320x200-source-to-640x480-output
+      mapping (`active_region`, `line_num`, `start_fetch`) for the
+      letterboxed 2x pixel-doubled framebuffer described in 4.2.
+    - Verified standalone (no bus, no other modules) in
+      `sim/tb_vga_timing_gen.vhd` over two full simulated frames:
+      `start_fetch` fires exactly 400 times (200/frame, once per source
+      line — not per doubled output line); `line_num` sequences 0..199
+      in order each frame with no skips/repeats; `active_region` is high
+      for exactly 640,000 of the 840,000 total cycles (400 active lines
+      x 800 cycles/line x 2 frames — it's a whole-line flag, not gated
+      by `hblank`); total elapsed cycles match `H_TOTAL * V_TOTAL * 2`
+      exactly, confirming no drift in the counter wrap logic.
 - [ ] **4.2 Framebuffer & Palette Conversion**
   - [ ] Reserve a 320x200 pixel region within SDRAM.
   - [ ] Implement $2 \times 2$ pixel-doubling logic for 640x480 output.
