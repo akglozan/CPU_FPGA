@@ -4,6 +4,11 @@
 --   outdata_reg_a / outdata_reg_b selectable,
 --   BIDIR_DUAL_PORT, byte enables on port B, read-old-data.
 -- Includes a write monitor that flags any write into the code region.
+--
+-- Also supports operation_mode = "DUAL_PORT" (simple dual port: port A
+-- write-only on clock0, port B read-only on clock1), added for Phase
+-- 4.2's vga_line_buffer.vhd -- see that file's header for why it
+-- instantiates altsyncram directly rather than relying on inference.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -34,6 +39,10 @@ package altera_mf_components is
         );
         port (
             clock0    : in  std_logic;
+            -- COMPONENT. Only used when operation_mode = "DUAL_PORT" (port B is
+            -- then a read port in its own clock domain). Defaulted so
+            -- single-clock BIDIR_DUAL_PORT users need not connect it.
+            clock1    : in  std_logic := '0';
             address_a : in  std_logic_vector(widthad_a - 1 downto 0);
             data_a    : in  std_logic_vector(width_a - 1 downto 0);
             wren_a    : in  std_logic := '0';
@@ -77,6 +86,10 @@ entity altsyncram is
     );
     port (
         clock0    : in  std_logic;
+        -- Only used when operation_mode = "DUAL_PORT" (port B is then a
+        -- read port in its own clock domain). Defaulted so single-clock
+        -- BIDIR_DUAL_PORT users need not connect it.
+        clock1    : in  std_logic := '0';
         address_a : in  std_logic_vector(widthad_a - 1 downto 0);
         data_a    : in  std_logic_vector(width_a - 1 downto 0);
         wren_a    : in  std_logic := '0';
@@ -205,50 +218,205 @@ architecture sim of altsyncram is
 
 begin
 
-    process (clock0)
+    -- Sensitive to BOTH clocks, and mem is driven from this one process
+    -- only, so the two operation modes can share the array without a
+    -- multiple-driver conflict. In BIDIR_DUAL_PORT (bram_4kb's use)
+    -- clock1 is never connected and never rises, so the clock1 branch
+    -- below is simply dead -- that mode's behaviour is byte-for-byte
+    -- what it was before DUAL_PORT support was added.
+    process (clock0, clock1)
         variable ia, ib : natural;
         variable w      : std_logic_vector(width_a - 1 downto 0);
     begin
         if rising_edge(clock0) then
             ia := to_integer(unsigned(address_a));
-            ib := to_integer(unsigned(address_b));
 
             -- Read old data (address register + array read).
             q_a_core <= mem(ia);
-            q_b_core <= mem(ib);
+            q_a_reg  <= q_a_core;
 
-            -- Optional output register stage.
-            q_a_reg <= q_a_core;
-            q_b_reg <= q_b_core;
+            if operation_mode = "DUAL_PORT" then
+                -- Simple dual port: port A is write-only, port B is
+                -- read-only and lives on clock1 (see below). No byte
+                -- enables, no write monitor -- that monitor is specific
+                -- to bram_4kb's code region, not to memories in general.
+                if wren_a = '1' then
+                    mem(ia) <= data_a;
+                end if;
+            else
+                ib := to_integer(unsigned(address_b));
+                q_b_core <= mem(ib);
+                q_b_reg  <= q_b_core;
 
-            if wren_b = '1' then
-                w := mem(ib);
-                for byte in 0 to width_byteena_b - 1 loop
-                    if byteena_b(byte) = '1' then
-                        w(byte * 8 + 7 downto byte * 8) :=
-                            data_b(byte * 8 + 7 downto byte * 8);
+                if wren_b = '1' then
+                    w := mem(ib);
+                    for byte in 0 to width_byteena_b - 1 loop
+                        if byteena_b(byte) = '1' then
+                            w(byte * 8 + 7 downto byte * 8) :=
+                                data_b(byte * 8 + 7 downto byte * 8);
+                        end if;
+                    end loop;
+                    mem(ib) <= w;
+
+                    if ib <= code_top then
+                        report "*** UNEXPECTED BRAM WRITE *** word " &
+                               integer'image(ib) &
+                               " (byte addr " & integer'image(ib * 4) &
+                               ")  old=" & to_string(mem(ib)) &
+                               "  new=" & to_string(w) &
+                               "  byteena=" & to_string(byteena_b)
+                               severity warning;
                     end if;
-                end loop;
-                mem(ib) <= w;
+                end if;
 
-                if ib <= code_top then
-                    report "*** UNEXPECTED BRAM WRITE *** word " &
-                           integer'image(ib) &
-                           " (byte addr " & integer'image(ib * 4) &
-                           ")  old=" & to_string(mem(ib)) &
-                           "  new=" & to_string(w) &
-                           "  byteena=" & to_string(byteena_b)
-                           severity warning;
+                if wren_a = '1' then
+                    report "*** PORT-A WRITE (should never happen) ***" severity warning;
                 end if;
             end if;
+        end if;
 
-            if wren_a = '1' then
-                report "*** PORT-A WRITE (should never happen) ***" severity warning;
+        -- DUAL_PORT read port, in its own clock domain.
+        if operation_mode = "DUAL_PORT" then
+            if rising_edge(clock1) then
+                ib := to_integer(unsigned(address_b));
+                q_b_core <= mem(ib);
+                q_b_reg  <= q_b_core;
             end if;
         end if;
     end process;
 
     q_a <= q_a_reg when outdata_reg_a = "CLOCK0" else q_a_core;
     q_b <= q_b_reg when outdata_reg_b = "CLOCK0" else q_b_core;
+
+end architecture sim;
+
+-------------------------------------------------------------------------------
+-- Minimal simulation-only stand-in for Altera's altpll, added for Phase
+-- 4.2 -- vga_pll.vhd (the wizard-generated ALTPLL wrapper for the 50->25
+-- MHz VGA pixel clock) instantiates a component named "altpll" from this
+-- same library, and nothing previously provided a matching entity, so no
+-- testbench that elaborates the full rv32im_soc top level (which
+-- instantiates vga_pll) could actually run under GHDL. Frequency
+-- behaviour is generic, not hardcoded to 50/25 MHz: it measures inclk(0)'s
+-- real period from two observed edges, then free-runs clk(0) scaled by
+-- clk0_divide_by/clk0_multiply_by -- the same relationship a real ALTPLL
+-- implements, just derived at runtime instead of needing an exact
+-- structural PLL model. locked follows areset with a fixed 1 us stand-in
+-- lock time (real lock time is on the order of tens of microseconds;
+-- exact value doesn't matter for any consumer in this design, which only
+-- waits for locked to go high once, via rst_sync).
+-------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity altpll is
+    generic (
+        bandwidth_type              : string  := "AUTO";
+        clk0_divide_by               : natural := 1;
+        clk0_duty_cycle              : natural := 50;
+        clk0_multiply_by             : natural := 1;
+        clk0_phase_shift             : string  := "0";
+        compensate_clock             : string  := "CLK0";
+        inclk0_input_frequency       : natural := 0;
+        intended_device_family       : string  := "";
+        lpm_hint                     : string  := "";
+        lpm_type                     : string  := "altpll";
+        operation_mode               : string  := "NORMAL";
+        pll_type                     : string  := "AUTO";
+        port_activeclock             : string  := "PORT_UNUSED";
+        port_areset                  : string  := "PORT_UNUSED";
+        port_clkbad0                 : string  := "PORT_UNUSED";
+        port_clkbad1                 : string  := "PORT_UNUSED";
+        port_clkloss                 : string  := "PORT_UNUSED";
+        port_clkswitch               : string  := "PORT_UNUSED";
+        port_configupdate            : string  := "PORT_UNUSED";
+        port_fbin                    : string  := "PORT_UNUSED";
+        port_inclk0                  : string  := "PORT_USED";
+        port_inclk1                  : string  := "PORT_UNUSED";
+        port_locked                  : string  := "PORT_UNUSED";
+        port_pfdena                  : string  := "PORT_UNUSED";
+        port_phasecounterselect      : string  := "PORT_UNUSED";
+        port_phasedone               : string  := "PORT_UNUSED";
+        port_phasestep               : string  := "PORT_UNUSED";
+        port_phaseupdown             : string  := "PORT_UNUSED";
+        port_pllena                  : string  := "PORT_UNUSED";
+        port_scanaclr                : string  := "PORT_UNUSED";
+        port_scanclk                 : string  := "PORT_UNUSED";
+        port_scanclkena              : string  := "PORT_UNUSED";
+        port_scandata                : string  := "PORT_UNUSED";
+        port_scandataout             : string  := "PORT_UNUSED";
+        port_scandone                : string  := "PORT_UNUSED";
+        port_scanread                : string  := "PORT_UNUSED";
+        port_scanwrite                : string  := "PORT_UNUSED";
+        port_clk0                    : string  := "PORT_USED";
+        port_clk1                    : string  := "PORT_UNUSED";
+        port_clk2                    : string  := "PORT_UNUSED";
+        port_clk3                    : string  := "PORT_UNUSED";
+        port_clk4                    : string  := "PORT_UNUSED";
+        port_clk5                    : string  := "PORT_UNUSED";
+        port_clkena0                 : string  := "PORT_UNUSED";
+        port_clkena1                 : string  := "PORT_UNUSED";
+        port_clkena2                 : string  := "PORT_UNUSED";
+        port_clkena3                 : string  := "PORT_UNUSED";
+        port_clkena4                 : string  := "PORT_UNUSED";
+        port_clkena5                 : string  := "PORT_UNUSED";
+        port_extclk0                 : string  := "PORT_UNUSED";
+        port_extclk1                 : string  := "PORT_UNUSED";
+        port_extclk2                 : string  := "PORT_UNUSED";
+        port_extclk3                 : string  := "PORT_UNUSED";
+        self_reset_on_loss_lock      : string  := "OFF";
+        width_clock                  : natural := 5
+    );
+    port (
+        areset : in  std_logic := '0';
+        inclk  : in  std_logic_vector(1 downto 0) := (others => '0');
+        clk    : out std_logic_vector(4 downto 0);
+        locked : out std_logic
+    );
+end entity altpll;
+
+architecture sim of altpll is
+    signal c0_int     : std_logic := '0';
+    signal locked_int : std_logic := '0';
+begin
+
+    clk(0)          <= c0_int;
+    clk(4 downto 1) <= (others => '0');
+    locked          <= locked_int;
+
+    gen_clk : process
+        variable t_prev    : time := 0 ns;
+        variable t_now     : time;
+        variable in_period : time;
+        variable half_out  : time;
+    begin
+        -- Measure inclk(0)'s real period from two consecutive edges
+        -- (it free-runs regardless of areset, same as real hardware's
+        -- reference input), then derive the scaled output half-period.
+        wait until rising_edge(inclk(0));
+        t_prev := now;
+        wait until rising_edge(inclk(0));
+        t_now  := now;
+        in_period := t_now - t_prev;
+        half_out  := (in_period * clk0_divide_by) / clk0_multiply_by / 2;
+
+        loop
+            if areset = '1' then
+                c0_int <= '0';
+                wait until areset = '0';
+            end if;
+            c0_int <= not c0_int;
+            wait for half_out;
+        end loop;
+    end process;
+
+    lock_proc : process
+    begin
+        locked_int <= '0';
+        wait until areset = '0';
+        wait for 1 us;
+        locked_int <= '1';
+        wait until areset = '1';
+    end process;
 
 end architecture sim;

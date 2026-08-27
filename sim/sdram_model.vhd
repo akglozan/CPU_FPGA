@@ -94,12 +94,47 @@ architecture sim of sdram_model is
     signal active_row   : row_array := (others => (others => '0'));
     signal bank_active  : std_logic_vector(3 downto 0) := (others => '0');
 
-    -- CAS Latency 2 Read Pipeline
-    signal read_valid_0 : std_logic := '0';
-    signal read_valid_1 : std_logic := '0';
-    signal read_valid_2 : std_logic := '0';
-    signal word0_reg    : std_logic_vector(15 downto 0) := (others => '0');
-    signal word1_reg    : std_logic_vector(15 downto 0) := (others => '0');
+    -- ------------------------------------------------------------------
+    -- MODE REGISTER (honoured since 2026-08-27)
+    --
+    -- This model used to treat LOAD MODE REGISTER as a no-op that merely
+    -- timestamped itself for the tMRD check, with burst length 2 and CAS
+    -- latency 2 HARDCODED into a fixed three-stage pipeline. That made a
+    -- whole class of bug structurally invisible: if the controller ever
+    -- programmed the wrong burst length, or the LOAD MODE REGISTER command
+    -- failed to land at all, every testbench would still pass while real
+    -- hardware returned one good beat followed by a floating bus for the
+    -- second. That is precisely the failure mode described in the COLUMN
+    -- WIDTH note above -- a model that shares the design's own assumption
+    -- cannot fail on it.
+    --
+    -- The register is now decoded and enforced, so burst length, burst
+    -- type and CAS latency all come from what the controller actually
+    -- programmed, and a READ/WRITE issued before any LOAD MODE REGISTER
+    -- is a hard error rather than silently working.
+    --
+    -- Field layout (JEDEC SDR, A11..A0):
+    --   A2..A0  burst length   000=1 001=2 010=4 011=8 111=full page
+    --   A3      burst type     0=sequential 1=interleaved
+    --   A6..A4  CAS latency    010=2 011=3
+    --   A8..A7  operating mode 00=standard
+    --   A9      write burst    0=same length as read 1=single location
+    -- ------------------------------------------------------------------
+    signal mr_loaded    : std_logic := '0';
+    signal mr_burst_len : natural   := 0;
+    signal mr_interleav : std_logic := '0';
+    signal mr_cas_lat   : natural   := 0;
+    signal mr_wr_single : std_logic := '0';
+
+    -- Read data pipeline. Deep enough for the worst legal combination
+    -- (CAS 3 + burst 8) with slack. Slot 0 is what DQ drives during the
+    -- current cycle, and every rising edge shifts the whole thing down by
+    -- one. A READ schedules its beat k into slot CL-1+k, so beat k becomes
+    -- sampleable exactly CL+k edges after the command was captured.
+    constant PIPE_DEPTH : natural := 12;
+    type dq_pipe_t is array (0 to PIPE_DEPTH) of std_logic_vector(15 downto 0);
+    signal dq_pipe   : dq_pipe_t := (others => (others => '0'));
+    signal dq_pipe_v : std_logic_vector(0 to PIPE_DEPTH) := (others => '0');
 
     -- Timing checks. A real part silently corrupts data when command
     -- spacing is violated; here we say so instead. NEVER_YET is far
@@ -112,9 +147,13 @@ architecture sim of sdram_model is
     signal t_write_beat  : cycle_array := (others => NEVER_YET);
     signal t_lmr         : integer := NEVER_YET;
 
-    -- Burst Write Tracking
-    signal write_active : std_logic := '0';
-    signal write_cell1  : integer range 0 to N_BANKS * SIM_ROWS * N_COLS - 1 := 0;
+    -- Burst write tracking: beats after the first, which lands on the same
+    -- edge as the WRITE command itself (write latency 0).
+    signal wr_active : std_logic := '0';
+    signal wr_beat   : natural   := 0;
+    signal wr_len    : natural   := 0;
+    signal wr_bank   : integer range 0 to 3 := 0;
+    signal wr_col0   : integer range 0 to N_COLS - 1 := 0;
 
     -- Storage index for one {bank, open row, column} triple.
     function cell_index (
@@ -127,12 +166,38 @@ architecture sim of sdram_model is
                * N_COLS + col;
     end function;
 
+    -- Column visited by beat k of a burst that started at column c.
+    -- A burst never leaves its own naturally-aligned block of bl columns:
+    -- sequential mode counts up and wraps inside the block, interleaved
+    -- mode XORs the beat index in. This is why a burst can never cross a
+    -- row boundary regardless of where it starts.
+    function burst_col (
+        c          : integer;
+        k          : integer;
+        bl         : integer;
+        interleave : std_logic
+    ) return integer is
+        variable blk : integer;
+    begin
+        if bl <= 1 then
+            return c;
+        end if;
+        if interleave = '1' then
+            return (c / bl) * bl +
+                   (to_integer(to_unsigned(c mod bl, 8) xor
+                               to_unsigned(k, 8)) mod bl);
+        end if;
+        blk := (c / bl) * bl;
+        return blk + (((c - blk) + k) mod bl);
+    end function;
+
 begin
 
-    -- Tri-state buffer for DQ (delayed by 1 clock to match CAS 2)
-    dq <= word0_reg when (read_valid_1 = '1') else
-          word1_reg when (read_valid_2 = '1') else
-          (others => 'Z');
+    -- Tri-state buffer for DQ. Driven only while the read pipeline has a
+    -- scheduled beat in slot 0; at every other moment the model releases
+    -- the bus, so a controller that samples outside its burst window sees
+    -- 'Z' here and reads a floating bus on hardware.
+    dq <= dq_pipe(0) when dq_pipe_v(0) = '1' else (others => 'Z');
 
     process(clk)
         variable cmd       : std_logic_vector(3 downto 0);
@@ -164,21 +229,33 @@ begin
                 cmd      := cs_n & ras_n & cas_n & we_n;
                 bank_idx := to_integer(unsigned(ba));
 
-                -- Shift read valid pipeline
-                read_valid_2 <= read_valid_1;
-                read_valid_1 <= read_valid_0;
-                read_valid_0 <= '0';
+                -- Shift the read data pipeline down by one slot. A READ
+                -- handled later in this same process overrides the slots
+                -- it schedules into, so ordering here is safe.
+                for s in 0 to PIPE_DEPTH - 1 loop
+                    dq_pipe(s)   <= dq_pipe(s + 1);
+                    dq_pipe_v(s) <= dq_pipe_v(s + 1);
+                end loop;
+                dq_pipe(PIPE_DEPTH)   <= (others => '0');
+                dq_pipe_v(PIPE_DEPTH) <= '0';
 
-                -- Execute Cycle 2 of Burst Write
-                if write_active = '1' then
+                -- Remaining beats of a burst write.
+                if wr_active = '1' then
+                    cell1 := cell_index(wr_bank, active_row(wr_bank),
+                                        burst_col(wr_col0, wr_beat, wr_len,
+                                                  mr_interleav));
                     if dqm(0) = '0' then
-                        ram_block(write_cell1)(7 downto 0) <= dq(7 downto 0);
+                        ram_block(cell1)(7 downto 0) <= dq(7 downto 0);
                     end if;
                     if dqm(1) = '0' then
-                        ram_block(write_cell1)(15 downto 8) <= dq(15 downto 8);
+                        ram_block(cell1)(15 downto 8) <= dq(15 downto 8);
                     end if;
-                    write_active <= '0';
-                    t_write_beat(bank_idx) <= now_ck;
+                    t_write_beat(wr_bank) <= now_ck;
+                    if wr_beat >= wr_len - 1 then
+                        wr_active <= '0';
+                    else
+                        wr_beat <= wr_beat + 1;
+                    end if;
                 end if;
 
                 case cmd is
@@ -222,38 +299,99 @@ begin
                         check_gap("tRCD (ACTIVE->READ/WRITE)", t_active(bank_idx), tRCD_CK, bank_idx);
                         check_gap("tMRD (LOAD_MR->command)",   t_lmr,              tMRD_CK, bank_idx);
 
+                        -- The burst length and CAS latency used from here
+                        -- on are whatever LOAD MODE REGISTER actually
+                        -- programmed -- not an assumption baked into this
+                        -- model. Accessing the array before the mode
+                        -- register has been written is undefined on a real
+                        -- part, so refuse to invent behaviour for it.
+                        assert mr_loaded = '1'
+                            report "sdram_model: READ/WRITE issued before " &
+                                   "any LOAD MODE REGISTER -- burst length " &
+                                   "and CAS latency are undefined"
+                            severity failure;
+
                         -- addr(8) is deliberately NOT read: on a 256-column
                         -- part it is not a column bit, and dropping it here
                         -- is what makes a 9-bit-column controller alias in
                         -- simulation exactly as it does on hardware.
                         col_v := addr(7 downto 0);
                         col0  := to_integer(unsigned(col_v));
-                        -- BL=2 sequential wraps inside the 2-word block,
-                        -- so the second beat is the column with bit 0
-                        -- flipped. It can never cross a row boundary.
-                        col1  := to_integer(unsigned(col_v xor "00000001"));
-
-                        cell0 := cell_index(bank_idx, active_row(bank_idx), col0);
-                        cell1 := cell_index(bank_idx, active_row(bank_idx), col1);
 
                         if cmd = "0101" then      -- READ
-                            word0_reg    <= ram_block(cell0);
-                            word1_reg    <= ram_block(cell1);
-                            read_valid_0 <= '1';  -- data on pins at CAS edge 2
-                        else                      -- WRITE, beat 1
+                            -- Schedule every beat the programmed burst
+                            -- length calls for. Beat k is driven CL-1+k
+                            -- slots out, so the controller can sample it
+                            -- CL+k edges after this command.
+                            for k in 0 to mr_burst_len - 1 loop
+                                cell1 := cell_index(
+                                    bank_idx, active_row(bank_idx),
+                                    burst_col(col0, k, mr_burst_len,
+                                              mr_interleav));
+                                dq_pipe(mr_cas_lat - 1 + k)   <= ram_block(cell1);
+                                dq_pipe_v(mr_cas_lat - 1 + k) <= '1';
+                            end loop;
+                        else                      -- WRITE, first beat
+                            cell0 := cell_index(bank_idx,
+                                                active_row(bank_idx), col0);
                             if dqm(0) = '0' then
                                 ram_block(cell0)(7 downto 0) <= dq(7 downto 0);
                             end if;
                             if dqm(1) = '0' then
                                 ram_block(cell0)(15 downto 8) <= dq(15 downto 8);
                             end if;
-                            write_active        <= '1';
-                            write_cell1         <= cell1;
                             t_write_beat(bank_idx) <= now_ck;
+
+                            -- A9=1 in the mode register makes writes
+                            -- single-location regardless of burst length.
+                            if mr_wr_single = '0' and mr_burst_len > 1 then
+                                wr_active <= '1';
+                                wr_beat   <= 1;
+                                wr_len    <= mr_burst_len;
+                                wr_bank   <= bank_idx;
+                                wr_col0   <= col0;
+                            end if;
                         end if;
 
                     when "0000" => -- LOAD MODE REGISTER
-                        t_lmr <= now_ck;
+                        t_lmr     <= now_ck;
+                        mr_loaded <= '1';
+
+                        case addr(2 downto 0) is
+                            when "000"  => mr_burst_len <= 1;
+                            when "001"  => mr_burst_len <= 2;
+                            when "010"  => mr_burst_len <= 4;
+                            when "011"  => mr_burst_len <= 8;
+                            when others =>
+                                report "sdram_model: unsupported burst " &
+                                       "length field A2..A0 in mode register"
+                                       severity failure;
+                        end case;
+
+                        case addr(6 downto 4) is
+                            when "010"  => mr_cas_lat <= 2;
+                            when "011"  => mr_cas_lat <= 3;
+                            when others =>
+                                report "sdram_model: unsupported CAS " &
+                                       "latency field A6..A4 in mode register"
+                                       severity failure;
+                        end case;
+
+                        assert addr(8 downto 7) = "00"
+                            report "sdram_model: mode register operating " &
+                                   "mode A8..A7 must be 00"
+                            severity failure;
+
+                        mr_interleav <= addr(3);
+                        mr_wr_single <= addr(9);
+
+                        report "sdram_model: mode register loaded -- " &
+                               "BL field=" & integer'image(
+                                   to_integer(unsigned(addr(2 downto 0)))) &
+                               " CL field=" & integer'image(
+                                   to_integer(unsigned(addr(6 downto 4)))) &
+                               " burst type=" & std_logic'image(addr(3))
+                               severity note;
 
                     when others =>
                         null;

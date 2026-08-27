@@ -22,6 +22,79 @@
 -- correctly. See docs/notes/bringup_bug_report_2026-08-23.txt for the full
 -- investigation.
 --
+-- NOTE ON BURST ALIGNMENT (resolved 2026-08-27) -- the actual root cause
+-- of the "80 vertical stripes" / corrupted-framebuffer bug.
+--
+-- This controller used to derive the column straight from
+-- latched_adr(8 downto 1), justified by the claim in the ADDRESS MAPPING
+-- note below that "bus addresses are 32-bit aligned (adr(1 downto 0) =
+-- 00), so the starting column is always even and the burst never wraps".
+-- That claim is FALSE. rtl/core/MEM_Stage.vhd drives the full byte
+-- address onto the bus -- "wb_addr_o <= mem_addr", with no alignment
+-- masking -- and selects the lane with wb_sel instead. So every byte or
+-- halfword access to an odd halfword (adr(1) = '1') presented an ODD
+-- start column.
+--
+-- With BL=2 sequential, a burst starting on an odd column wraps backwards
+-- inside its own 2-column block: it visits col, then col-1. The two beats
+-- come out SWAPPED. For a store that means beat 2's DQM-selected byte --
+-- meant for the upper halfword -- lands on the LOWER one, overwriting the
+-- data a previous store just put there; the upper halfword is never
+-- written at all and keeps whatever was in DRAM before.
+--
+-- On hardware that produced a framebuffer where every word read back as
+-- {stale, 0xBBBB}: the 0xBB bytes destined for bytes 2..3 had clobbered
+-- bytes 0..1, and bytes 2..3 still held leftover DOOM1.WAD payload. The
+-- giveaway was that the "garbage" half was byte-identical across two runs
+-- with completely different fill patterns -- it was never written, so it
+-- could not change. Word-sized accesses (wb_sel = "1111", adr(1..0) =
+-- "00") were always immune, which is why the ESP32 boot DMA loaded
+-- FIRMWARE.BIN and DOOM1.WAD perfectly and WAD[0] read back as "IWAD"
+-- throughout, and why this looked for a long time like a read-path fault
+-- specific to vga_line_fetch.
+--
+-- Fix: force adr(1) to '0' when forming the column, so the burst always
+-- starts on an even column and beat 1 / beat 2 map to the low / high
+-- halfword unconditionally. The existing DQM mapping (sel(1 downto 0) on
+-- beat 1, sel(3 downto 2) on beat 2) is then correct by construction for
+-- every access size. Word accesses are bit-for-bit unaffected.
+--
+-- Missed by every testbench because tb_sdram.vhd only ever drove
+-- wb_sel = "1111" word accesses. sim/ghdl/tb_vga_sdram.vhd now fills
+-- through byte stores and fails without this fix.
+--
+-- NOTE ON READ CAPTURE ALIGNMENT (2026-08-27): READ_CAS_WAIT is the
+-- number of cycles ST_READ_WAIT burns between issuing READ and sampling
+-- burst beat 1 in ST_READ_DATA. Simulation wants 1; real hardware wants
+-- 0, and the difference is not a bug in either -- it is a genuine
+-- one-cycle difference in round-trip latency that the behavioural model
+-- cannot reproduce.
+--
+-- sim/sdram_model.vhd captures a command at the rising edge AFTER the
+-- controller registers it onto the pins, because both sides share one
+-- ideal zero-delay clock signal. The real chip is clocked by a
+-- FORWARDED copy of clk on SD_CLK, which arrives at the chip at
+-- essentially the same instant the FPGA launches the command -- so the
+-- chip captures it a full cycle earlier in relative terms, and its data
+-- comes back one cycle sooner than the model's does. Sampling at the
+-- model's alignment therefore lands one cycle late on hardware.
+--
+-- Evidence (hardware, 2026-08-27): with the framebuffer filled so that
+-- burst beat 1 = 0xAAAA and beat 2 = 0xBBBB, every 32-bit read returned
+-- 0x????BBBB -- beat 2's data sitting in beat 1's half, with the high
+-- half sampling a bus the chip had already stopped driving. A full
+-- 64,000-byte readback reported exactly 32,000 bad bytes, all of them
+-- the two low bytes of each word and none of the two high bytes: the
+-- fingerprint of every read returning the upper halfword.
+--
+-- This had been invisible for four rounds of hardware debugging because
+-- the diagnostic filled memory uniformly with 0x01, making beat 1 and
+-- beat 2 byte-identical -- a one-cycle-late capture reads back perfect
+-- against a uniform pattern. It also made the fault look specific to
+-- vga_line_fetch's access pattern when in fact the CPU's own reads were
+-- corrupted identically the whole time. Do not re-verify this path with
+-- a uniform fill.
+--
 -- NOTE ON ADDRESS MAPPING (resolved 2026-08-25): the fitted chip is a
 -- Winbond W9864G6KH-6 -- 64 Mbit organised 4M x 16, i.e. 4 banks x 4096
 -- rows x 256 columns. 256 columns means the column address is only 8
@@ -65,7 +138,13 @@ use IEEE.NUMERIC_STD.ALL;
 entity sdram_controller is
     generic (
         CLK_FREQ_MHZ : integer := 50;   -- System Clock Frequency in MHz
-        SIMULATION   : boolean := false -- Set to true for fast simulation boot
+        SIMULATION   : boolean := false; -- Set to true for fast simulation boot
+
+        -- Cycles spent in ST_READ_WAIT between issuing READ and sampling
+        -- burst beat 1. See NOTE ON READ CAPTURE ALIGNMENT above for why
+        -- this is a generic rather than a constant, and why simulation
+        -- and hardware legitimately want different values (1 and 0).
+        READ_CAS_WAIT : natural := 1
     );
     port (
         clk           : in    std_logic;
@@ -144,6 +223,17 @@ architecture rtl of sdram_controller is
     signal latched_wdata    : std_logic_vector(31 downto 0);
     signal latched_sel      : std_logic_vector(3 downto 0);
 
+    -- Page-mode open-row tracking (added 2026-08-27 -- see ST_IDLE below).
+    -- At most one row is ever open at a time (this part has 4 banks, but
+    -- the controller only tracks a single open row/bank pair, matching
+    -- its existing "precharge all banks" behaviour). open_valid='1' means
+    -- open_bank/open_row identify the currently-active row; a request
+    -- that hits it can skip straight to READ_CMD/WRITE_CMD with no
+    -- ACTIVATE and no tRCD wait.
+    signal open_valid : std_logic := '0';
+    signal open_bank  : std_logic_vector(1 downto 0) := (others => '0');
+    signal open_row   : std_logic_vector(11 downto 0) := (others => '0');
+
 begin
 
     sdram_cke <= '1';
@@ -187,6 +277,7 @@ begin
             sdram_ba   <= "00";
             sdram_addr <= (others => '0');
             sdram_dqm  <= "11";
+            open_valid <= '0';
             send_cmd(CMD_NOP);
             if SIMULATION then
                 wait_cnt <= 10;
@@ -260,25 +351,105 @@ begin
                     -- pending when boot finished issued ACTIVE one clock
                     -- after LOAD MODE REGISTER. Confirmed by the timing
                     -- assertions in sim/sdram_model.vhd.
+                    --
+                    -- PAGE MODE (added 2026-08-27): this controller used
+                    -- to precharge unconditionally after every single
+                    -- transaction, so every access -- no matter how close
+                    -- together or to the same row -- paid a full
+                    -- ACTIVATE+tRCD before and a PRECHARGE+tRP after.
+                    -- vga_line_fetch (Phase 4.2) is the first thing in
+                    -- this design to hammer the controller with 80
+                    -- back-to-back word reads per scanline, continuously,
+                    -- for the life of the device -- and since a 320-byte
+                    -- scanline is smaller than the 512-byte row stride
+                    -- (see the ADDRESS MAPPING note in the header), those
+                    -- 80 reads mostly target the SAME open row. Real
+                    -- hardware showed 80 clean vertical stripes: burst
+                    -- beat 1 of every word always read back correct,
+                    -- beat 2 always came back as unrepeatable garbage
+                    -- (confirmed via vga_line_fetch's debug word-capture
+                    -- ports piped out over UART) -- and a CPU-side
+                    -- readback (slow, single accesses, the same path
+                    -- that already reads WAD[0] back correctly) confirmed
+                    -- the data is genuinely correct at rest in SDRAM.
+                    -- Widening tRP/tRCD 2->6 cycles made no difference,
+                    -- and delaying beat 2's own sample point by one cycle
+                    -- broke sim/ghdl/tb_sdram.vhd outright (the burst has
+                    -- ended by then; the bus is expected to have gone
+                    -- high-Z). Neither pointed at the actual mechanism.
+                    -- What IS architecturally unique about vga_line_fetch
+                    -- versus every other access pattern this controller
+                    -- has ever been tested against (including the
+                    -- historical 5-word CPU bring-up test, which
+                    -- deliberately spanned different rows and banks) is
+                    -- the sheer rate of repeated ACTIVATE/PRECHARGE
+                    -- cycling to the SAME row -- so this closes that gap:
+                    -- track whether the requested row/bank is already
+                    -- open (open_valid/open_bank/open_row below) and, if
+                    -- so, skip ACTIVATE and its tRCD wait entirely,
+                    -- issuing READ_CMD/WRITE_CMD immediately. A row is
+                    -- now only closed (ST_PRECHARGE) when a request
+                    -- targets a different row, or when a refresh is due,
+                    -- both handled below.
                     if wait_cnt /= 0 then
                         wait_cnt <= wait_cnt - 1;
                     elsif refresh_req = '1' then
-                        send_cmd(CMD_REFRESH);
-                        wait_cnt <= 4;
-                        state    <= ST_REFRESH;
+                        if open_valid = '1' then
+                            -- Close the open row before refreshing; once
+                            -- ST_PRECHARGE clears open_valid and returns
+                            -- here, this branch is retaken with
+                            -- open_valid='0' and refresh proceeds.
+                            state <= ST_PRECHARGE;
+                        else
+                            send_cmd(CMD_REFRESH);
+                            wait_cnt <= 4;
+                            state    <= ST_REFRESH;
+                        end if;
                     elsif (wb_cyc_i = '1' and wb_stb_i = '1') then
-                        latched_adr   <= wb_adr_i;
-                        latched_wdata <= wb_dat_i;
-                        latched_sel   <= wb_sel_i;
+                        if open_valid = '1' and
+                           (open_bank /= wb_adr_i(22 downto 21) or
+                            open_row  /= wb_adr_i(20 downto 9)) then
+                            -- Page miss: a different row is open. Close
+                            -- it first; wb_cyc_i/wb_stb_i/wb_adr_i are
+                            -- held stable by the master until ack, so
+                            -- this same request is re-seen (and latched)
+                            -- on the next pass through ST_IDLE once
+                            -- open_valid is clear.
+                            state <= ST_PRECHARGE;
+                        else
+                            latched_adr   <= wb_adr_i;
+                            latched_wdata <= wb_dat_i;
+                            latched_sel   <= wb_sel_i;
 
-                        -- Issue ACTIVE command. See the ADDRESS MAPPING
-                        -- note in the header for why these slices are
-                        -- what they are.
-                        send_cmd(CMD_ACTIVE);
-                        sdram_ba   <= wb_adr_i(22 downto 21); -- Bank
-                        sdram_addr <= wb_adr_i(20 downto 9);  -- Row
-                        wait_cnt   <= 2;                      -- tRCD delay
-                        state      <= ST_ACTIVE;
+                            if open_valid = '1' then
+                                -- Page hit: requested row already open --
+                                -- skip ACTIVATE and its tRCD wait.
+                                if wb_we_i = '1' then
+                                    state <= ST_WRITE_CMD;
+                                else
+                                    state <= ST_READ_CMD;
+                                end if;
+                            else
+                                -- No row open: issue ACTIVATE. See the
+                                -- ADDRESS MAPPING note in the header for
+                                -- why these slices are what they are.
+                                send_cmd(CMD_ACTIVE);
+                                sdram_ba   <= wb_adr_i(22 downto 21); -- Bank
+                                sdram_addr <= wb_adr_i(20 downto 9);  -- Row
+                                open_valid <= '1';
+                                open_bank  <= wb_adr_i(22 downto 21);
+                                open_row   <= wb_adr_i(20 downto 9);
+                                -- tRCD delay. Was 2 (40 ns @ 50 MHz);
+                                -- widened to 6 (120 ns, 3x this part's
+                                -- ~15-20 ns tRCD spec) while chasing the
+                                -- stripe bug -- kept at 6 since it's pure
+                                -- margin and page mode makes ACTIVATE
+                                -- infrequent enough that the extra cycles
+                                -- cost nothing.
+                                wait_cnt   <= 6;
+                                state      <= ST_ACTIVE;
+                            end if;
+                        end if;
                     end if;
 
                 when ST_REFRESH =>
@@ -307,10 +478,13 @@ begin
                     sdram_ba       <= latched_adr(22 downto 21);
                     -- 8 column bits; bit 10 = '0' suppresses auto-precharge
                     -- (this controller precharges explicitly). See the
-                    -- ADDRESS MAPPING note in the header.
-                    sdram_addr     <= "0000" & latched_adr(8 downto 1);
+                    -- ADDRESS MAPPING and BURST ALIGNMENT notes in the
+                    -- header -- adr(1) is forced to '0' so the burst
+                    -- always starts on an even column.
+                    sdram_addr     <= "0000" & latched_adr(8 downto 2) & '0';
                     sdram_dqm      <= "00";
-                    wait_cnt       <= 1; -- CAS-1 cycles; see NOTE ON READ TIMING
+                    -- See NOTE ON READ CAPTURE ALIGNMENT in the header.
+                    wait_cnt       <= READ_CAS_WAIT;
                     state          <= ST_READ_WAIT;
 
                 when ST_READ_WAIT =>
@@ -327,7 +501,34 @@ begin
                 when ST_READ_DATA2 =>
                     rdata_reg(31 downto 16) <= sdram_dq;
                     wb_ack_o                <= '1';
-                    state                   <= ST_PRECHARGE;
+                    -- Page mode (see ST_IDLE): leave the row open instead
+                    -- of unconditionally precharging. ST_IDLE closes it
+                    -- later only if a different row is requested or a
+                    -- refresh comes due.
+                    --
+                    -- wait_cnt<=1 forces ST_IDLE to burn one cycle before
+                    -- it looks at wb_cyc_i/wb_stb_i again. Without it,
+                    -- ST_IDLE is re-entered the SAME cycle wb_ack_o goes
+                    -- high, and a master whose wb_xfer-style protocol
+                    -- drops cyc/stb one cycle AFTER observing the ack
+                    -- (rather than the same cycle) still has the just-
+                    -- completed request's stale cyc/stb/adr on the bus at
+                    -- that instant -- so ST_IDLE spuriously re-latched and
+                    -- re-issued that same already-finished request a
+                    -- second time, silently shifting every subsequent
+                    -- read/write by one. Caught by sim/ghdl/tb_sdram.vhd's
+                    -- "sustained back-to-back traffic" test (104 failures,
+                    -- every readback one word behind what was written) --
+                    -- previously this race never showed up because every
+                    -- transaction detoured through ST_PRECHARGE's 7+
+                    -- cycles first, which incidentally gave the master
+                    -- plenty of time to drop cyc/stb. One bubble cycle
+                    -- here is far cheaper than that detour and preserves
+                    -- it. Genuine back-to-back masters that hold cyc/stb
+                    -- high continuously (already-updated address) are
+                    -- unaffected -- they just see one extra idle cycle.
+                    wait_cnt                <= 1;
+                    state                   <= ST_IDLE;
 
                 ----------------------------------------------------------------
                 -- Write Sequence (BL = 2)
@@ -336,8 +537,9 @@ begin
                     send_cmd(CMD_WRITE);
                     sdram_ba       <= latched_adr(22 downto 21);
                     -- Same slicing as ST_READ_CMD above -- see the
-                    -- ADDRESS MAPPING note in the header.
-                    sdram_addr     <= "0000" & latched_adr(8 downto 1);
+                    -- ADDRESS MAPPING and BURST ALIGNMENT notes in the
+                    -- header.
+                    sdram_addr     <= "0000" & latched_adr(8 downto 2) & '0';
                     sdram_dqm      <= not latched_sel(1 downto 0);
                     dq_out         <= latched_wdata(15 downto 0);
                     dq_oe          <= '1';
@@ -353,7 +555,11 @@ begin
                     dq_oe <= '0';
                     if wait_cnt = 0 then
                         wb_ack_o <= '1';
-                        state    <= ST_PRECHARGE;
+                        -- Page mode: leave the row open (see
+                        -- ST_READ_DATA2). Same 1-cycle turnaround bubble
+                        -- as ST_READ_DATA2, for the same reason.
+                        wait_cnt <= 1;
+                        state    <= ST_IDLE;
                     else
                         wait_cnt <= wait_cnt - 1;
                     end if;
@@ -361,10 +567,19 @@ begin
                 ----------------------------------------------------------------
                 -- Precharge & Close Row
                 ----------------------------------------------------------------
+                -- Reached only from ST_IDLE, either because a request
+                -- targets a row/bank other than the one currently open,
+                -- or because a refresh is due and a row is open. Always
+                -- closes whatever row is open (precharge-all-banks, as
+                -- before) and clears open_valid so ST_IDLE's next pass
+                -- re-evaluates cleanly.
                 when ST_PRECHARGE =>
                     send_cmd(CMD_PRECHG);
                     sdram_addr(10) <= '1';
-                    wait_cnt <= 2; -- tRP delay
+                    open_valid     <= '0';
+                    -- tRP delay. Widened 2 -> 6 alongside ST_IDLE's
+                    -- tRCD delay above -- see that comment for why.
+                    wait_cnt <= 6;
                     state    <= ST_IDLE;
 
             end case;

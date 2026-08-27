@@ -120,22 +120,17 @@ Phase 5 concern.
 ---
 
 ### Phase 4: VGA Framebuffer Engine
-> **Status:** In progress. The bus already reserves address space for it —
-> `bus_interconnect.vhd` decodes `0xC000_0000`–`0xC007_FFFF` (512 KB window)
-> as slave 2 — but no VGA module is wired up to it yet: `rv32im_soc.vhd`
-> still ties the slot off (`s2_ack_i <= '0'`, data/address ports left
-> open), so any access to that range currently hangs until the bus
-> watchdog forces a timeout. 4.1 is done: `vga_pll` (ALTPLL, 50→25 MHz)
-> and `rtl/video/vga_timing_gen.vhd` both exist and compile clean, and
-> `rv32im_soc.vhd` instantiates both — `vga_pll` driving `pix_clk`, a
-> second `rst_sync` instance synchronizing reset into that clock
-> domain (held until `vga_pll_locked`), and `vga_timing_gen` clocked
-> from `pix_clk` — but its nine outputs (`vga_hsync`, `vga_line_num`,
-> `vga_start_fetch`, etc.) aren't connected to anything downstream
-> yet. That's 4.2: the line buffer, SDRAM line-fetch bus master, and
-> palette/pixel-output stage sketched out in design discussion still
-> need to be built and wired to these signals and to the `s2_*` slot
-> above.
+> **Status:** 4.1 and 4.2 both implemented. 4.1 is hardware-toolchain
+> verified (Questa, via `sim/tb_vga_timing_gen.vhd`); everything in this
+> phase also now has a GHDL-runnable copy of its regression tests under
+> `sim/ghdl/` (`sh sim/ghdl/run.sh tb_vga_timing_gen tb_vga_line_fetch`),
+> which didn't exist before 4.2 — `run.sh`'s dependency list previously
+> didn't include `vga_pll.vhd`, `rtl/video/*.vhd`, or (independently of
+> anything VGA-related) `spi_slave.vhd`/`boot_loader.vhd`, so it couldn't
+> have analyzed the full `rv32im_soc.vhd` top level; a behavioural
+> `altpll` stand-in was also added to `sim/ghdl/altera_mf.vhd` (it only
+> had `altsyncram` before), needed now that `vga_pll` is wired in. Not
+> yet run on real hardware.
 - [x] **4.1 Timing Generator**
   - [x] Configure ALTPLL in Quartus II to generate a 25 MHz pixel clock.
     - `vga_pll` (Quartus MegaWizard/IP Catalog, `INTENDED_DEVICE_FAMILY
@@ -168,11 +163,171 @@ Phase 5 concern.
       x 800 cycles/line x 2 frames — it's a whole-line flag, not gated
       by `hblank`); total elapsed cycles match `H_TOTAL * V_TOTAL * 2`
       exactly, confirming no drift in the counter wrap logic.
-- [ ] **4.2 Framebuffer & Palette Conversion**
-  - [ ] Reserve a 320x200 pixel region within SDRAM.
-  - [ ] Implement $2 \times 2$ pixel-doubling logic for 640x480 output.
-  - [ ] Implement 8-bit palette RAM lookup table (LUT) for 256-color output.
-  - [ ] Map output signals to board RGB and sync pins.
+    - Mirrored at `sim/ghdl/tb_vga_timing_gen.vhd` for the GHDL suite,
+      with one deliberate difference: that copy releases reset and
+      terminates by counting actual `pix_clk` rising edges instead of
+      the original's raw `wait for <time>` values. The original's
+      100 ns reset-release and 33,600,000/33,600,010 ns timeout both
+      land exactly on a clock-edge boundary (100 ns is an exact
+      multiple of the 40 ns period), so which simulator's delta-cycle
+      scheduling wins that exact-time coincidence changes the final
+      cycle count by one — Questa and GHDL resolve it in opposite
+      directions (the `+10 ns` in the real file was tuned empirically
+      against Questa; running that same file under GHDL instead gives
+      `total_cycle_count = 840001`). Counting edges directly removes
+      the race rather than chasing another simulator-specific constant.
+      Not applied to the real file, since it already passes against
+      the actual verification tool this project relies on.
+- [x] **4.2 Framebuffer & Palette Conversion**
+  - [x] Reserve a 320x200 pixel region within SDRAM.
+    - `rtl/video/vga_pkg.vhd`: `FB_BASE_ADDR` is the last 64 KB of the
+      8 MB SDRAM chip (`0x807F_0000`). Confirmed clear of the boot
+      payload against this same file's own Phase 3 closeout section
+      above: `FIRMWARE.BIN` at `0x8000_0000` and `DOOM1.WAD` (4,207,819
+      bytes) at `0x8010_0000`, ending around `0x8050_33CB` — a good
+      ~3 MB below `FB_BASE_ADDR`. Not yet cross-checked against whatever
+      heap/stack layout Phase 5's linker script ends up using.
+  - [x] Implement 2x2 pixel-doubling logic for 640x480 output.
+    - Vertical doubling lives in `vga_timing_gen.vhd` (`line_num`, one
+      value held for two output lines — this was already true of 4.1).
+      Horizontal doubling is `vga_pixel_pipeline.vhd`: `pixel_x(9 downto 1)`
+      addresses `vga_line_buffer`, i.e. each of the 320 fetched bytes is
+      shown across 2 consecutive output columns.
+  - [x] Implement 8-bit palette RAM lookup table (LUT) for 256-color output.
+    - `rtl/video/vga_palette.vhd`: 256 x `PALETTE_BITS` (3, see below)
+      true dual-port RAM. Write side is the CPU, via the VGA slave-2
+      bus window (`0xC000_0000` + `4*index`, wired up in
+      `rv32im_soc.vhd` — this is also what actually gives slave 2 a job;
+      previously it was tied off entirely). Read side is
+      `vga_pixel_pipeline.vhd`, indexed by the byte `vga_line_buffer`
+      returns for the current column.
+  - [x] Map output signals to board RGB and sync pins.
+    - New top-level ports on `rv32im_soc` (`vga_hs_pin`/`vga_vs_pin`/
+      `vga_r_pin`/`vga_g_pin`/`vga_b_pin`), driven by
+      `vga_pixel_pipeline.vhd`. 1 bit each of R/G/B — this board has no
+      resistor-ladder DAC, so 8 discrete colours is the real ceiling
+      (established against the board's schematic earlier in this
+      project); forced to black outside the letterboxed active area.
+  - **New modules, beyond the four checklist items above:**
+    `rtl/video/vga_line_buffer.vhd` (ping-pong scanline store — one bank
+    being filled by the SDRAM fetch while the other is being scanned
+    out, so a fetch landing mid-line can't tear the image),
+    `rtl/video/vga_line_fetch.vhd` (Wishbone master that pulls one
+    320-byte scanline out of SDRAM per `start_fetch` pulse — see its
+    header for the pix_clk/sys_clk handshake), and
+    `rtl/memory/sdram_arbiter.vhd` (a small 2-input priority arbiter
+    sitting between `sdram_controller` and its two masters — the
+    existing CPU/`boot_loader` path and the new line-fetch master —
+    kept deliberately separate from the existing CPU/`boot_loader` mux
+    rather than added as a third leg to it; see the arbiter's own header
+    for why).
+  - Verified in `sim/ghdl/tb_vga_line_fetch.vhd`: a fake Wishbone SDRAM
+    slave that echoes its own address back as data makes every fetched
+    byte's expected value predictable from address arithmetic alone.
+    Checks the pix_clk→sys_clk handshake (including the FB_HEIGHT frame
+    wrap, i.e. line 199 → line 0, not 200), the full 320-byte unpack
+    into `vga_line_buffer`, and that the ping-pong bank keeps
+    alternating correctly across three consecutive fetches (not just the
+    first one). Along the way this also caught a real bug in
+    `vga_line_fetch.vhd`'s address arithmetic — `unsigned * natural` in
+    `numeric_std` returns a result twice as wide as the left operand,
+    not the same width, so the un-resized product was silently 64 bits
+    where 32 were expected; GHDL only caught it as a runtime bound-check
+    failure, not at analysis time, since the mismatch runs through a
+    function call. See that file's own comment at the fix site.
+  - **Real fitter failure and fix — `vga_line_buffer.vhd` RAM inference.**
+    The design didn't fit on first synthesis (`Error (170011): Design
+    contains 9017 blocks of type combinational node. However, the
+    device contains only 6272 blocks.` — this is an EP4CE6-class part).
+    `output_files/CPU_FPGA.map.rpt` showed the entire overage traced to
+    one module: `vga_line_buffer` synthesizing as 4112 combinational
+    ALUTs + 5120 discrete registers + 0 memory bits, instead of one
+    `altsyncram` block, the way `vga_palette.vhd`'s structurally similar
+    dual-clock dual-port RAM correctly does (0 ALUTs, 768 memory bits).
+    Two intermediate fix attempts both failed to trigger inference — a
+    single address computed via a local variable with if/else (no
+    change at all — the resynthesized numbers were byte-for-byte
+    identical), then addressing rewritten as a plain bank & column
+    concatenation staged through its own signal, computed by a separate
+    concurrent assignment outside the clocked processes (made it worse:
+    11434 vs. 6272, `vga_line_buffer` up to 6546 ALUTs / 8192
+    registers). The report's own Analysis & Synthesis Messages section
+    named the exact reason on that second attempt:
+    `Info (276007): RAM logic "vga_line_buffer:u_vga_line_buffer|ram" is
+    uninferred due to asynchronous read logic` — even though the array
+    is only ever read inside a `rising_edge(rd_clk)` process. A fourth
+    form — the bank/column concatenation moved inline into the `ram(...)`
+    index itself, as textually close to `vga_palette`'s shape as the
+    extra bank bit allows — produced the same message again.
+    - **Resolution: stop inferring, instantiate.** The remaining
+      difference from the working example isn't something the source can
+      express away — `vga_palette`'s index is a plain port fed straight
+      into `to_integer(unsigned(...))`, and a ping-pong buffer's cannot
+      be, because its address is inherently bank & column. Four failed
+      attempts at one full Quartus compile each was enough. So
+      `vga_line_buffer.vhd` now instantiates `altsyncram` directly,
+      following the precedent `bram_4kb.vhd` set in Phase 2 for exactly
+      this class of problem (see its header — a different inference
+      misfire, a 32-bit memory silently split into eight 8-bit
+      primitives that dropped the `.mif`, resolved the same way). The
+      mapping is now stated rather than inferred, so it also can't
+      silently regress into logic if a later edit or Quartus version
+      shifts what the template matcher accepts. Parameters mirror what
+      Quartus itself picked for the palette's inferred instance, with
+      the widths changed: `OPERATION_MODE DUAL_PORT`, `ADDRESS_REG_B`
+      on `CLOCK1`, `OUTDATA_REG_B UNREGISTERED` — the same one-cycle
+      read latency the array version had, so `vga_pixel_pipeline.vhd`'s
+      latency matching is unchanged.
+    - `sim/ghdl/altera_mf.vhd`'s `altsyncram` stand-in was extended to
+      support `DUAL_PORT` (port A write-only on `clock0`, port B
+      read-only on `clock1`) alongside the existing `BIDIR_DUAL_PORT`
+      path it was originally written for; `tb_vga_line_fetch` still
+      passes unchanged against it.
+  - **Fit achieved.** With the line buffer in an M9K, the design fits and
+    a `.sof` is produced: 4,928 / 6,272 logic elements (79 %), 2,245
+    registers (36 %), 41,728 / 276,480 memory bits (15 %), 1 / 2 PLLs.
+    The +8,192 memory bits over the previous build is exactly the line
+    buffer (1024 × 8) landing in a block where it belongs. Timing closes
+    on both domains — `sys_clk` Fmax 53.1 MHz against the 50 MHz
+    requirement (setup slack +1.166 ns, hold +0.410 ns), `pix_clk`
+    220.26 MHz against 25 MHz. **The `sys_clk` margin is only ~6 %**,
+    which is worth remembering before adding anything else to the CPU's
+    critical path.
+  - **VGA pin assignments (`CPU_FPGA.qsf`).** The first fitting compile
+    raised `Critical Warning (169085): No exact pin location
+    assignment(s) for 5 pins` — the five new VGA outputs, which the
+    Fitter then placed on pins 1, 2, 7, 10 and 11, nowhere near the
+    board's VGA connector. Programming that image would have produced no
+    video and driven five arbitrary pins. Now assigned explicitly:
+    `vga_hs_pin` PIN_101, `vga_vs_pin` PIN_103, `vga_r_pin` PIN_104,
+    `vga_g_pin` PIN_105, `vga_b_pin` PIN_106. **These came from public
+    RZ-EasyFPGA A2.2 projects, not from the board schematic** — the same
+    sources agree with this project's own existing `clk` (23), button
+    (88–91) and LED (84–87) assignments, which is good corroboration
+    that it is the same board, but they should still be checked against
+    the board's own pin table before programming.
+  - **`CPU_FPGA.sdc`** gained a `set_false_path` for the five VGA outputs
+    (passive connector, no setup/hold to meet — same treatment the LEDs
+    and `uart_tx` already had) and a `set_clock_groups -asynchronous`
+    between `sys_clk` and the PLL's `clk[0]`. Both derive from the same
+    oscillator, so `derive_pll_clocks` had TimeQuest timing every
+    crossing as synchronous; the design instead handles all of them
+    structurally (`rst_sync` for the pix_clk reset, the toggle-bit
+    handshake in `vga_line_fetch`, the bank synchronizer in
+    `vga_pixel_pipeline`, and the dual-clock RAM ports themselves).
+  - **Remaining warnings, all reviewed and benign:** `vga_vblank` /
+    `vga_pixel_y` assigned but never read (`vga_timing_gen` outputs the
+    pixel pipeline doesn't need — line doubling keys off `line_num`, and
+    blanking off `active_region`); `s2_sel` and `IF_Stage`'s
+    `pc_plus4_wire` likewise unread, both pre-existing; `data_b` defined
+    but never used (the line buffer's `altsyncram` write-side data on the
+    read-only port B, tied off deliberately); `sdram_cke` stuck at VCC
+    and `sdram_cs_n` at GND (both correct — the controller keeps the
+    chip enabled and selected); `uart_rx` driving no logic (no receiver
+    implemented yet).
+  - **Not yet done:** run on real hardware. `FB_BASE_ADDR` is confirmed
+    clear of the boot payload (see above) but not yet checked against
+    Phase 5's linker script, which doesn't exist yet.
 
 ---
 

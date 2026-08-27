@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.vga_pkg.all;
 
 -- Top-level RV32IM SoC: wires the CPU_FPGA core, bus_interconnect,
 -- internal bram_4kb, external sdram_controller, and the peripheral
@@ -71,7 +72,16 @@ entity rv32im_soc is
         -- instantiations that don't connect it keep compiling, and the
         -- CPU simply never comes out of reset if nothing drives it --
         -- a safe default, not a silent misconfiguration.
-        boot_done   : in    std_logic := '0'
+        boot_done   : in    std_logic := '0';
+
+        -- Physical VGA pins (Phase 4.2). 1 bit each of R/G/B -- this
+        -- board has no resistor-ladder DAC, so 8 discrete colours is
+        -- the real hardware ceiling. See vga_pkg.vhd (PALETTE_BITS).
+        vga_hs_pin : out std_logic;
+        vga_vs_pin : out std_logic;
+        vga_r_pin  : out std_logic;
+        vga_g_pin  : out std_logic;
+        vga_b_pin  : out std_logic
     );
 end entity rv32im_soc;
 
@@ -198,12 +208,23 @@ architecture structural of rv32im_soc is
     signal pix_rst_n_async : std_logic;  -- rst_n_sync AND vga_pll_locked
     signal pix_rst_n_sync  : std_logic;  -- clean reset, in the pix_clk domain
 
-    -- vga_timing_gen outputs. Not yet consumed by anything -- the
-    -- framebuffer/palette/pixel-output stage (Phase 4.2) and the
-    -- SDRAM line-fetch bus master are what will read these; for now
-    -- the module is instantiated and clocked, but sits unconnected
-    -- to the rest of the design, same as the reserved-but-unwired
-    -- s2_* VGA bus slot below.
+    -- SDRAM forwarded-clock phase shift (added 2026-08-27 -- see
+    -- sdram_pll.vhd's header for the full reasoning). Unlike pix_clk,
+    -- this does NOT create a new clock domain for any logic -- every
+    -- register in sdram_controller and everything else still runs on
+    -- the plain board clk. Only the physical SD_CLK pin is driven from
+    -- sdram_clk_shifted (sdram_pll's c0, same 50 MHz frequency as clk,
+    -- phase-advanced) instead of a raw copy of clk, to give the chip's
+    -- read response more setup margin before the FPGA's own clk-edge
+    -- capture. sdram_controller's reset is gated with sdram_pll_locked
+    -- (same pattern as pix_rst_n_async below) so its power-on command
+    -- sequence -- which the physical chip must see over a stable clock
+    -- -- can't start before the shifted clock has actually locked.
+    signal sdram_clk_shifted : std_logic;  -- from sdram_pll's c0
+    signal sdram_pll_locked  : std_logic;
+
+    -- vga_timing_gen outputs, consumed by vga_line_fetch and
+    -- vga_pixel_pipeline below (Phase 4.2).
     signal vga_hsync         : std_logic;
     signal vga_vsync         : std_logic;
     signal vga_hblank        : std_logic;
@@ -213,6 +234,86 @@ architecture structural of rv32im_soc is
     signal vga_pixel_y       : unsigned(9 downto 0);
     signal vga_line_num      : unsigned(7 downto 0);
     signal vga_start_fetch   : std_logic;
+
+    -- -------------------------------------------------------------
+    -- Phase 4.2: framebuffer/palette/pixel-output stage.
+    -- -------------------------------------------------------------
+
+    -- vga_line_fetch's Wishbone master (sys clk domain), port B into
+    -- sdram_arbiter.
+    signal vf_adr   : std_logic_vector(31 downto 0);
+    signal vf_rdata : std_logic_vector(31 downto 0);
+    signal vf_sel   : std_logic_vector(3 downto 0);
+    signal vf_we    : std_logic;
+    signal vf_stb   : std_logic;
+    signal vf_cyc   : std_logic;
+    signal vf_ack   : std_logic;
+
+    -- TEMP DIAGNOSTIC (2026-08-27, remove once resolved): real hardware
+    -- shows 80 clean, static vertical stripes with a uniformly-filled
+    -- framebuffer -- 80 is exactly vga_line_fetch's word count per line
+    -- (320 bytes / 4), which points at the SDRAM read path rather than
+    -- at vga_line_fetch's own unpacking (already GHDL-verified against
+    -- a fake slave, all checks passing). This constant, when true,
+    -- disconnects vga_line_fetch's Wishbone request from the real
+    -- sdram_arbiter/sdram_controller entirely (b_stb_i/b_cyc_i forced
+    -- to '0', so the real SDRAM machinery never sees these requests at
+    -- all -- CPU/boot_loader traffic on port A is unaffected) and
+    -- answers every request itself, same cycle, with a fixed
+    -- 0x01010101 word -- i.e. every unpacked byte is palette index 1,
+    -- which the current firmware has already set to white. If the
+    -- screen goes solid white with this set, the bug is in the real
+    -- SDRAM controller/timing, not in this module or anything
+    -- downstream of it. If stripes persist even with SDRAM fully out
+    -- of the loop, the bug is here or downstream instead.
+    -- 2026-08-27 update: confirmed solid white (with the expected
+    -- letterbox bars) when this was true -- everything downstream of
+    -- vga_line_fetch's own Wishbone request is correct. Set back to
+    -- false to restore the real SDRAM path while the actual read-path
+    -- issue is investigated; flip back to true for a quick re-check
+    -- if a candidate fix doesn't resolve it.
+    constant DEBUG_VGA_FETCH_BYPASS : boolean := false;
+    signal vf_stb_gated  : std_logic;
+    signal vf_cyc_gated  : std_logic;
+    signal vf_ack_used   : std_logic;
+    signal vf_rdata_used : std_logic_vector(31 downto 0);
+
+    -- TEMP DIAGNOSTIC: vga_line_fetch's raw received word0/word1, piped
+    -- through to periph_bridge at offsets 0x18/0x1C. See
+    -- vga_line_fetch.vhd's dbg_word0_o/dbg_word1_o.
+    signal vf_dbg_word0 : std_logic_vector(31 downto 0);
+    signal vf_dbg_word1 : std_logic_vector(31 downto 0);
+
+    -- sdram_arbiter's downstream port, replacing the direct s1_* ->
+    -- sdram_controller wiring Phase 4.1 left in place.
+    signal sdram_m_addr  : std_logic_vector(31 downto 0);
+    signal sdram_m_wdata : std_logic_vector(31 downto 0);
+    signal sdram_m_rdata : std_logic_vector(31 downto 0);
+    signal sdram_m_sel   : std_logic_vector(3 downto 0);
+    signal sdram_m_we    : std_logic;
+    signal sdram_m_stb   : std_logic;
+    signal sdram_m_cyc   : std_logic;
+    signal sdram_m_ack   : std_logic;
+
+    -- vga_line_buffer <-> vga_line_fetch (write side, sys clk) and
+    -- vga_line_buffer <-> vga_pixel_pipeline (read side, pix_clk).
+    signal lb_wr_en   : std_logic;
+    signal lb_wr_bank : std_logic;
+    signal lb_wr_col  : unsigned(8 downto 0);
+    signal lb_wr_data : std_logic_vector(7 downto 0);
+    signal lb_rd_bank : std_logic;
+    signal lb_rd_col  : unsigned(8 downto 0);
+    signal lb_rd_data : std_logic_vector(7 downto 0);
+
+    signal vf_write_bank : std_logic;
+
+    -- vga_palette: write side from the s2_* CPU bus window, read side
+    -- from vga_pixel_pipeline.
+    signal pal_wr_en    : std_logic;
+    signal pal_wr_index : std_logic_vector(7 downto 0);
+    signal pal_wr_data  : std_logic_vector(PALETTE_BITS-1 downto 0);
+    signal pal_rd_index : std_logic_vector(7 downto 0);
+    signal pal_rd_data  : std_logic_vector(PALETTE_BITS-1 downto 0);
 
     -- Muxed master signals actually presented to bus_interconnect.
     signal mux_adr         : std_logic_vector(31 downto 0);
@@ -244,7 +345,13 @@ architecture structural of rv32im_soc is
     signal s1_cyc         : std_logic;
     signal s1_ack         : std_logic;
 
+    signal s2_addr        : std_logic_vector(31 downto 0);
+    signal s2_wdata       : std_logic_vector(31 downto 0);
     signal s2_rdata       : std_logic_vector(31 downto 0);
+    signal s2_sel         : std_logic_vector(3 downto 0);
+    signal s2_we          : std_logic;
+    signal s2_stb         : std_logic;
+    signal s2_cyc         : std_logic;
     signal s2_ack         : std_logic;
 
     signal s3_addr        : std_logic_vector(31 downto 0);
@@ -307,6 +414,37 @@ architecture structural of rv32im_soc is
 
     constant rst_stretch_bits : natural :=
         get_rst_stretch_bits(simulation);
+
+    -- SDRAM read capture alignment. See the NOTE ON READ CAPTURE
+    -- ALIGNMENT header in rtl/memory/sdram_controller.vhd: the
+    -- behavioural SDRAM model captures a command one cycle later than
+    -- the real chip does (the chip runs off a forwarded copy of clk on
+    -- SD_CLK, so it sees a command essentially as it is launched), which
+    -- makes the correct beat-1 sample point differ by one cycle between
+    -- simulation and hardware. Same shape as get_baud_rate and
+    -- get_rst_stretch_bits above.
+    function get_read_cas_wait (
+        fast_simulation : boolean
+    ) return natural is
+    begin
+        -- REVERTED TO 1 FOR HARDWARE (2026-08-27). Shipping 0 was an
+        -- experiment and it disproved its own hypothesis: reads that had
+        -- always been correct (FW[0], WAD[0] -- both written by the
+        -- ESP32 boot DMA as full 32-bit words) came back with burst beat
+        -- 1 shifted up into the high half, exactly the overshoot
+        -- signature. That can only happen if the window had been
+        -- correctly aligned at 1 to begin with, so the read path was
+        -- never the fault. Kept as a generic because the sweep was worth
+        -- having and may be again.
+        if fast_simulation then
+            return 1;   -- sim/sdram_model.vhd's alignment
+        else
+            return 1;   -- real hardware: confirmed correct by the 0 experiment
+        end if;
+    end function;
+
+    constant sdram_read_cas_wait : natural :=
+        get_read_cas_wait(simulation);
 
 begin
 
@@ -485,14 +623,14 @@ begin
         s1_cyc_o => s1_cyc,
         s1_ack_i => s1_ack,
 
-        s2_adr_o => open,
-        s2_dat_o => open,
-        s2_dat_i => (others => '0'),
-        s2_sel_o => open,
-        s2_we_o  => open,
-        s2_stb_o => open,
-        s2_cyc_o => open,
-        s2_ack_i => '0',
+        s2_adr_o => s2_addr,
+        s2_dat_o => s2_wdata,
+        s2_dat_i => s2_rdata,
+        s2_sel_o => s2_sel,
+        s2_we_o  => s2_we,
+        s2_stb_o => s2_stb,
+        s2_cyc_o => s2_cyc,
+        s2_ack_i => s2_ack,
 
         s3_adr_o => s3_addr,
         s3_dat_o => s3_wdata,
@@ -562,22 +700,84 @@ begin
             rdata_b => s0_rdata
         );
 
+    -- Phase 4.2: sdram_arbiter now sits between bus_interconnect's
+    -- slave-1 port (CPU/boot_loader, port A) and sdram_controller,
+    -- with vga_line_fetch as port B. See sdram_arbiter.vhd for why
+    -- this is a separate arbiter rather than a third leg on the
+    -- boot_active mux above.
+    u_sdram_arbiter : entity work.sdram_arbiter
+        port map (
+            clk   => clk,
+            rst_n => rst_n_sync,
+
+            a_adr_i => s1_addr,
+            a_dat_i => s1_wdata,
+            a_dat_o => s1_rdata,
+            a_sel_i => s1_sel,
+            a_we_i  => s1_we,
+            a_stb_i => s1_stb,
+            a_cyc_i => s1_cyc,
+            a_ack_o => s1_ack,
+
+            b_adr_i => vf_adr,
+            b_dat_i => (others => '0'),  -- vga_line_fetch never writes
+            b_dat_o => vf_rdata,
+            b_sel_i => vf_sel,
+            b_we_i  => vf_we,
+            b_stb_i => vf_stb_gated,
+            b_cyc_i => vf_cyc_gated,
+            b_ack_o => vf_ack,
+
+            m_adr_o => sdram_m_addr,
+            m_dat_o => sdram_m_wdata,
+            m_dat_i => sdram_m_rdata,
+            m_sel_o => sdram_m_sel,
+            m_we_o  => sdram_m_we,
+            m_stb_o => sdram_m_stb,
+            m_cyc_o => sdram_m_cyc,
+            m_ack_i => sdram_m_ack
+        );
+
+    -- TEMP DIAGNOSTIC wiring for DEBUG_VGA_FETCH_BYPASS -- see the
+    -- constant's declaration above for the full explanation.
+    vf_stb_gated  <= '0' when DEBUG_VGA_FETCH_BYPASS else vf_stb;
+    vf_cyc_gated  <= '0' when DEBUG_VGA_FETCH_BYPASS else vf_cyc;
+    vf_ack_used   <= vf_stb when DEBUG_VGA_FETCH_BYPASS else vf_ack;
+    vf_rdata_used <= x"01010101" when DEBUG_VGA_FETCH_BYPASS else vf_rdata;
+
+    -- SDRAM forwarded-clock PLL (added 2026-08-27, see sdram_pll.vhd's
+    -- header and the sdram_clk_shifted/sdram_pll_locked declarations
+    -- above). areset follows the same active-high-from-active-low
+    -- convention as u_vga_pll below.
+    u_sdram_pll : entity work.sdram_pll
+        port map (
+            inclk0 => clk,
+            areset => not rst_n_sync,
+            c0     => sdram_clk_shifted,
+            locked => sdram_pll_locked
+        );
+
     u_sdram : entity work.sdram_controller
         generic map (
-            clk_freq_mhz => 50,
-            simulation    => simulation
+            clk_freq_mhz  => 50,
+            simulation    => simulation,
+            read_cas_wait => sdram_read_cas_wait
         )
         port map (
             clk          => clk,
-            reset_n      => rst_n_sync,
-            wb_adr_i     => s1_addr,
-            wb_dat_i     => s1_wdata,
-            wb_dat_o     => s1_rdata,
-            wb_sel_i     => s1_sel,
-            wb_we_i      => s1_we,
-            wb_stb_i     => s1_stb,
-            wb_cyc_i     => s1_cyc,
-            wb_ack_o     => s1_ack,
+            -- Gated with sdram_pll_locked: the controller's power-on
+            -- command sequence must not start until the physical chip
+            -- has a stable, locked clock to see it over. See
+            -- sdram_clk_shifted's declaration above.
+            reset_n      => rst_n_sync and sdram_pll_locked,
+            wb_adr_i     => sdram_m_addr,
+            wb_dat_i     => sdram_m_wdata,
+            wb_dat_o     => sdram_m_rdata,
+            wb_sel_i     => sdram_m_sel,
+            wb_we_i      => sdram_m_we,
+            wb_stb_i     => sdram_m_stb,
+            wb_cyc_i     => sdram_m_cyc,
+            wb_ack_o     => sdram_m_ack,
 
             sdram_cke    => sdram_cke,
             sdram_cs_n   => sdram_cs_n,
@@ -588,11 +788,33 @@ begin
             sdram_addr   => sdram_addr,
             sdram_dqm    => sdram_dqm,
             sdram_dq     => sdram_dq,
-            sdram_clk    => sdram_clk
+            -- sdram_controller's own sdram_clk output (a plain
+            -- unregistered copy of clk) is left unconnected -- the
+            -- physical pin is now driven from sdram_pll's
+            -- phase-shifted c0 instead. See the top-level sdram_clk
+            -- assignment below.
+            sdram_clk    => open
         );
 
+    -- Physical SD_CLK pin: the phase-shifted PLL output, not a raw
+    -- copy of clk. See sdram_clk_shifted's declaration above.
+    sdram_clk <= sdram_clk_shifted;
+
+    -- VGA slave-2 window (0xC000_0000+, see bus_interconnect.vhd):
+    -- palette control registers. Word-addressed, 256 entries at
+    -- +4*index; software writes a colour with a plain 32-bit store
+    -- (only the low PALETTE_BITS bits of the low byte are stored --
+    -- see vga_palette.vhd). Single-cycle ack, no readback yet (reads
+    -- always return 0) -- readback wasn't needed for anything so far
+    -- and would mean giving vga_palette a second read port on this
+    -- clock domain; add one if software ever needs to read back a
+    -- palette entry it wrote.
+    pal_wr_en    <= s2_we and s2_stb and s2_cyc;
+    pal_wr_index <= s2_addr(9 downto 2);
+    pal_wr_data  <= s2_wdata(PALETTE_BITS-1 downto 0);
+
     s2_rdata <= (others => '0');
-    s2_ack   <= '0';
+    s2_ack   <= s2_stb and s2_cyc;
 
     uart_status <= (0 => uart_tx_busy, others => '0');
 
@@ -615,7 +837,10 @@ begin
             gpio_key_data => gpio_key_data,
 
             timer_data    => timer_data,
-            bus_error     => bus_error
+            bus_error     => bus_error,
+
+            vga_dbg_word0 => vf_dbg_word0,
+            vga_dbg_word1 => vf_dbg_word1
         );
 
     u_uart_tx : entity work.uart_tx
@@ -722,6 +947,93 @@ begin
             pixel_y       => vga_pixel_y,
             line_num      => vga_line_num,
             start_fetch   => vga_start_fetch
+        );
+
+    -- ------------------------------------------------------------------
+    -- Phase 4.2: framebuffer line fetch, line buffer, palette, and
+    -- pixel-output stage. See each module's own header for the
+    -- reasoning (CDC handling, bank ping-pong, latency matching).
+    -- ------------------------------------------------------------------
+
+    u_vga_line_fetch : entity work.vga_line_fetch
+        port map (
+            clk             => clk,
+            rst_n           => rst_n_sync,
+
+            pix_clk         => pix_clk,
+            pix_rst_n       => pix_rst_n_sync,
+            start_fetch_pix => vga_start_fetch,
+            line_num_pix    => vga_line_num,
+
+            wb_adr_o => vf_adr,
+            wb_dat_i => vf_rdata_used,
+            wb_sel_o => vf_sel,
+            wb_we_o  => vf_we,
+            wb_stb_o => vf_stb,
+            wb_cyc_o => vf_cyc,
+            wb_ack_i => vf_ack_used,
+
+            buf_wr_en    => lb_wr_en,
+            buf_wr_bank  => lb_wr_bank,
+            buf_wr_col   => lb_wr_col,
+            buf_wr_data  => lb_wr_data,
+            write_bank_o => vf_write_bank,
+
+            dbg_word0_o => vf_dbg_word0,
+            dbg_word1_o => vf_dbg_word1
+        );
+
+    u_vga_line_buffer : entity work.vga_line_buffer
+        port map (
+            wr_clk  => clk,
+            wr_en   => lb_wr_en,
+            wr_bank => lb_wr_bank,
+            wr_col  => lb_wr_col,
+            wr_data => lb_wr_data,
+
+            rd_clk  => pix_clk,
+            rd_bank => lb_rd_bank,
+            rd_col  => lb_rd_col,
+            rd_data => lb_rd_data
+        );
+
+    u_vga_palette : entity work.vga_palette
+        port map (
+            wr_clk   => clk,
+            wr_en    => pal_wr_en,
+            wr_index => pal_wr_index,
+            wr_data  => pal_wr_data,
+
+            rd_clk   => pix_clk,
+            rd_index => pal_rd_index,
+            rd_data  => pal_rd_data
+        );
+
+    u_vga_pixel_pipeline : entity work.vga_pixel_pipeline
+        port map (
+            pix_clk   => pix_clk,
+            pix_rst_n => pix_rst_n_sync,
+
+            hsync_i         => vga_hsync,
+            vsync_i         => vga_vsync,
+            hblank_i        => vga_hblank,
+            active_region_i => vga_active_region,
+            pixel_x_i       => vga_pixel_x,
+
+            write_bank_i => vf_write_bank,
+
+            buf_rd_bank => lb_rd_bank,
+            buf_rd_col  => lb_rd_col,
+            buf_rd_data => lb_rd_data,
+
+            pal_rd_index => pal_rd_index,
+            pal_rd_data  => pal_rd_data,
+
+            vga_hsync => vga_hs_pin,
+            vga_vsync => vga_vs_pin,
+            vga_r     => vga_r_pin,
+            vga_g     => vga_g_pin,
+            vga_b     => vga_b_pin
         );
 
 end architecture structural;

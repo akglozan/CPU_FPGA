@@ -52,12 +52,23 @@ for f in \
     rtl/memory/bram_4kb.vhd \
     rtl/memory/bus_interconnect.vhd \
     rtl/memory/sdram_controller.vhd \
+    rtl/memory/spi_slave.vhd \
+    rtl/memory/boot_loader.vhd \
     rtl/peripherals/periph_bridge.vhd \
     rtl/peripherals/gpio_led.vhd \
     rtl/peripherals/gpio_key.vhd \
     rtl/peripherals/timer.vhd \
     rtl/peripherals/uart_tx.vhd \
     rtl/rst_sync.vhd \
+    vga_pll.vhd \
+    sdram_pll.vhd \
+    rtl/video/vga_pkg.vhd \
+    rtl/video/vga_timing_gen.vhd \
+    rtl/video/vga_palette.vhd \
+    rtl/video/vga_line_buffer.vhd \
+    rtl/memory/sdram_arbiter.vhd \
+    rtl/video/vga_line_fetch.vhd \
+    rtl/video/vga_pixel_pipeline.vhd \
     rtl/rv32im_soc.vhd
 do
     $GA "$f"
@@ -74,7 +85,7 @@ done
 if [ -n "$1" ]; then
     list="$*"
 else
-    list="tb_mdiv tb_buserr tb_sdram tb_uart tb_soc tb_rst tb_bounce"
+    list="tb_mdiv tb_buserr tb_sdram tb_uart tb_soc tb_rst tb_bounce tb_vga_timing_gen tb_vga_line_fetch tb_vga_sdram"
 fi
 
 status=0

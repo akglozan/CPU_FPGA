@@ -21,7 +21,9 @@ script cd's itself, so it can be invoked from anywhere.
 
 | File | Purpose |
 |---|---|
-| `altera_mf.vhd` | Simulation-only stand-in for `altsyncram`, configured to match exactly what `CPU_FPGA.map.rpt` reports for `u_bram`: address register always present on both ports, selectable output register, `BIDIR_DUAL_PORT`, byte enables, read-old-data. Loads the real `.mif`. Also carries a **write monitor** that reports any port-B write outside words 1022/1023, the only legitimate stack slots. |
+| `altera_mf.vhd` | Simulation-only stand-in for `altsyncram`, configured to match exactly what `CPU_FPGA.map.rpt` reports for `u_bram`: address register always present on both ports, selectable output register, `BIDIR_DUAL_PORT`, byte enables, read-old-data. Loads the real `.mif`. Also carries a **write monitor** that reports any port-B write outside words 1022/1023, the only legitimate stack slots. Also now carries a behavioural `altpll` stand-in (added for Phase 4.2), since `vga_pll.vhd` instantiates one and nothing previously provided a matching entity — the full `rv32im_soc` top level could not elaborate under GHDL before this. |
+| `tb_vga_timing_gen.vhd` | Phase 4.1 regression for `vga_timing_gen.vhd` alone (no bus, no other modules): checks `start_fetch` pulse count, `line_num` sequencing, `active_region` cycle count, and total elapsed cycles over two simulated frames. Mirrors `sim/tb_vga_timing_gen.vhd` (the real, Questa-verified copy), with one deliberate difference: reset release and termination are counted in actual `pix_clk` edges rather than raw `wait for <time>` values, which dodges a simulator-specific off-by-one the original's exact-edge-boundary timing hits differently under GHDL vs Questa (see the comment at the top of this file's `stim_process` for the full explanation). |
+| `tb_vga_line_fetch.vhd` | Phase 4.2 regression for `vga_line_fetch.vhd` + `vga_line_buffer.vhd` together: a fake Wishbone slave echoes its own address back as data, making every fetched byte predictable from address arithmetic alone. Checks the pix_clk/sys_clk handshake (including the FB_HEIGHT frame-wrap case), the full unpack into the line buffer, and that the ping-pong write bank keeps alternating across three consecutive fetches. |
 | `tb_soc.vhd` | Smoke test: reports every change of the LED register. |
 | `tb_uart.vhd` | Decodes the `uart_tx` pin as a real 115200 8N1 receiver and prints each byte with its stop bit. Runs with `simulation => false` so the true baud divider is exercised. |
 | `tb_rst.vhd` | Asserts reset at deliberately clock-misaligned offsets and fails if the LEDs stop moving afterwards. |
@@ -76,4 +78,29 @@ tb_uart    UART byte: 'A' 'B' 'C' CR LF, all with valid stop bits
 tb_soc     LEDs -> 1111 then 0000 after the ~1.3 ms power-on reset
 tb_rst     every reset recovers
 tb_bounce  every bouncy press recovers, no unexpected BRAM writes
+tb_vga_timing_gen  ALL CHECKS PASSED (see the testbench's own summary)
+tb_vga_line_fetch  tb_vga_line_fetch: ALL CHECKS PASSED
 ```
+
+### Currently failing: the four full-SoC benches
+
+`tb_uart`, `tb_soc`, `tb_rst` and `tb_bounce` all fail today with
+`firmware did not reach main()`. **There is no SPI flash model in this
+suite.** Those four instantiate the whole `rv32im_soc`, which since
+Phase 3 holds the CPU in reset until `boot_loader` finishes copying the
+payload in over SPI — with nothing driving `spi_miso`, `boot_done` never
+asserts, the CPU never starts, and the LED register never moves.
+
+This is not a Phase 4.2 regression, and it is not caused by
+`vga_line_buffer.vhd`'s switch to a directly instantiated `altsyncram`
+(verified by re-running `tb_soc` against the previous behavioural-array
+version of that file — identical failure). It predates the VGA work:
+`run.sh`'s dependency list was missing `spi_slave.vhd` and
+`boot_loader.vhd` entirely until Phase 4.2 added them, so these four
+benches could not even analyse the full top level before, let alone run
+it. The "known-good" lines above date from before the boot loader
+existed and are kept as the target to restore.
+
+Fixing this needs a behavioural SPI flash model (respond to the 0x03
+READ command, stream the payload back on `spi_miso`) wired into those
+four testbenches. Not yet written.

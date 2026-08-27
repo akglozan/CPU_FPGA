@@ -40,7 +40,15 @@ entity periph_bridge is
         -- 0x14 in bit 0. Set when a slave failed to acknowledge and the
         -- watchdog had to synthesise an ack; any read that returned zero
         -- while this is set should be treated as invalid.
-        bus_error  : in std_logic
+        bus_error  : in std_logic;
+
+        -- TEMP DIAGNOSTIC (2026-08-27, remove once the SDRAM
+        -- back-to-back read corruption is resolved): vga_line_fetch's
+        -- raw wb_dat_i for word positions 0/1 of the scanline it's
+        -- currently fetching, read at offsets 0x18/0x1C. See
+        -- vga_line_fetch.vhd's dbg_word0_o/dbg_word1_o.
+        vga_dbg_word0 : in std_logic_vector(31 downto 0);
+        vga_dbg_word1 : in std_logic_vector(31 downto 0)
     );
 end entity periph_bridge;
 
@@ -86,7 +94,9 @@ begin
         gpio_key_data,
         uart_status,
         timer_data,
-        bus_error
+        bus_error,
+        vga_dbg_word0,
+        vga_dbg_word1
     )
     begin
         wb_data_o <= (others => '0');
@@ -103,6 +113,12 @@ begin
 
             when x"14" =>
                 wb_data_o <= (0 => bus_error, others => '0');
+
+            when x"18" =>
+                wb_data_o <= vga_dbg_word0;
+
+            when x"1C" =>
+                wb_data_o <= vga_dbg_word1;
 
             when others =>
                 wb_data_o <= (others => '0');
