@@ -64,7 +64,13 @@ entity sdram_model is
         tRAS_CK : natural := 3;   -- ACTIVE -> PRECHARGE, same bank
         tRC_CK  : natural := 4;   -- ACTIVE -> ACTIVE, same bank
         tMRD_CK : natural := 2;   -- LOAD MODE REGISTER -> any command
-        tWR_CK  : natural := 2    -- last write beat -> PRECHARGE
+        tWR_CK  : natural := 2;   -- last write beat -> PRECHARGE
+
+        -- Fail on a READ/WRITE whose start column is not aligned to the
+        -- programmed burst length. See the BURST ALIGNMENT CHECK below.
+        -- Settable so a testbench that deliberately exercises wrapped
+        -- bursts can turn it off; nothing in this project does.
+        strict_burst_align : boolean := true
     );
     port (
         clk     : in    std_logic;
@@ -317,6 +323,38 @@ begin
                         -- simulation exactly as it does on hardware.
                         col_v := addr(7 downto 0);
                         col0  := to_integer(unsigned(col_v));
+
+                        -- BURST ALIGNMENT CHECK (added 2026-08-27 after the
+                        -- bug it would have caught -- see the NOTE ON BURST
+                        -- ALIGNMENT in rtl/memory/sdram_controller.vhd).
+                        --
+                        -- A burst never leaves its own naturally-aligned
+                        -- block of mr_burst_len columns: starting anywhere
+                        -- but the bottom of that block, it counts up and
+                        -- then WRAPS BACK to the start of the block. That
+                        -- is legal, specified behaviour, so a real chip
+                        -- does it silently and a controller that assumed
+                        -- otherwise just gets its beats permuted -- which
+                        -- is exactly how a byte store to an odd halfword
+                        -- ended up writing the wrong column on hardware
+                        -- while every testbench passed.
+                        --
+                        -- Almost no controller wants the wrapped ordering.
+                        -- Flag it loudly rather than quietly reordering the
+                        -- data, so the next controller that gets this wrong
+                        -- fails in simulation instead of on the bench.
+                        if strict_burst_align and mr_burst_len > 1 and
+                           (col0 mod mr_burst_len) /= 0 then
+                            report "sdram_model: UNALIGNED BURST START -- " &
+                                   "column " & integer'image(col0) &
+                                   " is not a multiple of the programmed " &
+                                   "burst length " &
+                                   integer'image(mr_burst_len) &
+                                   ", so this burst wraps backwards inside " &
+                                   "its column block and delivers its beats " &
+                                   "in a rotated order"
+                                   severity failure;
+                        end if;
 
                         if cmd = "0101" then      -- READ
                             -- Schedule every beat the programmed burst

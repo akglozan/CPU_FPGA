@@ -30,16 +30,6 @@
 #define VGA_FB_WIDTH     320u
 #define VGA_FB_HEIGHT    200u
 
-/* TEMP DIAGNOSTIC (2026-08-27, remove once the SDRAM back-to-back read
- * corruption is resolved): vga_line_fetch's raw wb_dat_i for word
- * positions 0/1 of whichever scanline it's currently fetching -- see
- * rtl/video/vga_line_fetch.vhd's dbg_word0_o/dbg_word1_o and
- * rtl/peripherals/periph_bridge.vhd. */
-#define VGA_DBG_WORD0_ADDR 0xE0000018u
-#define VGA_DBG_WORD1_ADDR 0xE000001Cu
-#define VGA_DBG_WORD0 (*(volatile uint32_t *)VGA_DBG_WORD0_ADDR)
-#define VGA_DBG_WORD1 (*(volatile uint32_t *)VGA_DBG_WORD1_ADDR)
-
 #define GPIO_LED (*(volatile uint32_t *)GPIO_LED_ADDR)
 #define GPIO_KEY (*(volatile uint32_t *)GPIO_KEY_ADDR)
 #define UART_TX  (*(volatile uint32_t *)UART_TX_ADDR)

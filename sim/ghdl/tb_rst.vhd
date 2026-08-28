@@ -43,6 +43,14 @@ begin
     dut : entity work.rv32im_soc
         generic map (simulation => true)
         port map (
+            -- Tied high: these testbenches don't model the ESP32 SPI
+            -- transfer, so "the boot loader has already finished" is the
+            -- correct precondition for what they actually test. Without
+            -- this the port defaults to '0', boot_done_latched never
+            -- sets, cpu_rst_n never releases and the CPU runs no
+            -- instructions at all -- which is why this testbench used to
+            -- report a dead SoC.
+            boot_done => '1',
             clk => clk, rst_n => rst_n, uart_rx => uart_rx,
             gpio_keys => gpio_keys, uart_tx => uart_tx, gpio_leds => gpio_leds,
             sdram_cke => sdram_cke, sdram_cs_n => sdram_cs_n,

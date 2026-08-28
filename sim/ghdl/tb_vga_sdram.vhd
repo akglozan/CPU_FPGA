@@ -91,9 +91,6 @@ architecture sim of tb_vga_sdram is
     signal lb_wr_data : std_logic_vector(7 downto 0);
     signal write_bank : std_logic;
 
-    signal dbg_word0 : std_logic_vector(31 downto 0);
-    signal dbg_word1 : std_logic_vector(31 downto 0);
-
     -- pix-domain stimulus.
     signal start_fetch_pix : std_logic := '0';
     signal line_num_pix    : unsigned(7 downto 0) := (others => '0');
@@ -190,8 +187,7 @@ begin
             wb_stb_o => vf_stb, wb_cyc_o => vf_cyc, wb_ack_i => vf_ack,
             buf_wr_en => lb_wr_en, buf_wr_bank => lb_wr_bank,
             buf_wr_col => lb_wr_col, buf_wr_data => lb_wr_data,
-            write_bank_o => write_bank,
-            dbg_word0_o => dbg_word0, dbg_word1_o => dbg_word1
+            write_bank_o => write_bank
         );
 
     -- ---------------------------------------------------------------
@@ -352,16 +348,10 @@ begin
             wait until rising_edge(clk);
         end loop;
 
-        report "after line 0 fetch: dbg_word0=0x" & h32(dbg_word0) &
-               " dbg_word1=0x" & h32(dbg_word1);
-
         pix_pulse(0);
         for i in 1 to 4000 loop
             wait until rising_edge(clk);
         end loop;
-
-        report "after line 1 fetch: dbg_word0=0x" & h32(dbg_word0) &
-               " dbg_word1=0x" & h32(dbg_word1);
 
         checking <= false;
         wait until rising_edge(clk);

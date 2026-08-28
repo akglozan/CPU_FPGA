@@ -58,20 +58,7 @@ entity vga_line_fetch is
         -- which bank is safe to read from (the OTHER one). Changes at
         -- most once per scanline; safe to synchronize as a level, same
         -- reasoning as above.
-        write_bank_o : out std_logic;
-
-        -- TEMP DIAGNOSTIC (2026-08-27, remove once the SDRAM
-        -- back-to-back read corruption is resolved): raw wb_dat_i as
-        -- captured into word_reg for the first two words (col_word=0,
-        -- col_word=1) of whichever scanline is currently being
-        -- fetched. Free-running -- always holds the most recent
-        -- fetch's values. With the framebuffer uniformly filled (as
-        -- vga_smoke_test() does), a correct read means both read back
-        -- as 0x01010101; firmware polls these to see the raw value
-        -- this module actually received over the real SDRAM path,
-        -- without needing a logic analyzer.
-        dbg_word0_o : out std_logic_vector(31 downto 0);
-        dbg_word1_o : out std_logic_vector(31 downto 0)
+        write_bank_o : out std_logic
     );
 end entity vga_line_fetch;
 
@@ -98,9 +85,6 @@ architecture rtl of vga_line_fetch is
     signal col_word     : unsigned(6 downto 0) := (others => '0');  -- 0..79 (320 bytes / 4)
     signal word_reg      : std_logic_vector(31 downto 0);
 
-    -- TEMP DIAGNOSTIC (see dbg_word0_o/dbg_word1_o in the entity).
-    signal dbg_word0 : std_logic_vector(31 downto 0) := (others => '0');
-    signal dbg_word1 : std_logic_vector(31 downto 0) := (others => '0');
     signal byte_idx       : natural range 0 to 3 := 0;
     signal write_bank_r   : std_logic := '0';
 
@@ -205,16 +189,6 @@ begin
                             word_reg  <= wb_dat_i;
                             byte_idx  <= 0;
                             state     <= ST_UNPACK;
-
-                            -- TEMP DIAGNOSTIC: capture the raw word as
-                            -- received, for word positions 0 and 1 of
-                            -- whichever line is currently being
-                            -- fetched. See dbg_word0_o/dbg_word1_o.
-                            if col_word = 0 then
-                                dbg_word0 <= wb_dat_i;
-                            elsif col_word = 1 then
-                                dbg_word1 <= wb_dat_i;
-                            end if;
                         end if;
 
                     when ST_UNPACK =>
@@ -251,9 +225,5 @@ begin
     end process;
 
     write_bank_o <= write_bank_r;
-
-    -- TEMP DIAGNOSTIC.
-    dbg_word0_o <= dbg_word0;
-    dbg_word1_o <= dbg_word1;
 
 end architecture rtl;

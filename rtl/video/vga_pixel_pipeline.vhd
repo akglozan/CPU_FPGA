@@ -69,7 +69,7 @@ architecture rtl of vga_pixel_pipeline is
     signal display_en : std_logic;  -- active_region and not hblank
 
     -- 2-stage matched-latency delay for the sync/blank signals.
-    type delay2_t is array (0 to 1) of std_logic;
+    type delay2_t is array (1 downto 0) of std_logic;
     signal hsync_d, vsync_d, display_en_d : delay2_t := (others => '0');
 
 begin

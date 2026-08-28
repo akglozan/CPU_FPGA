@@ -85,7 +85,7 @@ done
 if [ -n "$1" ]; then
     list="$*"
 else
-    list="tb_mdiv tb_buserr tb_sdram tb_uart tb_soc tb_rst tb_bounce tb_vga_timing_gen tb_vga_line_fetch tb_vga_sdram"
+    list="tb_mdiv tb_buserr tb_sdram tb_uart tb_soc tb_rst tb_bounce tb_vga_timing_gen tb_vga_line_fetch tb_vga_sdram tb_vga_display"
 fi
 
 status=0

@@ -155,7 +155,26 @@ architecture structural of rv32im_soc is
     -- electrical noise for the mechanical reset button in rst_sync.vhd
     -- -- negligible against the real multi-second/minute boot transfer,
     -- but far longer than any realistic glitch.
-    constant BOOT_DONE_DEBOUNCE_CYCLES : natural := 65535;
+    -- Shortened under `simulation` for the same reason get_baud_rate and
+    -- get_rst_stretch_bits below are: at the real 65535 cycles this
+    -- debounce alone is ~1.31 ms, which lands AFTER the end of a typical
+    -- testbench run. Every testbench that instantiates this SoC was
+    -- silently dead because of it -- boot_done never latched, so
+    -- cpu_rst_n never released and the CPU executed nothing, which reads
+    -- exactly like a hung design. Hardware behaviour is unchanged.
+    function get_boot_done_debounce (
+        fast_simulation : boolean
+    ) return natural is
+    begin
+        if fast_simulation then
+            return 63;      -- ~1.26 us at 50 MHz
+        else
+            return 65535;   -- ~1.31 ms, real anti-glitch timing
+        end if;
+    end function;
+
+    constant BOOT_DONE_DEBOUNCE_CYCLES : natural :=
+        get_boot_done_debounce(simulation);
     signal boot_done_sync      : std_logic_vector(1 downto 0) := (others => '0');
     signal boot_done_debounce_cnt : natural range 0 to BOOT_DONE_DEBOUNCE_CYCLES := 0;
     signal boot_done_latched   : std_logic := '0';
@@ -277,12 +296,6 @@ architecture structural of rv32im_soc is
     signal vf_cyc_gated  : std_logic;
     signal vf_ack_used   : std_logic;
     signal vf_rdata_used : std_logic_vector(31 downto 0);
-
-    -- TEMP DIAGNOSTIC: vga_line_fetch's raw received word0/word1, piped
-    -- through to periph_bridge at offsets 0x18/0x1C. See
-    -- vga_line_fetch.vhd's dbg_word0_o/dbg_word1_o.
-    signal vf_dbg_word0 : std_logic_vector(31 downto 0);
-    signal vf_dbg_word1 : std_logic_vector(31 downto 0);
 
     -- sdram_arbiter's downstream port, replacing the direct s1_* ->
     -- sdram_controller wiring Phase 4.1 left in place.
@@ -837,10 +850,7 @@ begin
             gpio_key_data => gpio_key_data,
 
             timer_data    => timer_data,
-            bus_error     => bus_error,
-
-            vga_dbg_word0 => vf_dbg_word0,
-            vga_dbg_word1 => vf_dbg_word1
+            bus_error     => bus_error
         );
 
     u_uart_tx : entity work.uart_tx
@@ -977,10 +987,7 @@ begin
             buf_wr_bank  => lb_wr_bank,
             buf_wr_col   => lb_wr_col,
             buf_wr_data  => lb_wr_data,
-            write_bank_o => vf_write_bank,
-
-            dbg_word0_o => vf_dbg_word0,
-            dbg_word1_o => vf_dbg_word1
+            write_bank_o => vf_write_bank
         );
 
     u_vga_line_buffer : entity work.vga_line_buffer

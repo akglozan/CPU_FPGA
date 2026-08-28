@@ -105,10 +105,6 @@ end entity altsyncram;
 
 architecture sim of altsyncram is
 
-    -- Only words 1022/1023 (0xFF8/0xFFC) are legitimate stack slots.
-    -- Anything below that is an unexpected write.
-    constant code_top : natural := 1021;
-
     type mem_t is array (0 to numwords_a - 1) of std_logic_vector(width_a - 1 downto 0);
 
     impure function load_mif return mem_t is
@@ -208,6 +204,38 @@ architecture sim of altsyncram is
         file_close(f);
         return m;
     end function;
+
+    -- Write monitor threshold: the highest word the program image
+    -- actually initialises. A write at or below it is overwriting code,
+    -- rodata or initialised data and is a genuine bug; everything above
+    -- it is BSS and stack, which the firmware writes legitimately.
+    --
+    -- This used to be hardcoded at 1021, on the assumption that "only
+    -- words 1022/1023 are legitimate stack slots". That was calibrated
+    -- when the firmware was a handful of instructions with almost no
+    -- stack frame, and it went stale the moment main() grew real locals
+    -- -- an ordinary function prologue saving nine words tripped it.
+    -- Deriving it from the loaded image instead means it can't go stale
+    -- again. With no init_file the image is all zeros, image_top returns
+    -- -1, and the monitor is inert -- which is what the DUAL_PORT line
+    -- buffer instance wants.
+    function image_top (m : mem_t) return integer is
+        variable top : integer := -1;
+    begin
+        for i in m'range loop
+            if m(i) /= (m(i)'range => '0') then
+                top := i;
+            end if;
+        end loop;
+        return top;
+    end function;
+
+    impure function get_code_top return integer is
+    begin
+        return image_top(load_mif);
+    end function;
+
+    constant code_top : integer := get_code_top;
 
     signal mem : mem_t := load_mif;
 

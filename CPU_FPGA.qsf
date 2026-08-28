@@ -148,6 +148,21 @@ set_location_assignment PIN_46 -to sdram_dq[14]
 set_location_assignment PIN_44 -to sdram_dq[15]
 
 # ==============================================================================
+# VGA Physical Pin Assignments (RZ-EasyFPGA A2.2 vendor pin table)
+# ==============================================================================
+# Never assigned anywhere in this project before 2026-08-28. The Fitter's
+# "No exact pin location assignment(s) for 5 pins of 59 total pins" Critical
+# Warning was these five -- Quartus was placing the VGA outputs arbitrarily,
+# so nothing reached the physical VGA connector even though the SDRAM/pixel
+# data path was verified clean end to end (see rtl/video/vga_pixel_pipeline.vhd
+# and sim/ghdl/tb_vga_display.vhd).
+set_location_assignment PIN_101 -to vga_hs_pin
+set_location_assignment PIN_103 -to vga_vs_pin
+set_location_assignment PIN_104 -to vga_b_pin
+set_location_assignment PIN_105 -to vga_g_pin
+set_location_assignment PIN_106 -to vga_r_pin
+
+# ==============================================================================
 # Fast I/O Registers for Timing Closure
 # ==============================================================================
 # sdram_dq[*] deliberately has NO FAST_INPUT_REGISTER / FAST_OUTPUT_REGISTER /
