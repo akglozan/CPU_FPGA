@@ -331,10 +331,179 @@ Phase 5 concern.
 
 ---
 
+### Phase 5 Prerequisite Closeout — SDRAM Instruction Fetch, verified on hardware 2026-08-28
+
+**The blocker.** Since Phase 3, instruction fetch was hardwired straight to
+BRAM (`rv32im_soc.vhd` drove `bram_4kb`'s port A directly from `pc`), so the
+CPU could read firmware/WAD data the ESP32 had DMA'd into SDRAM but could
+never execute code living there. Resolving this was a prerequisite for all
+of 5.1–5.3, since a linker script mapping code to SDRAM is pointless if the
+core can't fetch from it.
+
+**The fix — shared-bus fetch, no cache.** Instruction fetch now decodes the
+address: BRAM-range fetches are unchanged (still the direct one-cycle path),
+and SDRAM-range fetches go through a new small arbiter into the existing
+`sdram_arbiter` → `sdram_controller` path, sharing it with the CPU's own
+data accesses (data always wins on contention). An instruction cache was
+considered and rejected for this phase — the added verification surface
+wasn't worth it before Doom's actual performance profile is known.
+
+* `rtl/memory/fetch_arbiter.vhd` (new) — 2-port Wishbone arbiter (DATA vs.
+  FETCH, DATA always wins), with its own watchdog mirroring
+  `bus_interconnect.vhd`'s existing pattern.
+* `rtl/rv32im_soc.vhd` — address-decodes fetch to BRAM or SDRAM; SDRAM
+  fetches route through `fetch_arbiter` into `sdram_arbiter`'s CPU-side port
+  (previously wired directly to the CPU/`boot_loader` mux).
+* `rtl/core/IF_Stage.vhd` — `IF_ID_Register`'s `pc_in` now uses the PC that
+  actually corresponds to the arrived word (gated on `if_sdram_ack`) instead
+  of assuming BRAM's fixed one-cycle latency, which SDRAM's variable latency
+  breaks.
+* `rtl/core/Hazard_Unit.vhd` — new dedicated stall case for an in-flight
+  SDRAM fetch, freezing only IF/ID (not EX/MEM/WB) so a MEM-stage
+  transaction with side effects (UART TX, GPIO, palette writes) can't be
+  re-triggered by prolonging its stall past its own ack.
+* `rtl/core/CPU_FPGA.vhd` — a branch-target latch (`pending_branch`/
+  `pending_target`): if a branch/jump resolves while a fetch is still
+  outstanding, the redirect is held and applied once the fetch completes,
+  rather than dropped (the project's choice: never abandon an in-flight
+  SDRAM transaction).
+
+**A real bug found via the new integration test, not the plan.**
+`Hazard_Unit.vhd` already had a `branch_pending` mechanism for discarding
+the one stale pre-branch instruction that BRAM's fixed 1-cycle latency
+fetches before a redirect takes effect. It stayed "pending" across however
+many cycles `if_id_stall` next happened to be low, then fired the flush
+then. That assumption — exactly one stale fetch, discarded at the next
+opportunity — silently broke for a branch landing on an SDRAM address:
+`if_bus_stall` asserts immediately and freezes IF/ID before any stale word
+can land (so the freeze had already discarded it for free), but
+`branch_pending` stayed set regardless and fired its flush many cycles
+later, exactly when the *real*, correctly-fetched target instruction
+arrived — silently replacing it with a bubble. `tb_if_sdram_fetch` caught
+this directly: a `SW` instruction fetched from SDRAM was writing `0` to
+`GPIO_LED` instead of `5`, traced back to the preceding `ADDI` never
+reaching the ID stage at all. Fixed by making the discard a one-shot check
+on exactly the cycle after a branch (`branch_just_taken`, a single
+registered pulse) rather than an indefinitely-deferred one — see the
+comment at that signal's declaration for the full timing argument.
+
+**Verified in simulation.** `sim/ghdl/tb_fetch_arbiter.vhd` (new) is a unit
+test against a fake echoing slave: DATA-only and FETCH-only passthrough,
+DATA-wins-on-contention with FETCH still completing afterward (not
+dropped), and the watchdog forcing a synthetic ack + sticky `bus_error` on
+timeout. `sim/ghdl/tb_if_sdram_fetch.vhd` (new) is a full end-to-end
+integration test — real `rv32im_soc`, real `sdram_model` on its physical
+pins (unlike `tb_soc.vhd`, which floats them) — that stores three
+hand-assembled instructions into SDRAM via ordinary data writes (the
+Phase 3 path), then jumps into them: `ADDI x2,x0,5`, `SW x2,0(x3)` (to
+`GPIO_LED`), `JAL x0,0` (self-loop). Passing means `GPIO_LED` reaches `0x5`,
+i.e. the CPU decoded and executed real instructions straight out of SDRAM,
+not just read them as data. This also incidentally exercises a branch
+(the `JAL`) resolving while a fetch is outstanding, since the SDRAM
+transaction latency naturally lands that way. Both new tests are in
+`run.sh`'s default list; all 10 pre-existing tests still pass unchanged,
+confirming the arbiter is a transparent no-op when only BRAM is fetched
+from.
+
+**Easy to miss: `CPU_FPGA.qsf` needed `fetch_arbiter.vhd` added as its own
+`VHDL_FILE` assignment.** Unlike `run.sh`, which discovers everything in
+its dependency list automatically, Quartus's project file lists every VHDL
+source explicitly — a new entity referenced from `rv32im_soc.vhd` but
+missing from the `.qsf` fails Analysis & Synthesis with `(10481): ... design
+library "work" does not contain primary unit "fetch_arbiter"` even though
+GHDL had already compiled and passed everything cleanly.
+
+**Fit and timing.** 5,188 / 6,272 logic elements (83%, up from 4,928 /
+6,272 at the Phase 4.2 closeout), 2,490 registers (up from 2,245), memory
+bits and pin count unchanged (41,728 / 276,480; the arbiter added flops and
+muxes, not RAM). Timing closes on both domains — `sys_clk` Fmax 51.12 MHz
+against the 50 MHz requirement (setup slack +0.440 ns), `pix_clk` PLL
+201.17 MHz. **The `sys_clk` margin dropped to ~2.2%**, down from Phase
+4.2's ~6% — the fetch-address decode and arbiter sit on the instruction
+fetch's critical path. Worth checking timing again before adding anything
+else there.
+
+**Confirmed on real hardware 2026-08-28.** Flashed and observed against the
+Phase 4.2 baseline: ESP32 boot chain (SD mount, WAD/firmware read, SPI
+transfer, `BOOT_DONE`), `FW[0]`/`WAD[0]` magic checks, `BUS_ERR = 0`, VGA
+color-cycling test, and LED/button behavior all matched exactly, with no
+regressions. This is the expected and correct result — the firmware
+flashed is still Phase 3/4's, which never fetches from SDRAM, so a clean
+repeat of prior behavior confirms the new fetch path is a true no-op for
+existing code, matching what GHDL predicted. Actual SDRAM-resident code
+execution on real hardware (as opposed to in `tb_if_sdram_fetch`) will
+first be observable once Phase 5.1/5.2 produce firmware that's actually
+linked to run from SDRAM.
+
+---
+
+### Phase 5.1 Bring-Up Bug — SDRAM fetch/data starvation, fixed 2026-08-28
+
+First real SDRAM-resident firmware (`rv32_firmware`'s `crt0.s`+`main.c`,
+linked via `linker_sdram.ld`, booted via a small BRAM `boot_stub.s`)
+printed its immediate `"ABC"` greeting correctly on real hardware, then
+produced garbled or missing output for everything after — every
+`.rodata`-sourced string/table read, and everything touching the stack,
+which `linker_sdram.ld` also placed in SDRAM.
+
+**Root cause**: `if_fetch_stb`/`if_fetch_cyc` in `rv32im_soc.vhd` were
+driven as a bare level — asserted for as long as PC sat in the SDRAM
+range, with no gap between back-to-back fetches. `fetch_arbiter`'s grant
+only re-arbitrates when its `m_cyc_o` goes idle, and fetch's own request
+never did once the CPU started running SDRAM-resident code — so once
+FETCH first won the grant, DATA (every stack push/pop, every `.rodata`
+read) could never win the bus again, despite `fetch_arbiter`'s own header
+comment promising "DATA always wins". The system only limped forward at
+all because `bus_interconnect`'s watchdog — meant for genuine
+unanswered-slave faults — eventually force-acked each starved DATA access
+after its full 65536-cycle timeout. Reproduced in GHDL as the CPU parking
+on a single `pc` for ~1.3 ms at a time (matching the watchdog period
+exactly), `BUS_ERR` permanently latched, ~10.45 ms lost crawling through
+just the first handful of `main()`'s prologue stores. A forced ack is not
+a real completed transaction, which very plausibly explains the garbled
+(rather than merely delayed) real-hardware output.
+
+Found via a new GHDL reproduction testbench (`sim/ghdl/tb_firmware_sdram.vhd`)
+that bit-bangs the *actual compiled* `rv32_firmware/build/firmware.bin`
+over the real `spi_slave`/`boot_loader` RTL and decodes `uart_tx` like a
+serial monitor — `tb_if_sdram_fetch.vhd`'s narrow hand-assembled sequence
+never exercised the continuous, tightly-interleaved fetch+data access
+pattern of a real program. (The reproduction effort also turned up two
+testbench-only pitfalls worth remembering: starting the simulated SPI
+transfer before the SoC's internal reset synchronizer/SDRAM power-on
+sequence has settled silently drops the first MOSI bit and shifts every
+byte after it; and `rv32im_soc`'s `get_baud_rate()` runs the UART at
+12.5 MHz, not 115200, whenever `simulation=>true`.)
+
+**Fix**: hold `if_fetch_stb`/`if_fetch_cyc` low for the one bubble cycle
+`sdram_controller`'s own `ST_IDLE` already burns after every ack (see its
+`wait_cnt<=1` comment in `ST_READ_DATA2`/`ST_WRITE_REC`) — this costs no
+additional latency, since the controller was already going to ignore
+`wb_cyc_i`/`wb_stb_i` for that one cycle regardless, but it finally makes
+that idle cycle visible to `fetch_arbiter` as a genuine `m_cyc_o='0'`
+moment, restoring its ability to actually re-arbitrate in DATA's favour.
+The identical exposure existed one level up too — `fetch_arbiter`'s own
+combined output could just as easily have starved `vga_line_fetch` out of
+`sdram_arbiter`'s port A — never yet observed only because nothing had
+gotten far enough to draw a frame; the same fix closes that gap as a
+side effect, at its actual source, rather than patching each arbiter
+individually.
+
+`tb_firmware_sdram.vhd` is now a permanent regression test (added to
+`run.sh`'s default list) checking three things after boot completes: the
+`"ABC\r\n"` greeting arrives byte-for-byte intact, `GPIO_LED` reaches
+`0xF` within 500 µs (versus the ~10.45 ms the bug produced), and
+`BUS_ERR` never latches. All 13 GHDL testbenches pass with the fix in
+place.
+
+**Confirmed on real hardware (2026-08-28).** After flashing the fix, the CPU-side serial monitor showed the full expected sequence — `ABC` greeting, `FW[0]`/`WAD[0]` matching the expected magic bytes, and `BUS_ERR: 0x00000000` — followed by the VGA color-cycling smoke test running cleanly (RED/GREEN/BLUE/WHITE, no stalls). The `delay()` busy-wait in `vga_color_test()` was recalibrated at the same time: it had originally been tuned by feel assuming near-single-cycle BRAM execution, and once this code started genuinely running from SDRAM (each fetch costing ~7-10 cycles instead of BRAM's ~1) the observed pacing came out roughly 10x slower than intended. It's now retuned to land on the originally-intended ~3s per color, confirmed against the printed serial-monitor message.
+
+---
+
 ### Phase 5: Software Toolchain & Bare-Metal Doom Porting
-- [ ] **5.1 GCC Setup**
-  - [ ] Install and configure `riscv32-unknown-elf-gcc` cross-compiler.
-  - [ ] Write custom linker script (`linker.ld`) mapping code and data sections to SDRAM.
+- [x] **5.1 GCC Setup**
+  - [x] Install and configure `riscv32-unknown-elf-gcc` cross-compiler.
+  - [x] Write custom linker script (`linker_sdram.ld`) mapping code and data sections to SDRAM.
 - [ ] **5.2 Engine Porting**
   - [ ] Strip OS-dependent calls (`malloc`, `printf`, file I/O) from Doom source code.
   - [ ] Redirect `I_ReadFile` calls to memory pointers referencing the SDRAM WAD location.

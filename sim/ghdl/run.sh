@@ -51,6 +51,7 @@ for f in \
     rtl/core/CPU_FPGA.vhd \
     rtl/memory/bram_4kb.vhd \
     rtl/memory/bus_interconnect.vhd \
+    rtl/memory/fetch_arbiter.vhd \
     rtl/memory/sdram_controller.vhd \
     rtl/memory/spi_slave.vhd \
     rtl/memory/boot_loader.vhd \
@@ -85,7 +86,7 @@ done
 if [ -n "$1" ]; then
     list="$*"
 else
-    list="tb_mdiv tb_buserr tb_sdram tb_uart tb_soc tb_rst tb_bounce tb_vga_timing_gen tb_vga_line_fetch tb_vga_sdram tb_vga_display"
+    list="tb_mdiv tb_buserr tb_sdram tb_uart tb_soc tb_rst tb_bounce tb_vga_timing_gen tb_vga_line_fetch tb_vga_sdram tb_vga_display tb_fetch_arbiter tb_if_sdram_fetch tb_firmware_sdram tb_gpio_key"
 fi
 
 status=0

@@ -358,6 +358,47 @@ architecture structural of rv32im_soc is
     signal s1_cyc         : std_logic;
     signal s1_ack         : std_logic;
 
+    -- Phase 5: instruction-fetch path to SDRAM. pc_raw is IF_Stage's
+    -- undelayed PC (wired below via pc_debug => pc_current_out =>
+    -- pc_wire) -- unlike pc (imem_addr_o/pc_fetch_out, which has the
+    -- if_id_stall/pc_delayed mux applied), it does not depend on
+    -- if_id_stall, so this decode can't loop back through the stall
+    -- it's about to produce.
+    signal pc_raw         : std_logic_vector(31 downto 0);
+    signal if_is_sdram    : std_logic;
+    signal if_fetch_adr   : std_logic_vector(31 downto 0);
+    signal if_fetch_rdata : std_logic_vector(31 downto 0);
+    signal if_fetch_stb   : std_logic;
+    signal if_fetch_cyc   : std_logic;
+    signal if_fetch_ack   : std_logic;
+    -- One-cycle-delayed if_fetch_ack: forces if_fetch_stb/if_fetch_cyc
+    -- low for exactly the bubble cycle sdram_controller's own ST_IDLE
+    -- already burns after every ack, so fetch_arbiter (and, one level
+    -- up, sdram_arbiter) actually see the bus go idle and can
+    -- re-arbitrate -- see the fetch-request assignments below for the
+    -- full bug writeup.
+    signal if_fetch_bubble : std_logic := '0';
+    signal if_bus_stall   : std_logic;
+    signal if_sdram_ack   : std_logic;
+    signal cpu_imem_rdata : std_logic_vector(31 downto 0);
+
+    -- fetch_arbiter <-> sdram_arbiter. The CPU-data path (s1_*, from
+    -- bus_interconnect's slave-1 port) now goes through fetch_arbiter
+    -- first, arbitrated against the new CPU-fetch path, before reaching
+    -- sdram_arbiter's existing port A -- sdram_arbiter itself is
+    -- unchanged.
+    signal fa_addr        : std_logic_vector(31 downto 0);
+    signal fa_wdata       : std_logic_vector(31 downto 0);
+    signal fa_rdata       : std_logic_vector(31 downto 0);
+    signal fa_sel         : std_logic_vector(3 downto 0);
+    signal fa_we          : std_logic;
+    signal fa_stb         : std_logic;
+    signal fa_cyc         : std_logic;
+    signal fa_ack         : std_logic;
+
+    signal bus_error_ic    : std_logic;  -- bus_interconnect's own bus_error_o
+    signal fetch_bus_error : std_logic;  -- fetch_arbiter's watchdog
+
     signal s2_addr        : std_logic_vector(31 downto 0);
     signal s2_wdata       : std_logic_vector(31 downto 0);
     signal s2_rdata       : std_logic_vector(31 downto 0);
@@ -477,9 +518,12 @@ begin
             rst_n        => cpu_rst_n,
 
             imem_addr_o  => pc,
-            imem_rdata_i => instruction,
+            imem_rdata_i => cpu_imem_rdata,
 
-            pc_debug     => open,
+            if_bus_stall_i => if_bus_stall,
+            if_sdram_ack_i => if_sdram_ack,
+
+            pc_debug     => pc_raw,
             instr_debug  => open,
             rs1_debug    => open,
             rs2_debug    => open,
@@ -578,6 +622,11 @@ begin
     end process;
 
 
+    -- Phase 5: fetch_arbiter's own watchdog (protects the new
+    -- instruction-fetch path; see its header) OR'd into the same
+    -- BUS_ERR bit bus_interconnect's watchdog already drives.
+    bus_error <= bus_error_ic or fetch_bus_error;
+
     boot_active <= not boot_done_latched;
 
     -- The CPU comes out of reset one cycle after boot_active has
@@ -616,7 +665,7 @@ begin
         m_stb_i => mux_stb,
         m_cyc_i => mux_cyc,
         m_ack_o => mux_ack,
-        bus_error_o => bus_error,
+        bus_error_o => bus_error_ic,
 
         s0_adr_o => s0_addr,
         s0_dat_o => s0_wdata,
@@ -713,24 +762,130 @@ begin
             rdata_b => s0_rdata
         );
 
-    -- Phase 4.2: sdram_arbiter now sits between bus_interconnect's
-    -- slave-1 port (CPU/boot_loader, port A) and sdram_controller,
-    -- with vga_line_fetch as port B. See sdram_arbiter.vhd for why
-    -- this is a separate arbiter rather than a third leg on the
-    -- boot_active mux above.
+    -- Phase 5: instruction fetch from SDRAM -- resolves the
+    -- fetch-hardwired-to-BRAM blocker from the Phase 3 closeout. pc_raw
+    -- in the SDRAM range (0x8000_0000-0x87FF_FFFF, same decode
+    -- bus_interconnect uses for data accesses) routes the fetch through
+    -- fetch_arbiter/sdram_arbiter instead of bram_4kb's port A. See
+    -- fetch_arbiter.vhd, Hazard_Unit.vhd's dedicated fetch-stall case,
+    -- IF_Stage.vhd's pc_in_to_ifid mux, and CPU_FPGA.vhd's
+    -- pending_branch/pending_target latch for the rest of this design.
+    if_is_sdram  <= '1' when pc_raw(31 downto 27) = "10000" else '0';
+
+    -- BUG FOUND 2026-08-28 (GHDL reproduction of the Phase 5.1 hardware
+    -- bring-up failure -- see docs/README.md): if_fetch_stb/if_fetch_cyc
+    -- used to be driven as a bare level, "asserted for as long as PC
+    -- happens to sit in the SDRAM range" -- true across every fetch,
+    -- back to back, with no gap, for the entire time the CPU runs code
+    -- resident in SDRAM. fetch_arbiter's grant only ever re-arbitrates
+    -- when its m_cyc_o goes idle ('0'); with fetch's own request never
+    -- dropping, m_cyc_o never went idle once FETCH first won the grant,
+    -- so DATA (CPU stores/loads, including every stack push/pop once
+    -- linker_sdram.ld put the stack in SDRAM, and every .rodata read)
+    -- could never win the bus again -- despite fetch_arbiter's header
+    -- comment promising "DATA always wins". The only thing that ever
+    -- unstuck a pending DATA access was bus_interconnect's own watchdog
+    -- (meant for genuine unanswered-slave faults) timing out after
+    -- 65536 cycles and force-acking it -- reproduced in simulation as
+    -- the CPU parking at a single pc for ~1.3 ms at a time, sticky
+    -- BUS_ERR permanently latched, and (very plausibly, given a forced
+    -- ack is not a real completed transaction) the "ABC" prints fine
+    -- but everything .rodata-sourced after it comes out garbled symptom
+    -- seen on real hardware. The same starvation risk exists one level
+    -- up too: fa_cyc (this arbiter's own combined output) would have
+    -- been just as continuously asserted whenever FETCH is running,
+    -- which could in principle have starved vga_line_fetch out of
+    -- sdram_arbiter's port A the same way -- never observed yet only
+    -- because nothing got far enough to draw a frame.
+    --
+    -- Fix: hold the fetch request low for exactly the one bubble cycle
+    -- that already exists right after every ack -- sdram_controller's
+    -- own ST_IDLE already burns that cycle unconditionally (see its
+    -- wait_cnt<=1 comment in ST_READ_DATA2/ST_WRITE_REC) before it looks
+    -- at wb_cyc_i/wb_stb_i again, so this costs no additional latency;
+    -- it just makes that already-existing idle cycle visible to
+    -- fetch_arbiter (and, transitively, sdram_arbiter) as a genuine
+    -- m_cyc_o='0' moment, restoring their ability to actually
+    -- re-arbitrate in DATA's (or VGA's) favour instead of latching
+    -- FETCH's grant forever. if_bus_stall below is deliberately left
+    -- keyed off if_fetch_ack alone, unchanged -- the pipeline-freeze
+    -- window is exactly as long as before; only the request signal
+    -- fetch_arbiter sees gets this one-cycle gap.
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n_sync = '0' then
+                if_fetch_bubble <= '0';
+            else
+                if_fetch_bubble <= if_fetch_ack;
+            end if;
+        end if;
+    end process;
+
+    if_fetch_adr <= pc_raw;
+    if_fetch_stb <= if_is_sdram and not if_fetch_bubble;
+    if_fetch_cyc <= if_is_sdram and not if_fetch_bubble;
+
+    -- Mirrors MEM_Stage's own bus_stall_o (bus_access and not ack):
+    -- held high for as long as this fetch is outstanding, however many
+    -- cycles that takes.
+    if_bus_stall <= if_is_sdram and not if_fetch_ack;
+    if_sdram_ack <= if_is_sdram and if_fetch_ack;
+
+    cpu_imem_rdata <= if_fetch_rdata when if_is_sdram = '1' else instruction;
+
+    u_fetch_arbiter : entity work.fetch_arbiter
+        port map (
+            clk   => clk,
+            rst_n => rst_n_sync,
+
+            data_adr_i => s1_addr,
+            data_dat_i => s1_wdata,
+            data_dat_o => s1_rdata,
+            data_sel_i => s1_sel,
+            data_we_i  => s1_we,
+            data_stb_i => s1_stb,
+            data_cyc_i => s1_cyc,
+            data_ack_o => s1_ack,
+
+            fetch_adr_i => if_fetch_adr,
+            fetch_dat_o => if_fetch_rdata,
+            fetch_sel_i => "1111",
+            fetch_stb_i => if_fetch_stb,
+            fetch_cyc_i => if_fetch_cyc,
+            fetch_ack_o => if_fetch_ack,
+
+            m_adr_o => fa_addr,
+            m_dat_o => fa_wdata,
+            m_dat_i => fa_rdata,
+            m_sel_o => fa_sel,
+            m_we_o  => fa_we,
+            m_stb_o => fa_stb,
+            m_cyc_o => fa_cyc,
+            m_ack_i => fa_ack,
+
+            bus_error_o => fetch_bus_error
+        );
+
+    -- Phase 4.2: sdram_arbiter sits between the CPU-data path (now via
+    -- fetch_arbiter above, port A) and sdram_controller, with
+    -- vga_line_fetch as port B. See sdram_arbiter.vhd for why this is a
+    -- separate arbiter rather than a third leg on the boot_active mux
+    -- above. Unchanged since Phase 4.2 -- only what feeds its port A
+    -- changed (fa_* instead of s1_* directly).
     u_sdram_arbiter : entity work.sdram_arbiter
         port map (
             clk   => clk,
             rst_n => rst_n_sync,
 
-            a_adr_i => s1_addr,
-            a_dat_i => s1_wdata,
-            a_dat_o => s1_rdata,
-            a_sel_i => s1_sel,
-            a_we_i  => s1_we,
-            a_stb_i => s1_stb,
-            a_cyc_i => s1_cyc,
-            a_ack_o => s1_ack,
+            a_adr_i => fa_addr,
+            a_dat_i => fa_wdata,
+            a_dat_o => fa_rdata,
+            a_sel_i => fa_sel,
+            a_we_i  => fa_we,
+            a_stb_i => fa_stb,
+            a_cyc_i => fa_cyc,
+            a_ack_o => fa_ack,
 
             b_adr_i => vf_adr,
             b_dat_i => (others => '0'),  -- vga_line_fetch never writes
@@ -892,6 +1047,9 @@ begin
                  when boot_active = '1' else led_out_cpu;
 
     u_gpio_key : entity work.gpio_key
+        generic map (
+            simulation => simulation
+        )
         port map (
             clk        => clk,
             rst_n      => rst_n_sync,

@@ -17,14 +17,21 @@ static void uart_putc(uint8_t c)
 }
 
 /* Crude busy-wait delay so the blink is visible to the eye rather than
- * happening every clock cycle (which would just look dim/solid). Not
- * calibrated to a specific time -- just enough spin to be visible at
- * 50 MHz with -O2 (the loop body is not optimized away since 'i' is
- * volatile, forcing an actual memory read/compare/branch each pass). */
+ * happening every clock cycle (which would just look dim/solid).
+ * Calibrated 2026-08-28 against real hardware, running from SDRAM (this
+ * loop and its stack both live there now, per linker_sdram.ld -- each
+ * iteration costs an SDRAM instruction fetch, ~7-10 cycles, not BRAM's
+ * ~1): the previous 2,000,000 count -- tuned back when this only ran
+ * from BRAM -- measured out to ~30s per color in vga_color_test() below
+ * (6 delay() calls per color) instead of the intended ~3s, a ~10x
+ * slowdown matching the fetch-latency difference exactly. Scaled down
+ * by that same ~1/6 to land back on a deliberately-chosen ~5s per
+ * color; the loop body is not optimized away since 'i' is volatile,
+ * forcing an actual memory read/compare/branch each pass. */
 static void delay(void)
 {
     volatile uint32_t i;
-    for (i = 0; i < 2000000u; i++) {
+    for (i = 0; i < 111111u; i++) {
         /* spin */
     }
 }
@@ -281,6 +288,59 @@ static void vga_color_test(void)
     }
 }
 
+/* Phase 6.1 bring-up: gpio_key.vhd, its MMIO wiring, and the four
+ * PIN_88..91 button assignments (see CPU_FPGA.qsf) have existed since
+ * early in the project but were never actually exercised end to end --
+ * nothing before this read GPIO_KEY. This is the same kind of one-shot
+ * hardware confirmation as vga_smoke_test() above: poll the register
+ * for a short window, print every state change over UART, and mirror
+ * it live onto the LEDs, so a button press is visible two independent
+ * ways at once.
+ *
+ * Both GPIO_KEY and GPIO_LED are active-low 4-bit fields on this board
+ * (see the "Push Buttons / Keys (Active-Low Inputs)" comment in
+ * CPU_FPGA.qsf, and GPIO_LED's own active-low note in main() below), so
+ * a straight copy of one into the other lights each LED exactly under
+ * the button that drives it -- no inversion needed.
+ *
+ * Confirmed on hardware 2026-08-28: the first version of this test
+ * called delay() once per poll (~0.5s each, 20 iterations), so it only
+ * ever sampled GPIO_KEY 20 times across the whole window -- a quick tap
+ * that didn't happen to land on one of those instants was silently
+ * missed, matching exactly what was observed (only a press held across
+ * a sample point registered). Fixed by dropping delay() from the loop
+ * entirely and sampling every iteration instead; the iteration count
+ * below is scaled up by the same ~0.5s/111111-iterations ratio so the
+ * window is still ~10s overall, just sampled continuously rather than
+ * at 20 checkpoints.
+ */
+#define GPIO_KEY_TEST_ITERS (20u * 111111u)
+
+static void gpio_key_test(void)
+{
+    uint32_t last = 0xFFFFFFFFu; /* force one print on the first read */
+    uint32_t iter;
+
+    uart_print_str("GPIO key test: press KEY0-3 now (~10s window), "
+                   "LEDs mirror button state live\r\n");
+
+    for (iter = 0; iter < GPIO_KEY_TEST_ITERS; iter++) {
+        uint32_t keys = GPIO_KEY & 0xFu;
+
+        if (keys != last) {
+            uart_print_str("KEY state: ");
+            uart_print_hex32(keys);
+            uart_print_str("\r\n");
+            last = keys;
+        }
+
+        GPIO_LED = keys;
+    }
+
+    GPIO_LED = 0xFu; /* back to all-off before vga_color_test's heartbeat */
+    uart_print_str("GPIO key test: done\r\n");
+}
+
 int main(void)
 {
     /* LEDs on this board are active-low: writing 0x0 turns every LED ON
@@ -301,6 +361,7 @@ int main(void)
     verify_sdram_boot_load();
     vga_smoke_test();
     vga_readback_check();
+    gpio_key_test();
     vga_color_test();
 
     return 0;

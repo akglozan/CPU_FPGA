@@ -221,6 +221,7 @@ set_global_assignment -name VHDL_FILE rtl/core/MEM_Stage.vhd
 set_global_assignment -name VHDL_FILE rtl/core/CPU_FPGA.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/bram_4kb.vhd
 set_global_assignment -name VHDL_FILE rtl/memory/bus_interconnect.vhd
+set_global_assignment -name VHDL_FILE rtl/memory/fetch_arbiter.vhd
 set_global_assignment -name VHDL_FILE rtl/rv32im_soc.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/uart_tx.vhd
 set_global_assignment -name VHDL_FILE rtl/peripherals/gpio_led.vhd

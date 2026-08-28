@@ -25,9 +25,19 @@ entity CPU_FPGA is
         -- Fetch address presented to the external instruction BRAM.
         imem_addr_o     : out std_logic_vector(31 downto 0);
         -- Instruction word returned by the BRAM (one cycle after the
-        -- address was presented).
+        -- address was presented), or the SDRAM fetch path's data when
+        -- pc is in SDRAM range -- rv32im_soc.vhd muxes the two.
         imem_rdata_i    : in  std_logic_vector(31 downto 0);
-        
+
+        -- Phase 5: high while an instruction fetch to SDRAM is
+        -- outstanding (rv32im_soc.vhd's if_bus_stall). Feeds
+        -- Hazard_Unit's dedicated fetch-stall case.
+        if_bus_stall_i  : in  std_logic;
+        -- Phase 5: pulses the one cycle a SDRAM-sourced instruction is
+        -- being captured into IF_ID_Register. Feeds IF_Stage's
+        -- pc_in_to_ifid mux (see IF_Stage.vhd for why that's needed).
+        if_sdram_ack_i  : in  std_logic;
+
         -- Debug Outputs
         -- Current program counter, for on-chip debug (SignalTap/etc.).
         pc_debug        : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -63,6 +73,27 @@ architecture Structural of CPU_FPGA is
     signal target_pc_wire    : std_logic_vector(31 downto 0);
     signal stall_m_wire      : std_logic;
     signal bus_stall_wire    : std_logic;
+
+    -- Phase 5: take_branch_wire/target_pc_wire are EX_Stage's raw,
+    -- single-cycle combinational outputs -- valid only the one cycle a
+    -- branch resolves, since EX_Stage moves on to whatever's next
+    -- (a bubble, if id_ex_flush fired) the very next cycle regardless.
+    -- Hazard_Unit's existing branch_pending mechanism only remembers
+    -- THAT a branch happened (a one-bit flag), which was enough when
+    -- the redirect always applies the very next cycle (BRAM's fixed
+    -- one-cycle fetch latency). It is not enough here: if a branch
+    -- resolves while if_bus_stall_i is asserted, case 4 in Hazard_Unit
+    -- deliberately holds pc_write low rather than apply the redirect
+    -- (see that case's comment for why -- aborting the in-flight SDRAM
+    -- fetch is what we're avoiding), and that stall can run for many
+    -- cycles. Without latching WHERE to jump, target_pc_wire would be
+    -- long gone (EX_Stage having moved on to other instructions) by the
+    -- time the redirect is finally allowed to happen, and the branch
+    -- would be silently dropped. pending_branch/pending_target hold it.
+    signal pending_branch  : std_logic := '0';
+    signal pending_target  : std_logic_vector(31 downto 0) := (others => '0');
+    signal take_branch_eff : std_logic;
+    signal target_pc_eff   : std_logic_vector(31 downto 0);
 
     signal pc_current        : std_logic_vector(31 downto 0);
     signal id_pc             : std_logic_vector(31 downto 0);
@@ -114,10 +145,38 @@ architecture Structural of CPU_FPGA is
 
 begin
 
+    -- Phase 5 branch-target latch. Set the cycle a branch resolves while
+    -- a SDRAM fetch is outstanding (can't apply it yet); applied (and
+    -- cleared) the cycle the fetch finally completes. See the signals'
+    -- declaration above for the full rationale.
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n = '0' then
+                pending_branch <= '0';
+                pending_target <= (others => '0');
+            elsif take_branch_wire = '1' and if_bus_stall_i = '1' then
+                pending_branch <= '1';
+                pending_target <= target_pc_wire;
+            elsif pending_branch = '1' and if_bus_stall_i = '0' then
+                pending_branch <= '0';
+            end if;
+        end if;
+    end process;
+
+    -- Whenever if_bus_stall_i never asserts (every scenario before
+    -- Phase 5, and any current instruction stream that never executes
+    -- from SDRAM), pending_branch stays 0 forever and these reduce to
+    -- exactly take_branch_wire/target_pc_wire -- unchanged behavior.
+    take_branch_eff <= '1' when if_bus_stall_i = '0' and
+                                 (take_branch_wire = '1' or pending_branch = '1')
+                        else '0';
+    target_pc_eff   <= pending_target when pending_branch = '1' else target_pc_wire;
+
     -- 1. Instruction Fetch Stage
     U_STAGE_IF : entity work.IF_Stage
-        generic map ( 
-            DATA_WIDTH => DATA_WIDTH 
+        generic map (
+            DATA_WIDTH => DATA_WIDTH
         )
         port map (
             clk             => clk,
@@ -125,8 +184,9 @@ begin
             pc_write        => pc_write_wire,
             if_id_stall     => if_id_stall_wire,
             if_id_flush     => if_id_flush_wire,
-            pc_src          => take_branch_wire,
-            target_pc       => target_pc_wire,
+            pc_src          => take_branch_eff,
+            target_pc       => target_pc_eff,
+            if_sdram_ack    => if_sdram_ack_i,
             pc_fetch_out    => imem_addr_o,
             instr_fetch_in  => imem_rdata_i,
             pc_current_out  => pc_current,
@@ -269,11 +329,12 @@ begin
             rst_n         => rst_n,
             stall_m       => stall_m_wire,
             stall_wb_mem  => bus_stall_wire,
+            if_bus_stall  => if_bus_stall_i,
             id_rs1_addr   => id_rs1_addr,
             id_rs2_addr   => id_rs2_addr,
             ex_rd_addr    => ex_rd_addr,
             ex_mem_read   => ex_mem_read,
-            take_branch   => take_branch_wire,
+            take_branch   => take_branch_eff,
             pc_write      => pc_write_wire,
             if_id_stall   => if_id_stall_wire,
             if_id_flush   => if_id_flush_wire,

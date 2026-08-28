@@ -24,6 +24,11 @@ entity Hazard_Unit is
         -- multi-cycle multiply/divide.
         stall_m       : in  std_logic;
         stall_wb_mem  : in  std_logic; -- High when WB bus transaction is waiting for ack
+        -- Phase 5: high while an instruction fetch to SDRAM is
+        -- outstanding (see rv32im_soc.vhd's if_bus_stall). Deliberately
+        -- a separate port from stall_wb_mem rather than OR'd into it --
+        -- see the dedicated case below for why.
+        if_bus_stall  : in  std_logic;
         -- ID-stage source register 1 address, compared against
         -- ex_rd_addr for load-use hazard detection.
         id_rs1_addr   : in  std_logic_vector(4 downto 0);
@@ -64,42 +69,53 @@ architecture Behavioral of Hazard_Unit is
     -- design) would clear the pipeline too early, letting that stale
     -- pre-branch instruction slip into ID the following cycle.
     --
-    -- branch_pending tracks "there is a stale pre-branch fetch still in
-    -- flight that needs to be discarded." It is set the cycle a branch is
-    -- taken, and stays set across any intervening if_id_stall cycles
-    -- (bus wait-states, load-use hazards) since IF_ID_Register is frozen
-    -- during those and the stale instruction hasn't landed yet anyway.
-    -- It only clears on the cycle the flush actually takes effect (i.e.
-    -- if_id_stall = '0'), which is also the cycle it forces if_id_flush.
+    -- branch_just_taken is a single registered pulse, high for exactly
+    -- the one cycle immediately after take_branch -- the only cycle on
+    -- which a stale pre-branch fetch could possibly land in IF/ID. If
+    -- if_id_stall_comb is already '1' that cycle (IF/ID frozen for any
+    -- reason -- a bus wait-state, a load-use hazard, or Phase 5's SDRAM
+    -- if_bus_stall), the freeze itself already prevents the stale word
+    -- from being latched, so no flush is needed and none is asserted.
+    --
+    -- Earlier version of this logic (branch_pending) stayed pending
+    -- across every subsequent if_id_stall cycle and fired the flush
+    -- whenever if_id_stall_comb *next* happened to drop -- correct only
+    -- if that first post-branch cycle was guaranteed to be the one that
+    -- captures the stale fetch. That assumption broke for a branch
+    -- landing on an SDRAM address: if_bus_stall asserts immediately
+    -- (freezing IF/ID before any stale word lands, per the paragraph
+    -- above), so the "pending" flush instead fired many cycles later,
+    -- on the cycle the CORRECT target instruction finally arrived from
+    -- SDRAM -- silently replacing it with a bubble. Found via
+    -- tb_if_sdram_fetch: the first SDRAM-resident instruction after a
+    -- JALR into SDRAM never reached ID at all. Restricting the check to
+    -- a single one-shot cycle (this version) fixes that: if the freeze
+    -- is already up that one cycle, the flush is simply skipped rather
+    -- than deferred.
+    --
     -- This does not affect id_ex_flush, which flushes instructions
     -- already resident in pipeline registers (not a fetch in flight)
-    -- and is unaffected by BRAM latency.
-    signal branch_pending      : std_logic := '0';
+    -- and is unaffected by fetch latency of any kind.
+    signal branch_just_taken   : std_logic := '0';
     signal if_id_stall_comb    : std_logic;
     signal take_branch_flush   : std_logic;
 
 begin
 
-    -- Cycle this flush actually takes effect: pending from a PRIOR taken
-    -- branch, and IF/ID is not frozen this cycle. take_branch itself is
-    -- handled separately by case 4 below (unchanged, same-cycle flush of
-    -- whatever's already resident in IF/ID); this signal only covers the
-    -- following cycle's stale in-flight fetch.
-    take_branch_flush <= branch_pending and not if_id_stall_comb;
+    -- The one and only cycle this flush can take effect: the cycle right
+    -- after a taken branch, and only if IF/ID isn't already frozen for
+    -- some other reason this same cycle. take_branch itself is handled
+    -- separately by case 4 below (unchanged, same-cycle flush of
+    -- whatever's already resident in IF/ID).
+    take_branch_flush <= branch_just_taken and not if_id_stall_comb;
 
 process(clk)
 begin
     if rising_edge(clk) then
         if rst_n = '0' then
-            branch_pending <= '0';
-        elsif take_branch = '1' then
-            -- A new branch always (re-)arms the pending flag, even if a
-            -- previously pending flush is also resolving this same cycle
-            -- (back-to-back taken branches) -- the new branch's own fetch
-            -- is now in flight and needs its own future flush.
-            branch_pending <= '1';
-        elsif take_branch_flush = '1' then
-            branch_pending <= '0';
+            branch_just_taken <= '0';
+        else
+            branch_just_taken <= take_branch;
         end if;
     end if;
 end process;
@@ -109,6 +125,7 @@ end process;
     -- above) does not depend on signals assigned inside process(all).
     if_id_stall_comb <= '1' when (stall_wb_mem = '1') or (stall_m = '1') or
         (ex_mem_read = '1' and (ex_rd_addr = id_rs1_addr or ex_rd_addr = id_rs2_addr) and ex_rd_addr /= "00000")
+        or (if_bus_stall = '1')
         else '0';
 
 process(all)
@@ -151,7 +168,35 @@ begin
         mem_wb_stall <= '0';
         id_ex_flush  <= '1';
     
-    -- 4. Control Hazards (Branch / Jump Flushes)
+    -- 4. Instruction-Fetch Stall (SDRAM fetch in flight, no MEM-stage
+    -- bus wait of its own -- that's cases 1/2 above). Freezes only the
+    -- front of the pipe: IF/ID holds its position (there's nothing new
+    -- to fetch yet) and ID/EX gets a bubble every cycle instead of being
+    -- frozen, so EX/MEM/WB keep draining normally, governed solely by
+    -- MEM_Stage's own bus_stall_o. Deliberately NOT merged into case 1's
+    -- global freeze: prolonging ex_mem_stall/mem_wb_stall past a MEM
+    -- transaction's own ack (which is level-driven off a frozen EX/MEM
+    -- register) would re-assert wb_we_o/wb_stb_o/wb_cyc_o for extra
+    -- cycles after that transaction already completed -- harmless for
+    -- idempotent memory, but a real bug for a write with side effects
+    -- (UART TX, GPIO, palette) getting re-executed.
+    --
+    -- This also takes priority over case 5 (branch) below: a branch
+    -- resolving while a fetch is outstanding is held pending rather
+    -- than applied immediately, so the outstanding SDRAM request is
+    -- never abandoned mid-transaction. See CPU_FPGA.vhd's
+    -- pending_branch/pending_target latch, which holds the redirect
+    -- (take_branch is already that latched, "effective" signal by the
+    -- time it reaches this port) until this case clears.
+    elsif if_bus_stall = '1' then
+        pc_write     <= '0';
+        if_id_stall  <= '1';
+        id_ex_stall  <= '0';
+        ex_mem_stall <= '0';
+        mem_wb_stall <= '0';
+        id_ex_flush  <= '1';
+
+    -- 5. Control Hazards (Branch / Jump Flushes)
     elsif take_branch = '1' then
         pc_write     <= '1';
         if_id_flush  <= '1';

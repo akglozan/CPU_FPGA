@@ -34,7 +34,13 @@ entity IF_Stage is
         pc_src          : in  std_logic;
         -- Branch/jump target address.
         target_pc       : in  std_logic_vector(31 downto 0);
-        
+
+        -- Phase 5: asserted the one cycle a SDRAM-sourced instruction
+        -- (see rv32im_soc.vhd's if_is_sdram mux) is being captured into
+        -- IF_ID_Register -- see pc_in_to_ifid below for why this needs
+        -- a different PC source than the BRAM path's pc_delayed.
+        if_sdram_ack    : in  std_logic;
+
         -- External Instruction Memory / BRAM Interface
         -- PC value driven out to the instruction memory this cycle.
         pc_fetch_out    : out std_logic_vector(31 downto 0);
@@ -70,7 +76,27 @@ architecture Structural of IF_Stage is
     -- wait-states) rather than sliding out of sync.
     signal pc_delayed    : std_logic_vector(31 downto 0) := (others => '0');
 
+    -- Phase 5: pc_delayed's update rule (capture pc_wire whenever
+    -- if_id_stall = '0') assumes a fixed one-cycle memory -- it captures
+    -- the address on the LAST unstalled cycle, one cycle before that
+    -- address's data arrives. A SDRAM fetch breaks that assumption: the
+    -- stall for a SDRAM-range address begins in the SAME cycle that
+    -- address first appears as pc_wire (rv32im_soc.vhd's if_bus_stall is
+    -- asserted combinationally off the very fetch it's stalling), so
+    -- pc_delayed never gets an unstalled cycle to capture it -- it stays
+    -- frozen at whatever address preceded the stall. Since pc_write is
+    -- held low for the SDRAM stall's entire duration (Hazard_Unit's
+    -- dedicated fetch-stall case), pc_wire itself doesn't move and is
+    -- still the correct address when the data finally arrives, so this
+    -- mux substitutes pc_wire directly for that one capture instead of
+    -- pc_delayed. If this doesn't fire, the answer is provably wrong,
+    -- not just imprecise -- IF_ID_Register would pair a fresh SDRAM
+    -- instruction with the previous (stale) BRAM-side pc_delayed value.
+    signal pc_in_to_ifid : std_logic_vector(31 downto 0);
+
 begin
+
+    pc_in_to_ifid <= pc_wire when if_sdram_ack = '1' else pc_delayed;
 
     pc_current_out <= pc_wire;
 
@@ -126,7 +152,7 @@ begin
             rst_n           => rst_n,
             stall           => if_id_stall,
             flush           => if_id_flush,
-            pc_in           => pc_delayed,
+            pc_in           => pc_in_to_ifid,
             instruction_in  => instr_fetch_in,
             pc_out          => id_pc_out,
             instruction_out => id_instr_out
