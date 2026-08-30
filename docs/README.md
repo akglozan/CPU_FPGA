@@ -515,9 +515,9 @@ place.
 ---
 
 ### Phase 6: Input Controls & Final Polish
-- [ ] **6.1 Input Integration**
-  - [ ] Implement GPIO button reading **OR** UART receiver for ESP32 Bluetooth controller packets.
-  - [ ] Map input signals to MMIO register address range.
+- [x] **6.1 Input Integration**
+  - [x] Implement GPIO button reading **OR** UART receiver for ESP32 Bluetooth controller packets. (GPIO buttons: debounced, MMIO-mapped, hardware-confirmed 2026-08-28.)
+  - [x] Map input signals to MMIO register address range.
 - [ ] **6.2 System Optimization & Closure**
   - [ ] Run Quartus II TimeQuest Timing Analyzer to fix setup/hold violations.
   - [ ] Optimize VHDL code to keep total logic usage strictly under ~5,000 LEs.

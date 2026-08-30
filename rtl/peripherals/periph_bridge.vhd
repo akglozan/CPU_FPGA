@@ -9,6 +9,10 @@ use ieee.numeric_std.all;
 -- (single-cycle peripheral latency), unlike the multi-cycle SDRAM slave.
 entity periph_bridge is
     port (
+
+        clk       : in  std_logic;
+        rst_n     : in  std_logic;
+
         wb_addr_i : in  std_logic_vector(31 downto 0);
         -- Write data; low byte is also routed directly to uart_tx_data.
         wb_data_i : in  std_logic_vector(31 downto 0);
@@ -55,29 +59,27 @@ begin
 
     uart_tx_data <= wb_data_i(7 downto 0);
 
-    process (
-        wb_addr_i,
-        wb_sel_i,
-        wb_we_i,
-        bus_active
-    )
+process (clk)
     begin
-        uart_tx_start <= '0';
-        gpio_led_we   <= '0';
+        if rising_edge(clk) then
+            if rst_n = '0' then
+                uart_tx_start <= '0';
+                gpio_led_we   <= '0';
+            else
+                uart_tx_start <= '0';  -- default pulse down
+                gpio_led_we   <= '0';
 
-        if bus_active = '1' and wb_we_i = '1'
-           and wb_sel_i /= "0000" then
-
-            case wb_addr_i(7 downto 0) is
-                when x"00" =>
-                    gpio_led_we <= '1';
-
-                when x"08" =>
-                    uart_tx_start <= '1';
-
-                when others =>
-                    null;
-            end case;
+                if bus_active = '1' and wb_we_i = '1' and wb_sel_i /= "0000" then
+                    case wb_addr_i(7 downto 0) is
+                        when x"00" =>
+                            gpio_led_we <= '1';
+                        when x"08" =>
+                            uart_tx_start <= '1';  -- single-cycle pulse on write
+                        when others =>
+                            null;
+                    end case;
+                end if;
+            end if;
         end if;
     end process;
 

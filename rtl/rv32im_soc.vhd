@@ -382,6 +382,16 @@ architecture structural of rv32im_soc is
     signal if_sdram_ack   : std_logic;
     signal cpu_imem_rdata : std_logic_vector(31 downto 0);
 
+    -- instr_cache <-> fetch_arbiter (Phase 5.3 draft, 2026-08-29):
+    -- instr_cache now sits between if_fetch_* and fetch_arbiter's FETCH
+    -- port. See rtl/memory/instr_cache.vhd's header for the full
+    -- rationale; NOT YET VERIFIED IN SIMULATION OR ON HARDWARE.
+    signal ic_mem_adr   : std_logic_vector(31 downto 0);
+    signal ic_mem_rdata : std_logic_vector(31 downto 0);
+    signal ic_mem_stb   : std_logic;
+    signal ic_mem_cyc   : std_logic;
+    signal ic_mem_ack   : std_logic;
+
     -- fetch_arbiter <-> sdram_arbiter. The CPU-data path (s1_*, from
     -- bus_interconnect's slave-1 port) now goes through fetch_arbiter
     -- first, arbitrated against the new CPU-fetch path, before reaching
@@ -834,6 +844,30 @@ begin
 
     cpu_imem_rdata <= if_fetch_rdata when if_is_sdram = '1' else instruction;
 
+    -- Phase 5.3 draft (2026-08-29): instr_cache now intercepts every
+    -- SDRAM-range fetch request before it ever reaches fetch_arbiter.
+    -- Upstream (CPU-facing) side keeps the exact if_fetch_* protocol
+    -- unchanged; downstream (memory-facing) side drives fetch_arbiter's
+    -- FETCH port with the identical single-word protocol it already
+    -- implements. See rtl/memory/instr_cache.vhd's header.
+    u_instr_cache : entity work.instr_cache
+        port map (
+            clk   => clk,
+            rst_n => rst_n_sync,
+
+            cpu_adr_i => if_fetch_adr,
+            cpu_stb_i => if_fetch_stb,
+            cpu_cyc_i => if_fetch_cyc,
+            cpu_dat_o => if_fetch_rdata,
+            cpu_ack_o => if_fetch_ack,
+
+            mem_adr_o => ic_mem_adr,
+            mem_dat_i => ic_mem_rdata,
+            mem_stb_o => ic_mem_stb,
+            mem_cyc_o => ic_mem_cyc,
+            mem_ack_i => ic_mem_ack
+        );
+
     u_fetch_arbiter : entity work.fetch_arbiter
         port map (
             clk   => clk,
@@ -848,12 +882,12 @@ begin
             data_cyc_i => s1_cyc,
             data_ack_o => s1_ack,
 
-            fetch_adr_i => if_fetch_adr,
-            fetch_dat_o => if_fetch_rdata,
+            fetch_adr_i => ic_mem_adr,
+            fetch_dat_o => ic_mem_rdata,
             fetch_sel_i => "1111",
-            fetch_stb_i => if_fetch_stb,
-            fetch_cyc_i => if_fetch_cyc,
-            fetch_ack_o => if_fetch_ack,
+            fetch_stb_i => ic_mem_stb,
+            fetch_cyc_i => ic_mem_cyc,
+            fetch_ack_o => ic_mem_ack,
 
             m_adr_o => fa_addr,
             m_dat_o => fa_wdata,
@@ -988,6 +1022,8 @@ begin
 
     u_periph_bridge : entity work.periph_bridge
         port map (
+            clk           => clk,
+            rst_n         => rst_n,
             wb_addr_i     => s3_addr,
             wb_data_i     => s3_wdata,
             wb_data_o     => s3_rdata,

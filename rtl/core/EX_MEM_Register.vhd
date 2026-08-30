@@ -63,7 +63,7 @@ end entity EX_MEM_Register;
 architecture rtl of EX_MEM_Register is
 begin
 
-    process (clk)
+   process (clk)
     begin
         if rising_edge(clk) then
             if rst_n = '0' then
@@ -79,10 +79,13 @@ begin
                 mem_wb_sel     <= (others => '0');
                 mem_funct3     <= (others => '0');
 
+            -- 1. STALL HAS HIGHEST PRIORITY (Preserve memory bus integrity)
             elsif stall = '1' then
                 null;
 
+            -- 2. FLUSH ONLY WHEN NOT STALLED
             elsif flush = '1' then
+                -- Keep address/data stable or clear controls only
                 mem_addr       <= (others => '0');
                 mem_result     <= (others => '0');
                 mem_write_data <= (others => '0');
@@ -96,7 +99,7 @@ begin
                 mem_funct3     <= (others => '0');
 
             else
-                -- The ALU result is the complete 32-bit byte address.
+                -- Normal stage advancement
                 mem_addr       <= ex_result;
                 mem_result     <= ex_result;
                 mem_write_data <= ex_operand_b;

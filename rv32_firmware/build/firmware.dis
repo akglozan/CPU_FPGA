@@ -78,7 +78,7 @@ Disassembly of section .text:
 800000e8:	00008067          	ret
 
 800000ec <main>:
-800000ec:	fb010113          	addi	sp,sp,-80 # 807effb0 <_zone_start+0x2ebfb0>
+800000ec:	fb010113          	addi	sp,sp,-80 # 807effb0 <_mischeap_end+0x3ffb0>
 800000f0:	e0000737          	lui	a4,0xe0000
 800000f4:	04112623          	sw	ra,76(sp)
 800000f8:	04812423          	sw	s0,72(sp)

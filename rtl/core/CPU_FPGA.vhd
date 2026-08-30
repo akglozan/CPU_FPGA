@@ -149,29 +149,73 @@ begin
     -- a SDRAM fetch is outstanding (can't apply it yet); applied (and
     -- cleared) the cycle the fetch finally completes. See the signals'
     -- declaration above for the full rationale.
+    -- 2026-08-29: if_bus_stall_i alone isn't the whole story -- Hazard_
+    -- Unit's case 1 (stall_wb_mem, fed by bus_stall_wire below) holds
+    -- pc_write low for exactly the same reason (a data-side store/load,
+    -- e.g. a UART_TX write, still waiting on its own bus ack), but this
+    -- pending-branch latch previously only watched if_bus_stall_i. A
+    -- branch resolving (take_branch_wire='1', target_pc_wire valid for
+    -- that one cycle only) while bus_stall_wire='1' and if_bus_stall_i='0'
+    -- was falling straight through: take_branch_eff went high that same
+    -- cycle even though pc_write was held low by Hazard_Unit, and by the
+    -- time the stall actually cleared, target_pc_wire had already moved
+    -- on to whatever EX_Stage computed next -- silently replaying
+    -- already-executed instructions once the stall released. Confirmed
+    -- via tb_firmware_sdram: uart_putc's busy-poll loop (a backward
+    -- bnez) resolving while the previous uart_putc's own UART_TX store
+    -- was still stall_wb_mem-stalled caused already-sent bytes ('B',
+    -- then 'A') to be physically retransmitted before the real next
+    -- byte ('C') finally went out -- see uart_tx.vhd's debug report log,
+    -- which shows genuine, fully-framed duplicate transmissions, not
+    -- bit-level corruption. The process and take_branch_eff below now
+    -- OR in bus_stall_wire alongside if_bus_stall_i so the same
+    -- latch-and-defer mechanism covers either stall source.
     process (clk)
     begin
         if rising_edge(clk) then
             if rst_n = '0' then
                 pending_branch <= '0';
                 pending_target <= (others => '0');
-            elsif take_branch_wire = '1' and if_bus_stall_i = '1' then
+            elsif take_branch_wire = '1' and
+                  (if_bus_stall_i = '1' or bus_stall_wire = '1') then
                 pending_branch <= '1';
                 pending_target <= target_pc_wire;
-            elsif pending_branch = '1' and if_bus_stall_i = '0' then
+            elsif pending_branch = '1' and
+                  if_bus_stall_i = '0' and bus_stall_wire = '0' then
                 pending_branch <= '0';
             end if;
         end if;
     end process;
 
-    -- Whenever if_bus_stall_i never asserts (every scenario before
-    -- Phase 5, and any current instruction stream that never executes
-    -- from SDRAM), pending_branch stays 0 forever and these reduce to
-    -- exactly take_branch_wire/target_pc_wire -- unchanged behavior.
-    take_branch_eff <= '1' when if_bus_stall_i = '0' and
+    -- Whenever neither stall source ever asserts, pending_branch stays 0
+    -- forever and these reduce to exactly take_branch_wire/target_pc_wire
+    -- -- unchanged behavior for anything that never hits a bus wait.
+    take_branch_eff <= '1' when if_bus_stall_i = '0' and bus_stall_wire = '0' and
                                  (take_branch_wire = '1' or pending_branch = '1')
                         else '0';
     target_pc_eff   <= pending_target when pending_branch = '1' else target_pc_wire;
+
+    -- pragma translate_off
+    -- Temporary trace, narrow time window bracketing the tb_firmware_sdram
+    -- UART duplicate-byte hang, to see what the PC/stall/branch signals
+    -- are actually doing cycle-by-cycle. Remove once the bug is found.
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if now >= 7290000 ns and now <= 7345000 ns then
+                report "CPU trace: pc=" & to_hstring(pc_current) &
+                       " take_branch_wire=" & std_logic'image(take_branch_wire) &
+                       " target_pc_wire=" & to_hstring(target_pc_wire) &
+                       " if_bus_stall_i=" & std_logic'image(if_bus_stall_i) &
+                       " bus_stall_wire=" & std_logic'image(bus_stall_wire) &
+                       " pending_branch=" & std_logic'image(pending_branch) &
+                       " take_branch_eff=" & std_logic'image(take_branch_eff) &
+                       " target_pc_eff=" & to_hstring(target_pc_eff) &
+                       " @ " & time'image(now);
+            end if;
+        end if;
+    end process;
+    -- pragma translate_on
 
     -- 1. Instruction Fetch Stage
     U_STAGE_IF : entity work.IF_Stage

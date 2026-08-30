@@ -62,6 +62,7 @@ architecture rtl of uart_tx is
     signal tx_shift  : std_logic_vector(7 downto 0) := (others => '0');
     signal tx_reg    : std_logic := '1';
     signal busy_reg  : std_logic := '0';
+    signal tx_start_prev : std_logic := '0';
 
 begin
 
@@ -82,8 +83,19 @@ begin
                 tx_shift  <= (others => '0');
                 tx_reg    <= '1';
                 busy_reg  <= '0';
+                tx_start_prev <= '0';
 
             else
+                 tx_start_prev <= '0';
+
+                -- pragma translate_off
+                if tx_start = '1' then
+                    report "uart_tx: tx_start seen, state=" & state_t'image(state) &
+                           " busy_reg=" & std_logic'image(busy_reg) &
+                           " tx_data=" & to_hstring(tx_data) &
+                           " @ " & time'image(now);
+                end if;
+                -- pragma translate_on
                 case state is
 
                     when STATE_IDLE =>
@@ -92,11 +104,15 @@ begin
                         bit_index <= 0;
                         busy_reg  <= '0';
 
-                        if tx_start = '1' then
+                        if tx_start = '1' and tx_start_prev = '0' then
                             tx_shift  <= tx_data;
                             tx_reg    <= '0';
                             busy_reg  <= '1';
                             state     <= STATE_START;
+                            -- pragma translate_off
+                            report "uart_tx: ACCEPT -> STATE_START, latching tx_data=" &
+                                   to_hstring(tx_data) & " @ " & time'image(now);
+                            -- pragma translate_on
                         end if;
 
                     when STATE_START =>
@@ -136,6 +152,10 @@ begin
                             clk_count <= 0;
                             busy_reg  <= '0';
                             state     <= STATE_IDLE;
+                            -- pragma translate_off
+                            report "uart_tx: STOP done -> STATE_IDLE, busy_reg -> 0 @ " &
+                                   time'image(now);
+                            -- pragma translate_on
                         else
                             clk_count <= clk_count + 1;
                         end if;

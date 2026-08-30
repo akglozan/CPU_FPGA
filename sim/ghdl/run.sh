@@ -50,6 +50,7 @@ for f in \
     rtl/core/Hazard_Unit.vhd \
     rtl/core/CPU_FPGA.vhd \
     rtl/memory/bram_4kb.vhd \
+    rtl/memory/instr_cache.vhd \
     rtl/memory/bus_interconnect.vhd \
     rtl/memory/fetch_arbiter.vhd \
     rtl/memory/sdram_controller.vhd \
