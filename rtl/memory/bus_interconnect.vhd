@@ -151,9 +151,36 @@ begin
     s3_we_o  <= m_we_i;
 
     -- Address decoder.
+    --
+    -- 2026-09-04: BRAM narrowed from adr(31 downto 16) to adr(31 downto 12).
+    -- bram_4kb is 1024 words, addressed by s0_addr(11 downto 2), so the old
+    -- 64 KB window aliased the same 4 KB sixteen times and turned ANY stray
+    -- address below 0x0001_0000 into a write to instruction memory --
+    -- contents that survive every reset and are only restored by
+    -- reconfiguring the FPGA. That is what amplified the 2026-09-01
+    -- branch-shadow bug from a pipeline fault into a corrupted program image
+    -- (58476 bogus word stores in one run).
+    --
+    -- Verified before narrowing: across the whole GHDL suite, all 413241 CPU
+    -- write transactions target SDRAM (413106) or the peripheral bridge
+    -- (135) -- none below 0x8000_0000. Instruction fetch does not use this
+    -- decode at all (bram_4kb port A is wired straight to pc(11 downto 2) in
+    -- rv32im_soc.vhd). sw/boot_bram.mif is two instructions with no loads or
+    -- stores, and every lui-built base in the SDRAM firmware is 0x80000 /
+    -- 0x80001 / 0x80100 / 0x807f0 / 0x80800 / 0xc0000 / 0xe0000.
+    --
+    -- COUPLING: bsp/linker.ld sets _estack = 0x0000_1000, exactly this
+    -- boundary. Harmless while nothing dereferences sp before decrementing
+    -- it, and the only linker.ld program is the stack-free boot stub -- but
+    -- the two now share one edge with no slack. Move them together.
+    --
+    -- COST: a stray access in 0x0000_1000-0x0000_FFFF now falls to
+    -- slave_none, which acks immediately with data 0. Discarded rather than
+    -- corrupting BRAM -- but also not flagged, since an immediate ack means
+    -- the watchdog never fires and bus_error stays clear.
     process (m_adr_i)
     begin
-        if m_adr_i(31 downto 16) = x"0000" then
+        if m_adr_i(31 downto 12) = x"00000" then
             active_slave <= slave_bram;
 
         elsif m_adr_i(31 downto 27) = "10000" then

@@ -1098,7 +1098,7 @@ begin
     u_periph_bridge : entity work.periph_bridge
         port map (
             clk           => clk,
-            rst_n         => rst_n,
+            rst_n         => rst_n_sync,
             wb_addr_i     => s3_addr,
             wb_data_i     => s3_wdata,
             wb_data_o     => s3_rdata,
