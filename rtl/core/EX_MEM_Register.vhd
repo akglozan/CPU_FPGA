@@ -62,8 +62,7 @@ end entity EX_MEM_Register;
 
 architecture rtl of EX_MEM_Register is
 begin
-
-   process (clk)
+    process(clk)
     begin
         if rising_edge(clk) then
             if rst_n = '0' then
@@ -72,47 +71,39 @@ begin
                 mem_write_data <= (others => '0');
                 mem_rd_addr    <= (others => '0');
                 mem_pc_plus4   <= (others => '0');
-
-                mem_reg_write  <= '0';
+                mem_funct3     <= (others => '0');
+                
+                -- Control signals
                 mem_read       <= '0';
                 mem_write      <= '0';
+                mem_reg_write  <= '0';
                 mem_wb_sel     <= (others => '0');
-                mem_funct3     <= (others => '0');
 
-            -- 1. STALL HAS HIGHEST PRIORITY (Preserve memory bus integrity)
-            elsif stall = '1' then
-                null;
-
-            -- 2. FLUSH ONLY WHEN NOT STALLED
             elsif flush = '1' then
-                -- Keep address/data stable or clear controls only
-                mem_addr       <= (others => '0');
-                mem_result     <= (others => '0');
-                mem_write_data <= (others => '0');
-                mem_rd_addr    <= (others => '0');
-                mem_pc_plus4   <= (others => '0');
-
-                mem_reg_write  <= '0';
+                -- CRITICAL FIX: Zero out ONLY the control signals to create a bubble.
+                -- Do NOT clear data payloads like mem_addr or mem_write_data.
                 mem_read       <= '0';
                 mem_write      <= '0';
+                mem_reg_write  <= '0';
                 mem_wb_sel     <= (others => '0');
-                mem_funct3     <= (others => '0');
 
-            else
-                -- Normal stage advancement
+            elsif stall = '0' then
+                -- Normal pipeline advance
                 mem_addr       <= ex_result;
                 mem_result     <= ex_result;
                 mem_write_data <= ex_operand_b;
                 mem_rd_addr    <= ex_rd_addr;
                 mem_pc_plus4   <= ex_pc_plus4;
-
-                mem_reg_write  <= ex_reg_write;
+                mem_funct3     <= ex_funct3;
+                
+                -- Control signals
                 mem_read       <= ex_mem_read;
                 mem_write      <= ex_mem_write;
+                mem_reg_write  <= ex_reg_write;
                 mem_wb_sel     <= ex_wb_sel;
-                mem_funct3     <= ex_funct3;
             end if;
+            -- If stall = '1' and flush = '0', no assignments occur,
+            -- holding all outputs perfectly stable.
         end if;
     end process;
-
 end architecture rtl;

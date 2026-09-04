@@ -135,13 +135,17 @@ begin
                 alu_src_a_out <= '0';
                 alu_ctrl_out  <= (others => '0');
                 is_m_ext_out  <= '0';
+
+                -- Control signals zeroed to prevent ghost writes/reads
                 mem_read_out  <= '0';
                 mem_write_out <= '0';
                 branch_out    <= '0';
                 jump_out      <= '0';
                 reg_write_out <= '0';
                 wb_sel_out    <= (others => '0');
+
             elsif stall = '0' then
+                -- Normal pipeline advance
                 pc_out        <= pc_in;
                 pc_plus4_out  <= pc_plus4_in;
                 imm_ext_out   <= imm_ext_in;
@@ -162,6 +166,11 @@ begin
                 reg_write_out <= reg_write_in;
                 wb_sel_out    <= wb_sel_in;
             end if;
+            -- If stall = '1' and flush = '0', no assignments occur,
+            -- holding all outputs unchanged. EX_MEM_Register's own
+            -- ex_mem_stall_combined (see EX_Stage.vhd) already freezes
+            -- in lockstep for the M-extension multi-cycle case, so a
+            -- held instruction here cannot be re-latched downstream.
         end if;
     end process;
 

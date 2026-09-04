@@ -68,6 +68,30 @@ architecture Structural of CPU_FPGA is
     signal id_ex_stall_wire  : std_logic;
     signal id_ex_flush_wire  : std_logic;
     signal ex_mem_stall_wire : std_logic;
+    -- 2026-09-01: Hazard_Unit's own flush pulses (if_id_flush_hz/
+    -- id_ex_flush_hz below) assume a taken branch is followed by AT
+    -- MOST ONE stale in-flight fetch before the redirect lands --
+    -- true for BRAM's fixed one-cycle latency, and still true for a
+    -- single long contiguous SDRAM stall. instr_cache broke that:
+    -- if_bus_stall now toggles on/off roughly every fetch instead of
+    -- staying high for one stall, so while a branch redirect is stuck
+    -- in pending_branch (deferred because take_branch resolved during
+    -- a stall -- see that signal's comment), MULTIPLE separate
+    -- wrong-path fetches each get their own brief non-stalled window
+    -- and slip through the one-shot squash pulse to actually commit.
+    -- Confirmed via tb_firmware_sdram: trap_loop's "j 8000002c"
+    -- kept re-taking the branch correctly, but the LUI/ADDI/LW at
+    -- 0x30/0x34/0x38 (wrong-path fetches issued while that redirect
+    -- was pending) executed for real every pass, including a genuine
+    -- MMIO read. pending_branch already flags exactly the window that
+    -- needs squashing -- set the cycle a branch resolves-but-can't-
+    -- apply, cleared the cycle it finally does -- so if_id_flush_wire/
+    -- id_ex_flush_wire below OR it in on top of Hazard_Unit's own
+    -- pulses, holding IF/ID and ID/EX squashed for the pending
+    -- window's full duration instead of one cycle. Branches that never
+    -- stall never set pending_branch, so this is a no-op for them.
+    signal if_id_flush_hz    : std_logic;
+    signal id_ex_flush_hz    : std_logic;
     signal mem_wb_stall_wire : std_logic;
     signal take_branch_wire  : std_logic;
     signal target_pc_wire    : std_logic_vector(31 downto 0);
@@ -97,6 +121,7 @@ architecture Structural of CPU_FPGA is
 
     signal pc_current        : std_logic_vector(31 downto 0);
     signal id_pc             : std_logic_vector(31 downto 0);
+    signal id_pc_plus4       : std_logic_vector(31 downto 0);
     signal id_instr          : std_logic_vector(31 downto 0);
     signal id_rs1_addr       : std_logic_vector(4 downto 0);
     signal id_rs2_addr       : std_logic_vector(4 downto 0);
@@ -195,6 +220,10 @@ begin
                         else '0';
     target_pc_eff   <= pending_target when pending_branch = '1' else target_pc_wire;
 
+    -- See if_id_flush_hz/id_ex_flush_hz's declaration above.
+    if_id_flush_wire <= if_id_flush_hz or pending_branch;
+    id_ex_flush_wire <= id_ex_flush_hz or pending_branch;
+
     -- pragma translate_off
     -- Temporary trace, narrow time window bracketing the tb_firmware_sdram
     -- UART duplicate-byte hang, to see what the PC/stall/branch signals
@@ -202,7 +231,35 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if now >= 7290000 ns and now <= 7345000 ns then
+            -- 2026-08-31: retargeted a second time -- the previous
+            -- window (0x00000000-0x00000050) was based on a misreading:
+            -- trap_loop (0x8000002c) is in the firmware image's own
+            -- address space, not near physical 0x0. instr_cache's own
+            -- fetch log confirms the CPU boots cleanly (the ~7.1ms of
+            -- pc=0 before that is the expected pre-boot delay, not a
+            -- hang) and then livelocks cycling
+            -- 0x8000002c -> 0x80000030 -> 0x80000034 -> 0x80000034
+            -- (again) -> 0x80000038 -> 0x8000002c forever, with
+            -- 0x80000034 fetched twice every iteration -- despite
+            -- 0x8000002c disassembling to "j 8000002c <trap_loop>", an
+            -- unconditional self-jump that should never fall through.
+            -- Retargeted to the real address range to see what EX/take_
+            -- branch is doing there.
+            -- 2026-09-01: retargeted again. The PC-window trigger is
+            -- dead weight now that the boot-stub livelock is fixed (the
+            -- CPU no longer sits in 0x2C-0x40). The open bug is a store
+            -- that reaches the bus a second time after its base register
+            -- has been clobbered by later instructions: 'A' is written
+            -- correctly to UART_TX at 0xE0000008, and then written AGAIN
+            -- to 0x00000008 -- which bus_interconnect decodes as BRAM --
+            -- while the CPU is spinning in the 0x148/0x14C/0x150 UART
+            -- busy-poll loop, whose own `lw a4,0(a5)` has by then
+            -- overwritten a4 with 0. So trigger on any store in MEM or
+            -- any asserted Wishbone write, and capture the EX pc and rs1
+            -- value that produced it: a replayed store shows up as the
+            -- same ex_pc appearing twice, the second time with
+            -- reg_data1=00000000.
+            if mem_mem_write = '1' or wb_we_o = '1' then
                 report "CPU trace: pc=" & to_hstring(pc_current) &
                        " take_branch_wire=" & std_logic'image(take_branch_wire) &
                        " target_pc_wire=" & to_hstring(target_pc_wire) &
@@ -211,6 +268,51 @@ begin
                        " pending_branch=" & std_logic'image(pending_branch) &
                        " take_branch_eff=" & std_logic'image(take_branch_eff) &
                        " target_pc_eff=" & to_hstring(target_pc_eff) &
+                       " id_ex_flush=" & std_logic'image(id_ex_flush_wire) &
+                       " id_ex_stall=" & std_logic'image(id_ex_stall_wire) &
+                       " if_sdram_ack_i=" & std_logic'image(if_sdram_ack_i) &
+                       " imem_addr_o=" & to_hstring(imem_addr_o) &
+                       " imem_rdata_i=" & to_hstring(imem_rdata_i) &
+                       " id_pc=" & to_hstring(id_pc) &
+                       " @ " & time'image(now);
+
+                -- 2026-08-31: extended for the GPIO_LED=0xF-lands-at-
+                -- address-0 investigation. id_instr/id_rs*_data show what
+                -- ID decoded the store as and what base value it read;
+                -- ex_rs1_addr/ex_reg_data1/ex_mem_write show the same
+                -- store one stage later, after forwarding; mem_addr/
+                -- mem_mem_write/mem_write_data show what actually reached
+                -- the bus. Comparing these across the same instruction as
+                -- it moves ID -> EX -> MEM should show which stage first
+                -- turns 0xE0000000 into 0x00000000 (or the store's rs1
+                -- into something else entirely). Remove once found.
+                report "  ID: instr=" & to_hstring(id_instr) &
+                       " rs1=" & to_hstring(id_rs1_addr) &
+                       " rs1_data=" & to_hstring(id_rs1_data) &
+                       " rs2=" & to_hstring(id_rs2_addr) &
+                       " rs2_data=" & to_hstring(id_rs2_data) &
+                       "  EX: pc=" & to_hstring(ex_pc) &
+                       " rs1=" & to_hstring(ex_rs1_addr) &
+                       " reg_data1=" & to_hstring(ex_reg_data1) &
+                       " reg_data2=" & to_hstring(ex_reg_data2) &
+                       " alu_src_a=" & std_logic'image(ex_alu_src_a) &
+                       " mem_write=" & std_logic'image(ex_mem_write) &
+                       " reg_write=" & std_logic'image(ex_reg_write) &
+                       " rd=" & to_hstring(ex_rd_addr) &
+                       "  MEM: addr=" & to_hstring(mem_addr) &
+                       " write_data=" & to_hstring(mem_write_data) &
+                       " mem_write=" & std_logic'image(mem_mem_write) &
+                       " rd=" & to_hstring(mem_rd_addr) &
+                       "  BUS: wb_addr=" & to_hstring(wb_addr_o) &
+                       " wb_data=" & to_hstring(wb_data_o) &
+                       " wb_sel=" & to_hstring(wb_sel_o) &
+                       " wb_we=" & std_logic'image(wb_we_o) &
+                       " wb_stb=" & std_logic'image(wb_stb_o) &
+                       " wb_cyc=" & std_logic'image(wb_cyc_o) &
+                       " wb_ack=" & std_logic'image(wb_ack_i) &
+                       " bus_stall=" & std_logic'image(bus_stall_wire) &
+                       " ex_mem_stall=" & std_logic'image(ex_mem_stall_wire) &
+                       " mem_wb_stall=" & std_logic'image(mem_wb_stall_wire) &
                        " @ " & time'image(now);
             end if;
         end if;
@@ -235,6 +337,7 @@ begin
             instr_fetch_in  => imem_rdata_i,
             pc_current_out  => pc_current,
             id_pc_out       => id_pc,
+            id_pc_plus4_out => id_pc_plus4,
             id_instr_out    => id_instr
         );
 
@@ -246,7 +349,7 @@ begin
             id_ex_stall      => id_ex_stall_wire,
             id_ex_flush      => id_ex_flush_wire,
             id_pc_in         => id_pc,
-            id_pc_plus4_in   => std_logic_vector(unsigned(id_pc) + 4),
+            id_pc_plus4_in   => id_pc_plus4,
             id_instr_in      => id_instr,
             wb_reg_write     => wb_reg_write,
             wb_rd_addr       => wb_rd_addr,
@@ -381,9 +484,9 @@ begin
             take_branch   => take_branch_eff,
             pc_write      => pc_write_wire,
             if_id_stall   => if_id_stall_wire,
-            if_id_flush   => if_id_flush_wire,
+            if_id_flush   => if_id_flush_hz,
             id_ex_stall   => id_ex_stall_wire,
-            id_ex_flush   => id_ex_flush_wire,
+            id_ex_flush   => id_ex_flush_hz,
             ex_mem_stall  => ex_mem_stall_wire,
             mem_wb_stall  => mem_wb_stall_wire
         );

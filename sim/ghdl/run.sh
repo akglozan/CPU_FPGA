@@ -98,7 +98,40 @@ for tb in $list; do
     echo "  $tb"
     echo "=============================================================="
     log="$work/$tb.log"
-    if ghdl -r --std=08 --workdir="$work" -P"$work" "$tb" > "$log" 2>&1; then
+    # Waveform dump -- OPT-IN as of 2026-09-01. This used to dump a
+    # full-signal GHW for tb_firmware_sdram on every single run: ~945MB
+    # for the 30ms sim, costing a large slice of each run's wall time
+    # and disk, for a file nothing ever opened (there is no gtkwave on
+    # this machine). It is now off unless asked for. Three modes:
+    #
+    #   sh sim/ghdl/run.sh tb_firmware_sdram
+    #       No waveform. Default. Fastest.
+    #
+    #   WAVE_OPT_GEN=1 sh sim/ghdl/run.sh tb_firmware_sdram
+    #       No dump; writes $work/<tb>.wave.opt, a template listing every
+    #       signal in the design. Copy it somewhere permanent, delete the
+    #       lines you don't care about, and feed it back via WAVE_OPT.
+    #
+    #   WAVE=1 sh sim/ghdl/run.sh tb_firmware_sdram
+    #       Full dump to $work/<tb>.ghw. Big -- see above.
+    #
+    #   WAVE=1 WAVE_OPT=sim/ghdl/waves.opt sh sim/ghdl/run.sh tb_firmware_sdram
+    #       Dump ONLY the signals listed in that file. This is the one
+    #       that produces a waveform small enough to actually open.
+    #
+    # GHW is GTKWave's native format; if you'd rather use a viewer that
+    # only speaks VCD, swap --wave= for --vcd= below (much larger file
+    # for the same signals).
+    wave_args=""
+    if [ -n "$WAVE_OPT_GEN" ]; then
+        wave_args="--write-wave-opt=$work/$tb.wave.opt"
+    elif [ -n "$WAVE" ]; then
+        wave_args="--wave=$work/$tb.ghw"
+        if [ -n "$WAVE_OPT" ] && [ -f "$WAVE_OPT" ]; then
+            wave_args="$wave_args --read-wave-opt=$WAVE_OPT"
+        fi
+    fi
+    if ghdl -r --std=08 --workdir="$work" -P"$work" "$tb" $wave_args > "$log" 2>&1; then
         rc=0
     else
         rc=$?

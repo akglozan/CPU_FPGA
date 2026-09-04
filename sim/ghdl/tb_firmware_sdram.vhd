@@ -214,7 +214,7 @@ begin
             send_byte(w(31 downto 24));
         end procedure;
 
-        constant FW_LEN : natural := 2252;
+        constant FW_LEN : natural := 2212;
         variable n_bytes : natural := 0;
     begin
         wait until rst_n = '1';

@@ -41,17 +41,21 @@ entity IF_ID_Register is
 		--Program Counter from IF stage.
 		pc_in 	: in std_logic_vector(31 downto 0);
 		
+		--PC + 4 from IF stage.
+		pc_plus4_in : in std_logic_vector(31 downto 0);
+		
 		--Instruction fetched from Instruction Memory.
 		instruction_in	: in std_logic_vector(31 downto 0);
 		
 		--Program Counter passed to ID stage.
 		pc_out	: out std_logic_vector(31 downto 0);
 		
+		--PC + 4 passed to ID stage.
+		pc_plus4_out : out std_logic_vector(31 downto 0);
+		
 		--Instruction passed to ID stage.
 		instruction_out	: out std_logic_vector(31 downto 0)
 		
-		
-	
 	);
 end entity;
 	
@@ -61,26 +65,28 @@ architecture Behavioral of IF_ID_Register is
 begin
 
 process(clk)
-begin
-    if rising_edge(clk) then
-        if rst_n = '0' then
-            pc_out          <= (others => '0');
-            instruction_out <= x"00000013"; -- NOP (addi x0, x0, 0)
-        elsif stall = '1' then
-            -- Freeze both PC and instruction during bus wait-states and load hazards
-            null;
-        elsif flush = '1' then
-            -- Insert NOP bubble, but maintain pc_in or clear to avoid invalid link target
-            pc_out          <= (others => '0');
-            instruction_out <= x"00000013"; -- NOP (addi x0, x0, 0)
-        else
-            pc_out          <= pc_in;
-            instruction_out <= instruction_in;
+    begin
+        if rising_edge(clk) then
+            if rst_n = '0' then
+                pc_out          <= (others => '0');
+                pc_plus4_out    <= (others => '0');
+                instruction_out <= x"00000013"; -- NOP (addi x0, x0, 0)
+            elsif flush = '1' then
+                -- Branch taken: squash the speculative fetch
+                pc_out          <= (others => '0');
+                pc_plus4_out    <= (others => '0');
+                instruction_out <= x"00000013"; -- NOP
+            elsif stall = '0' then
+                -- Normal advance: load new instruction from IF stage
+                pc_out          <= pc_in;
+                pc_plus4_out    <= pc_plus4_in;
+                instruction_out <= instruction_in;
+            end if;
+            -- Note: If stall = '1' and flush = '0', there is no assignment. 
+            -- The register natively holds its current value, preventing the 
+            -- fetched instruction from being overwritten.
         end if;
-    end if;
-end process;
+    end process;
 
 
 end architecture Behavioral;
-
-

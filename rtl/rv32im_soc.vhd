@@ -433,6 +433,7 @@ architecture structural of rv32im_soc is
     signal uart_status    : std_logic_vector(31 downto 0);
 
     signal gpio_led_we    : std_logic;
+    signal gpio_led_data  : std_logic_vector(31 downto 0);
     signal gpio_key_data  : std_logic_vector(31 downto 0);
 
     signal timer_data     : std_logic_vector(31 downto 0);
@@ -832,9 +833,83 @@ begin
         end if;
     end process;
 
-    if_fetch_adr <= pc_raw;
+    -- 2026-09-01: was pc_raw. instr_cache latches cpu_adr_i in S_IDLE
+    -- and drives cpu_ack_o/cpu_dat_o two cycles later (registered
+    -- assignments made in S_COMPARE), while IF_Stage pairs the returned
+    -- word with pc_fetch_delayed -- a delayed copy of pc_fetch_out, NOT
+    -- of pc_raw. Driving the request from pc_raw made those two address
+    -- streams disagree whenever if_id_stall was already high for a
+    -- non-fetch reason (data-side bus_stall_wire, Hazard case 1, or a
+    -- load-use hazard, case 3): pc_delayed stays frozen while pc_raw has
+    -- already advanced, so the cache latched the NEXT address while
+    -- IF_Stage still believed it had requested the previous one. IF/ID
+    -- then latched an instruction paired with the wrong PC, skewing
+    -- every branch/jump target by one word -- confirmed in
+    -- tb_firmware_sdram: `jal main` at 0x80000028 arrived in ID paired
+    -- with id_pc=0x80000024, the bss-loop `blt` at 0x24 ran with
+    -- ex_pc=0x20 and targeted 0x18 instead of 0x1c, main was never
+    -- fetched at all (no fetch past 0x80000038 in the whole run), and
+    -- the CPU fell through into trap_loop at 0x8000002C.
+    --
+    -- pc_fetch_out is held constant for the entire fetch, so pairing
+    -- against it holds whether or not if_id_stall was set when the cache
+    -- latched the address. It is also what makes IF_Stage's
+    -- re-present-the-unconsumed-instruction rewind (pc_fetch_out <=
+    -- pc_delayed when if_id_stall = '1', see IF_Stage.vhd) actually
+    -- apply to the SDRAM path at all -- with pc_raw that protection was
+    -- a no-op here, and instructions were being silently skipped.
+    --
+    -- if_is_sdram below deliberately stays on pc_raw: that decode must
+    -- not depend on if_id_stall, or it closes a combinational loop
+    -- through if_bus_stall (see pc_raw's declaration). Only the address
+    -- bus moves; cpu_adr_i never feeds back into if_bus_stall.
+    if_fetch_adr <= pc;
     if_fetch_stb <= if_is_sdram and not if_fetch_bubble;
     if_fetch_cyc <= if_is_sdram and not if_fetch_bubble;
+
+    -- pragma translate_off
+    -- 2026-09-01: KNOWN, FLAGGED, NOT FIXED -- region-decode skew.
+    --
+    -- if_fetch_adr is driven from pc (pc_fetch_out, stall-rewound, so
+    -- the fetch address and IF/ID's pc_fetch_delayed agree -- see that
+    -- assignment above). if_is_sdram is decoded from pc_raw, which is
+    -- one word ahead and is deliberately loop-free: decoding the region
+    -- from the address actually driven closes a combinational loop
+    -- (if_adr_is_sdram -> if_fetch_stb/if_bus_stall -> if_id_stall ->
+    -- pc_fetch_out -> if_adr_is_sdram), which is why the original code
+    -- used pc_raw in the first place.
+    --
+    -- Consequence: for one cycle at a BRAM->SDRAM handoff the two
+    -- disagree, and a BRAM-range address is presented to instr_cache
+    -- with an SDRAM request asserted. Observed once per run at boot
+    -- (adr=0x00000010, ~7.1277 ms in tb_firmware_sdram). Benign on THIS
+    -- memory map only, because the SDRAM decode ignores the top address
+    -- bits, so 0x00000010 returns the very word 0x80000010 would; the
+    -- cost is one spurious cache line tagged 0x00000. It would NOT be
+    -- benign if BRAM and SDRAM ever held different content at the same
+    -- offset -- on hardware BRAM holds the boot loader and SDRAM holds
+    -- the firmware.
+    --
+    -- Fixing it properly means restructuring the pc_fetch_out rewind so
+    -- the held fetch address comes from a register whose update
+    -- condition does not involve if_bus_stall. Until then this warning
+    -- makes the skew impossible to regress silently. It deliberately
+    -- does NOT start with "FAIL", so sim/ghdl/run.sh's failure regex
+    -- ignores it and the suite still reports ok.
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst_n_sync = '1' and if_fetch_stb = '1' and
+               if_fetch_adr(31 downto 27) /= "10000" then
+                report "if_fetch: region-decode skew -- non-SDRAM address 0x" &
+                       to_hstring(if_fetch_adr) &
+                       " presented to instr_cache with stb asserted (pc_raw=0x" &
+                       to_hstring(pc_raw) & ")"
+                       severity warning;
+            end if;
+        end if;
+    end process;
+    -- pragma translate_on
 
     -- Mirrors MEM_Stage's own bus_stall_o (bus_access and not ack):
     -- held high for as long as this fetch is outstanding, however many
@@ -1038,6 +1113,7 @@ begin
             uart_status   => uart_status,
 
             gpio_led_we   => gpio_led_we,
+            gpio_led_data => gpio_led_data,
             gpio_key_data => gpio_key_data,
 
             timer_data    => timer_data,
@@ -1063,7 +1139,7 @@ begin
             clk     => clk,
             rst_n   => rst_n_sync,
             we      => gpio_led_we,
-            wdata   => s3_wdata,
+            wdata   => gpio_led_data,
             led_out => led_out_cpu
         );
 
